@@ -55,7 +55,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const logoutBtn = document.getElementById('logoutBtn');
     if(logoutBtn) {
         logoutBtn.addEventListener('click', function() {
-            alert('You have been logged out.');
+            // Clear any organizer session data
+            localStorage.removeItem('organizerSession');
+            sessionStorage.clear();
+            
+            // Redirect to login page
+            window.location.href = 'login_signup.html';
         });
     }
 

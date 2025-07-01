@@ -22,10 +22,10 @@
                 </div>
                 
                 <div class="hidden md:flex items-center space-x-6">
-                    <a href="#" class="hover:text-gray-200">Home</a>
+                    <a href="index.html" class="hover:text-gray-200">Home</a>
                     <a href="event_page.html" class="hover:text-gray-200">Events</a>
-                    <a href="event_creation.html" class="hover:text-gray-200">Categories</a>
-                    <a href="login_signup.html" class="hover:text-gray-200">For Organizers</a>
+                    <a href="event_creation.html" class="hover:text-gray-200">Create Event</a>
+                    <a href="login_signup.html" class="hover:text-gray-200">Login</a>
                 </div>
                 
                 <div class="flex items-center space-x-4">
@@ -44,11 +44,11 @@
                         
                         <!-- Dropdown menu -->
                         <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50">
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Profile</a>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">My Events</a>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Settings</a>
+                            <a href="user.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Profile</a>
+                            <a href="user.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">My Events</a>
+                            <a href="user.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Settings</a>
                             <div class="border-t border-gray-200 dark:border-gray-700"></div>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Sign out</a>
+                            <a href="login_signup.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Sign out</a>
                         </div>
                     </div>
                     
@@ -60,14 +60,14 @@
             
             <!-- Mobile menu -->
             <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4">
-                <a href="#" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Home</a>
-                <a href="#events" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Events</a>
-                <a href="#categories" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Categories</a>
-                <a href="#organizers" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">For Organizers</a>
+                <a href="index.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Home</a>
+                <a href="event_page.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Events</a>
+                <a href="event_creation.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Create Event</a>
+                <a href="login_signup.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Login</a>
                 <div class="border-t border-white border-opacity-20 mt-2 pt-2">
-                    <a href="#" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Profile</a>
-                    <a href="#" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">My Events</a>
-                    <a href="#" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Sign out</a>
+                    <a href="user.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Profile</a>
+                    <a href="user.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">My Events</a>
+                    <a href="login_signup.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Sign out</a>
                 </div>
             </div>
         </div>
@@ -82,7 +82,7 @@
                     <p class="text-xl mb-8">Find, attend, and organize hackathons, workshops, competitions and more with Event Koi?!</p>
                     <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                         <a href="#events" class="bg-white text-purple-700 hover:bg-gray-100 font-bold py-3 px-6 rounded-lg text-center">Browse Events</a>
-                        <a href="#" class="bg-transparent border-2 border-white hover:bg-white hover:bg-opacity-10 font-bold py-3 px-6 rounded-lg text-center">Create Event</a>
+                        <a href="event_creation.html" class="bg-transparent border-2 border-white hover:bg-white hover:bg-opacity-10 font-bold py-3 px-6 rounded-lg text-center">Create Event</a>
                     </div>
                 </div>
                 <div class="md:w-1/2">
@@ -225,9 +225,9 @@
                             <span class="text-sm font-semibold text-purple-600 dark:text-purple-400">
                                 <i class="fas fa-clock mr-1"></i> 3 days left to register
                             </span>
-                            <button class="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg">
+                            <a href="event_page.html" class="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg">
                                 Details
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -266,9 +266,9 @@
                             <span class="text-sm font-semibold text-blue-600 dark:text-blue-400">
                                 <i class="fas fa-clock mr-1"></i> 2 weeks left to register
                             </span>
-                            <button class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg">
+                            <a href="event_page.html" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg">
                                 Details
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -307,9 +307,9 @@
                             <span class="text-sm font-semibold text-green-600 dark:text-green-400">
                                 <i class="fas fa-clock mr-1"></i> 1 month left to register
                             </span>
-                            <button class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg">
+                            <a href="event_page.html" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg">
                                 Details
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -348,9 +348,9 @@
                             <span class="text-sm font-semibold text-yellow-600 dark:text-yellow-400">
                                 <i class="fas fa-clock mr-1"></i> Early bird ends in 2 weeks
                             </span>
-                            <button class="bg-yellow-600 hover:bg-yellow-700 text-white py-2 px-4 rounded-lg">
+                            <a href="event_page.html" class="bg-yellow-600 hover:bg-yellow-700 text-white py-2 px-4 rounded-lg">
                                 Details
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -389,9 +389,9 @@
                             <span class="text-sm font-semibold text-indigo-600 dark:text-indigo-400">
                                 <i class="fas fa-clock mr-1"></i> 3 weeks left to register
                             </span>
-                            <button class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg">
+                            <a href="event_page.html" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg">
                                 Details
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -430,9 +430,9 @@
                             <span class="text-sm font-semibold text-pink-600 dark:text-pink-400">
                                 <i class="fas fa-clock mr-1"></i> 1 month left to register
                             </span>
-                            <button class="bg-pink-600 hover:bg-pink-700 text-white py-2 px-4 rounded-lg">
+                            <a href="event_page.html" class="bg-pink-600 hover:bg-pink-700 text-white py-2 px-4 rounded-lg">
                                 Details
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>

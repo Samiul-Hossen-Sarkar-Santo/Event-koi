@@ -3,20 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Organizer Dashboard | Event Platform</title>
+    <title>Organizer Dashboard | Event Koi?!</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="organizer.css">
+    <link rel="stylesheet" href="css/organizer.css">
 </head>
 <body class="bg-gray-100 min-h-screen">
     <div class="container mx-auto px-4 py-8">
         <!-- Header -->
         <header class="bg-white shadow-md rounded-lg p-6 mb-8">
             <div class="flex flex-col md:flex-row justify-between items-center">
-                <a href="#" class="text-3xl font-bold text-purple-700 mb-4 md:mb-0">Event Platform</a>
+                <a href="index.html" class="text-3xl font-bold text-purple-700 mb-4 md:mb-0">Event Koi?! [Organizer]</a>
                 <div class="flex items-center space-x-4">
-                    <span class="font-semibold">Welcome, Tech Events Org!</span>
+                    <span class="font-semibold">Welcome, Alex!</span>
                     <button id="logoutBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-4 rounded-lg flex items-center justify-center">
                         <i class="fas fa-sign-out-alt mr-2"></i> Logout
                     </button>
@@ -32,127 +31,123 @@
                     <div class="bg-purple-50 rounded-lg p-6 mb-6 text-center md:text-left">
                         <div class="flex flex-col md:flex-row items-center mb-4">
                             <div class="relative w-20 h-20 rounded-full bg-purple-200 flex items-center justify-center text-purple-600 text-3xl font-bold mr-0 md:mr-4 mb-4 md:mb-0">
-                                <span>O</span>
+                                <span>A</span>
                             </div>
                             <div>
-                                <h2 class="text-xl font-semibold">Tech Events Org</h2>
-                                <p class="text-gray-600">events@techorg.com</p>
+                                <h2 class="text-xl font-semibold">Alex Smith</h2>
+                                <p class="text-gray-600">alex@events.com</p>
                             </div>
                         </div>
                         <nav class="space-y-2">
-                            <button class="w-full text-left p-3 rounded-lg hover:bg-purple-100 flex items-center org-tab-btn active-tab" data-org-tab="events">
-                                <i class="fas fa-calendar-day w-6 text-center mr-3 text-purple-600"></i> My Events
+                            <button class="w-full text-left p-3 rounded-lg hover:bg-purple-100 flex items-center org-tab-btn active-tab" data-tab="dashboard">
+                                <i class="fas fa-tachometer-alt w-6 text-center mr-3 text-purple-600"></i> Dashboard
                             </button>
-                             <button class="w-full text-left p-3 rounded-lg hover:bg-purple-100 flex items-center">
-                                <i class="fas fa-calendar-plus w-6 text-center mr-3 text-purple-600"></i> Create Event
+                            <button class="w-full text-left p-3 rounded-lg hover:bg-purple-100 flex items-center org-tab-btn" data-tab="events">
+                                <i class="fas fa-calendar-plus w-6 text-center mr-3 text-purple-600"></i> My Events
                             </button>
-                            <button class="w-full text-left p-3 rounded-lg hover:bg-purple-100 flex items-center org-tab-btn" data-org-tab="analytics">
+                            <button class="w-full text-left p-3 rounded-lg hover:bg-purple-100 flex items-center relative org-tab-btn" data-tab="analytics">
                                 <i class="fas fa-chart-bar w-6 text-center mr-3 text-purple-600"></i> Analytics
                             </button>
-                            <button class="w-full text-left p-3 rounded-lg hover:bg-purple-100 flex items-center org-tab-btn" data-org-tab="profile">
-                                <i class="fas fa-user-edit w-6 text-center mr-3 text-purple-600"></i> Profile
-                            </button>
-                            <button class="w-full text-left p-3 rounded-lg hover:bg-purple-100 flex items-center relative">
-                                <i class="fas fa-bell w-6 text-center mr-3 text-purple-600"></i> Notifications
-                                <span class="notification-badge">1</span>
-                            </button>
+                            <a href="event_creation.html" class="w-full text-left p-3 rounded-lg hover:bg-purple-100 flex items-center text-purple-700 font-medium">
+                                <i class="fas fa-plus w-6 text-center mr-3 text-purple-600"></i> Create Event
+                            </a>
                         </nav>
                     </div>
                 </aside>
                 
                 <!-- Main Content -->
                 <main class="w-full md:w-3/4">
+                    <!-- Dashboard Tab -->
+                    <div id="dashboard" class="org-tab-content active">
+                        <h2 class="text-2xl font-bold mb-6 text-gray-800">Dashboard Overview</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-lg">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-blue-100">Total Events</p>
+                                        <p class="text-3xl font-bold">12</p>
+                                    </div>
+                                    <i class="fas fa-calendar-check text-4xl text-blue-200"></i>
+                                </div>
+                            </div>
+                            <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-lg">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-green-100">Total Attendees</p>
+                                        <p class="text-3xl font-bold">1,247</p>
+                                    </div>
+                                    <i class="fas fa-users text-4xl text-green-200"></i>
+                                </div>
+                            </div>
+                            <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-lg">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-purple-100">Revenue</p>
+                                        <p class="text-3xl font-bold">$8,350</p>
+                                    </div>
+                                    <i class="fas fa-dollar-sign text-4xl text-purple-200"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Events Tab -->
-                    <div id="events" class="org-tab-content active">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                            <h2 class="text-2xl font-bold mb-4 sm:mb-0">Event Management</h2>
-                            <button class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg flex items-center">
+                    <div id="events" class="org-tab-content">
+                        <h2 class="text-2xl font-bold mb-6 text-gray-800">My Events</h2>
+                        <div class="mb-6 flex flex-wrap items-center justify-between">
+                            <div class="flex space-x-2 mb-4 md:mb-0">
+                                <button class="px-4 py-2 bg-purple-600 text-white rounded-lg event-mgmt-tab-btn active" data-tab="active-events">Active</button>
+                                <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 event-mgmt-tab-btn" data-tab="pending-events">Pending</button>
+                                <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 event-mgmt-tab-btn" data-tab="past-events">Past</button>
+                            </div>
+                            <a href="event_creation.html" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg">
                                 <i class="fas fa-plus mr-2"></i> Create New Event
-                            </button>
+                            </a>
                         </div>
                         
-                        <div class="border-b border-gray-200 mb-6">
-                            <nav class="-mb-px flex space-x-6">
-                                <button class="event-mgmt-tab-btn py-3 px-1 font-medium text-purple-600 border-b-2 border-purple-600" data-event-mgmt-tab="active">Active/Upcoming (5)</button>
-                                <button class="event-mgmt-tab-btn py-3 px-1 font-medium text-gray-500 hover:text-purple-600" data-event-mgmt-tab="pending">Pending Approval (2)</button>
-                                <button class="event-mgmt-tab-btn py-3 px-1 font-medium text-gray-500 hover:text-purple-600" data-event-mgmt-tab="past">Past/Completed (3)</button>
-                            </nav>
-                        </div>
-                        
-                        <div id="active" class="event-mgmt-tab-content active">
+                        <!-- Active Events -->
+                        <div id="active-events" class="event-mgmt-tab-content active">
                             <div class="space-y-4">
-                                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                                    <div class="flex flex-col md:flex-row justify-between">
+                                <div class="bg-gray-50 p-6 rounded-lg border">
+                                    <div class="flex justify-between items-start">
                                         <div>
-                                            <h3 class="font-bold text-lg">Tech Conference 2023</h3>
-                                            <p class="text-gray-500 text-sm mt-1"><i class="fas fa-calendar-alt mr-2"></i>Oct 15-17, 2023</p>
-                                            <p class="text-gray-500 text-sm"><i class="fas fa-map-marker-alt mr-2"></i>Online</p>
-                                            <p class="text-green-600 text-sm mt-2"><i class="fas fa-check-circle mr-2"></i>Approved</p>
+                                            <h3 class="text-lg font-semibold text-gray-800">Tech Innovation Summit 2025</h3>
+                                            <p class="text-gray-600 mt-1">July 15, 2025 • Downtown Convention Center</p>
+                                            <p class="text-sm text-gray-500 mt-2">247 registered • 15 days remaining</p>
                                         </div>
-                                        <div class="flex items-center mt-4 md:mt-0 space-x-2">
-                                            <button class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg"><i class="fas fa-eye mr-1"></i> View</button>
-                                            <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg"><i class="fas fa-edit"></i></button>
-                                            <button class="bg-red-100 hover:bg-red-200 text-red-700 font-semibold py-2 px-4 rounded-lg"><i class="fas fa-trash"></i></button>
+                                        <div class="flex space-x-2">
+                                            <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">Edit</button>
+                                            <button class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm">View</button>
                                         </div>
                                     </div>
                                 </div>
-                                <!-- More event cards -->
                             </div>
                         </div>
-                        <div id="pending" class="event-mgmt-tab-content"><p class="text-gray-500">Your events pending approval will appear here.</p></div>
-                        <div id="past" class="event-mgmt-tab-content"><p class="text-gray-500">Your past events will appear here.</p></div>
                     </div>
-                    
+
                     <!-- Analytics Tab -->
                     <div id="analytics" class="org-tab-content">
-                        <h2 class="text-2xl font-bold mb-6">Event Analytics</h2>
+                        <h2 class="text-2xl font-bold mb-6 text-gray-800">Analytics</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="bg-gray-50 border rounded-lg p-6">
-                                <h3 class="font-semibold mb-4 text-gray-800">Registration Count</h3>
-                                <div class="chart-container"><canvas id="registrationChart"></canvas></div>
+                            <div class="bg-white p-6 border rounded-lg">
+                                <h3 class="text-lg font-semibold mb-4">Registration Trends</h3>
+                                <div class="chart-container">
+                                    <canvas id="registrationChart"></canvas>
+                                </div>
                             </div>
-                            <div class="bg-gray-50 border rounded-lg p-6">
-                                <h3 class="font-semibold mb-4 text-gray-800">Attendee Universities</h3>
-                                <div class="chart-container"><canvas id="universityChart"></canvas></div>
-                            </div>
-                            <div class="bg-gray-50 border rounded-lg p-6">
-                                <h3 class="font-semibold mb-4 text-gray-800">Attendee Skills</h3>
-                                <div class="chart-container"><canvas id="skillsChart"></canvas></div>
-                            </div>
-                            <div class="bg-gray-50 border rounded-lg p-6">
-                                <h3 class="font-semibold mb-4 text-gray-800">Registration Timeline</h3>
-                                <div class="chart-container"><canvas id="timelineChart"></canvas></div>
+                            <div class="bg-white p-6 border rounded-lg">
+                                <h3 class="text-lg font-semibold mb-4">Event Categories</h3>
+                                <div class="chart-container">
+                                    <canvas id="categoryChart"></canvas>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Profile Tab -->
-                    <div id="profile" class="org-tab-content">
-                        <h2 class="text-2xl font-bold mb-6">Organizer Profile</h2>
-                        <form class="space-y-6 bg-gray-50 p-6 rounded-lg border">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Organization Name</label>
-                                    <input type="text" value="Tech Events Org" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Contact Email</label>
-                                    <input type="email" value="events@techorg.com" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Bio/Description</label>
-                                <textarea class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500" rows="4">We organize the best tech events in the region, bringing together professionals and enthusiasts to share knowledge and network.</textarea>
-                            </div>
-                            <div class="flex justify-end pt-4 border-t">
-                                <button class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">Save Changes</button>
-                            </div>
-                        </form>
                     </div>
                 </main>
             </div>
         </section>
     </div>
-    <script src="organizer.js"></script>
+    <script src="js/organizer.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>

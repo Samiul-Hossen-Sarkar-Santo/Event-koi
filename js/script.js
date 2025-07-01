@@ -132,3 +132,58 @@ document.addEventListener('click', (e) => {
         userMenu.classList.add('hidden');
     }
 });
+
+// --- Authentication Check ---
+// Check if user is logged in when accessing protected pages
+function checkAuthentication() {
+    const currentPage = window.location.pathname.split('/').pop();
+    const hasUserSession = localStorage.getItem('userSession');
+    const hasAdminSession = localStorage.getItem('adminSession');
+    const hasOrganizerSession = localStorage.getItem('organizerSession');
+    
+    // Define which pages require authentication
+    const protectedPages = ['user.html', 'admin.html', 'organizer.html'];
+    
+    if(protectedPages.includes(currentPage)) {
+        if(!hasUserSession && !hasAdminSession && !hasOrganizerSession) {
+            // Redirect to login if no session found
+            window.location.href = 'login_signup.html';
+        }
+    }
+}
+
+// Run auth check on page load
+if(typeof(Storage) !== "undefined") {
+    checkAuthentication();
+}
+
+// --- Global Navigation Enhancement ---
+// Update navigation based on login status
+function updateNavigation() {
+    const hasUserSession = localStorage.getItem('userSession');
+    const hasAdminSession = localStorage.getItem('adminSession');
+    const hasOrganizerSession = localStorage.getItem('organizerSession');
+    
+    // Find login/logout buttons and update them
+    const loginLinks = document.querySelectorAll('a[href="login_signup.html"]');
+    
+    if(hasUserSession || hasAdminSession || hasOrganizerSession) {
+        loginLinks.forEach(link => {
+            if(link.textContent.trim() === 'Login') {
+                if(hasUserSession) {
+                    link.href = 'user.html';
+                    link.textContent = 'Profile';
+                } else if(hasAdminSession) {
+                    link.href = 'admin.html';
+                    link.textContent = 'Admin';
+                } else if(hasOrganizerSession) {
+                    link.href = 'organizer.html';
+                    link.textContent = 'Dashboard';
+                }
+            }
+        });
+    }
+}
+
+// Run navigation update on page load
+document.addEventListener('DOMContentLoaded', updateNavigation);

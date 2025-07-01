@@ -28,9 +28,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const logoutBtn = document.getElementById('logoutBtn');
     if(logoutBtn) {
         logoutBtn.addEventListener('click', function() {
-            // In a real application, this would handle session termination.
-            alert('You have been logged out.');
-            // window.location.href = '/login'; // Example redirect
+            // Clear any admin session data
+            localStorage.removeItem('adminSession');
+            sessionStorage.clear();
+            
+            // Redirect to login page
+            window.location.href = 'login_signup.html';
         });
     }
 });

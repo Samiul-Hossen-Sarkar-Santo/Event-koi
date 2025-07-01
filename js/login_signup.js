@@ -116,18 +116,53 @@ document.addEventListener('DOMContentLoaded', function() {
     setupPasswordToggle(toggleSignupPassword, signupPassword);
 
     // --- Form Submission Handlers ---
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('Login successful! Redirecting...');
-    });
+    const loginForm = document.getElementById('loginForm');
+    if(loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Simulate login validation
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if(email && password) {
+                // Simulate different user types based on email
+                if(email.includes('admin')) {
+                    localStorage.setItem('adminSession', 'true');
+                    window.location.href = 'admin.html';
+                } else if(email.includes('organizer')) {
+                    localStorage.setItem('organizerSession', 'true');
+                    window.location.href = 'organizer.html';
+                } else {
+                    localStorage.setItem('userSession', 'true');
+                    window.location.href = 'user.html';
+                }
+            }
+        });
+    }
 
-    signupForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        if (validateStep(currentStep)) {
-            alert(`Account created successfully as an ${selectedRole}!`);
-            toggleMainView('login');
-        }
-    });
+    const signupFormElement = document.getElementById('signupForm');
+    if(signupFormElement) {
+        signupFormElement.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get the selected role
+            const selectedRole = document.querySelector('input[name="role"]:checked');
+            
+            if(selectedRole) {
+                const role = selectedRole.value;
+                
+                // Redirect based on role after successful signup
+                if(role === 'organizer') {
+                    localStorage.setItem('organizerSession', 'true');
+                    window.location.href = 'organizer.html';
+                } else {
+                    localStorage.setItem('userSession', 'true');
+                    window.location.href = 'user.html';
+                }
+            }
+        });
+    }
 
     /**
      * Validates the inputs for the current step of the signup form.

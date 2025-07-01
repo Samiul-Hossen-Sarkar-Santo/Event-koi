@@ -71,7 +71,19 @@ const eventSchema = new mongoose.Schema({
     type: String,
     enum: ['pending', 'approved', 'rejected'],
     default: 'pending'
-  }
+  },
+  registrations: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Registration' // Reference to a future Registration model
+    }
+  ],
+  interestedUsers: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User' // Reference to the User model
+    }
+  ],
 }, {
   timestamps: true // Adds createdAt and updatedAt timestamps
 });

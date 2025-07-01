@@ -23,7 +23,7 @@ app.use(express.json());
 
 // Session Middleware
 app.use(session({
-  secret: 'your-secret-key', // Replace with a strong, random secret key
+  secret: '$#@3ozr89r5nno10s7aum5#9l6i@i$$drlahj1537ksm72s60u7r7na0s118c0sos1a59rkM2d80!', // Replace with a strong, random secret key
   resave: false,
   saveUninitialized: false,
   cookie: { secure: false } // Set to true if using HTTPS

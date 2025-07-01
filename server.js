@@ -28,6 +28,7 @@ const sessionSecret = process.env.SESSION_SECRET || '$#@3ozr89r5nno10s7aum5#9l6i
 app.use(express.static('E:/Projects/sre/Event-koi'));
 app.use(express.static('E:/Projects/sre/Event-koi/css'));
 app.use(session({
+
   secret: '$#@3ozr89r5nno10s7aum5#9l6i@i$$drlahj1537ksm72s60u7r7na0s118c0sos1a59rkM2d80!', // Replace with a strong, random secret key
   resave: false,
   saveUninitialized: false,
@@ -36,6 +37,9 @@ app.use(session({
 
 // Use authentication routes
 app.use('/auth', authRoutes);
+// Serve uploaded files statically
+app.use('/uploads', express.static('E:/Projects/sre/Event-koi/uploads'));
+
 
 app.use('/events', eventRoutes);
 app.use('/users', userRoutes);

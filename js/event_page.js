@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
 
     // --- Existing FAQ Toggle Functionality ---
     document.querySelectorAll('.faq-toggle').forEach(button => {
@@ -45,8 +45,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const days = Math.floor(distance / (1000 * 60 * 60 * 24));
         const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-         // Add seconds for more precise initial display, though updating every minute is fine for the interval
-         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        // Add seconds for more precise initial display, though updating every minute is fine for the interval
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
 
         if (countdownEl) {
@@ -95,14 +95,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (response.ok) {
                 const event = await response.json();
                 populateEventPage(event); // Populate the HTML with event data
-                 // Start the countdown with the actual event date
-                 if (event.date && event.time) {
+                // Start the countdown with the actual event date
+                if (event.date && event.time) {
                     const eventDateTimeString = `${event.date}T${event.time}`; // Assuming date and time are in compatible formats
                     updateCountdown(eventDateTimeString);
                     // Update countdown every minute
-                     clearInterval(countdownInterval); // Clear any existing interval
+                    clearInterval(countdownInterval); // Clear any existing interval
                     countdownInterval = setInterval(() => updateCountdown(eventDateTimeString), 60000);
-                 }
+                }
 
 
             } else if (response.status === 404) {
@@ -115,16 +115,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Handle other backend errors
                 const errorData = await response.json();
                 const mainContent = document.querySelector('body');
-                 if(mainContent) {
+                if (mainContent) {
                     mainContent.innerHTML = `<div class="container mx-auto px-4 py-16 text-center"><h1 class="text-3xl font-bold text-red-600 mb-4">Error Loading Event</h1><p class="text-gray-700">${errorData.message || 'An error occurred while fetching event details.'}</p></div>`;
-                 }
+                }
             }
         } catch (error) {
             console.error('Error fetching event:', error);
             const mainContent = document.querySelector('body');
-             if(mainContent) {
+            if (mainContent) {
                 mainContent.innerHTML = '<div class="container mx-auto px-4 py-16 text-center"><h1 class="text-3xl font-bold text-red-600 mb-4">Network Error</h1><p class="text-gray-700">Could not connect to the server to load event details. Please try again later.</p></div>';
-             }
+            }
         }
     }
 
@@ -137,18 +137,20 @@ document.addEventListener('DOMContentLoaded', function() {
         document.title = `${event.title} | Event Koi?!`;
 
         // Update Hero Section
+        // Update Cover Image
         const heroSection = document.querySelector('.event-hero');
-         if (heroSection && event.coverImage) {
-            // Assuming coverImage is a URL
-            heroSection.style.backgroundImage = `url('${event.coverImage}')`;
+        if (heroSection && event.coverImage) {
+            const imageUrl = `/uploads/${event.coverImage}`; // Construct the URL
+            heroSection.style.backgroundImage = `url('${imageUrl}')`;
             heroSection.style.backgroundSize = 'cover';
             heroSection.style.backgroundPosition = 'center';
-         }
-         const eventTitleEl = heroSection.querySelector('h1');
-         if(eventTitleEl) eventTitleEl.textContent = event.title || 'Event Details';
+        }
 
-         const eventDescriptionEl = heroSection.querySelector('p.text-xl'); // Targeting the description below the title
-         if(eventDescriptionEl) eventDescriptionEl.textContent = event.description || '';
+        const eventTitleEl = heroSection.querySelector('h1');
+        if (eventTitleEl) eventTitleEl.textContent = event.title || 'Event Details';
+
+        const eventDescriptionEl = heroSection.querySelector('p.text-xl'); // Targeting the description below the title
+        if (eventDescriptionEl) eventDescriptionEl.textContent = event.description || '';
 
 
         // Update About Section (using prose for description)
@@ -165,13 +167,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (dateTimeEl && event.date && event.time) {
                 try {
                     const eventDateTime = new Date(`${event.date}T${event.time}`);
-                     dateTimeEl.innerHTML = `<div class="font-semibold">Date & Time</div><div class="text-gray-600">${eventDateTime.toLocaleString()}</div>`;
+                    dateTimeEl.innerHTML = `<div class="font-semibold">Date & Time</div><div class="text-gray-600">${eventDateTime.toLocaleString()}</div>`;
                 } catch (e) {
                     console.error('Error parsing event date/time:', e);
-                     dateTimeEl.innerHTML = `<div class="font-semibold">Date & Time</div><div class="text-gray-600">Date and time not available</div>`;
+                    dateTimeEl.innerHTML = `<div class="font-semibold">Date & Time</div><div class="text-gray-600">Date and time not available</div>`;
                 }
             } else if (dateTimeEl) {
-                 dateTimeEl.innerHTML = `<div class="font-semibold">Date & Time</div><div class="text-gray-600">Date and time not available</div>`;
+                dateTimeEl.innerHTML = `<div class="font-semibold">Date & Time</div><div class="text-gray-600">Date and time not available</div>`;
             }
 
 
@@ -181,57 +183,57 @@ document.addEventListener('DOMContentLoaded', function() {
                 locationEl.innerHTML = `<div class="font-semibold">Location</div><div class="text-gray-600">${event.location}</div>`;
                 // You might add logic here to include a map link if event.location provides address details
             } else if (locationEl) {
-                 locationEl.innerHTML = `<div class="font-semibold">Location</div><div class="text-gray-600">Location not specified</div>`;
+                locationEl.innerHTML = `<div class="font-semibold">Location</div><div class="text-gray-600">Location not specified</div>`;
             }
 
-             // Ticket Price (Assuming event object has a price field or similar)
-             const priceEl = detailsSidebar.querySelector('.fa-ticket-alt').closest('.flex').querySelector('div:last-child');
-             if (priceEl && event.price) { // Assuming event.price exists
-                  priceEl.innerHTML = `<div class="font-semibold">Ticket Price</div><div class="text-gray-600">${event.price}</div>`;
-             } else if (priceEl) {
-                 priceEl.innerHTML = `<div class="font-semibold">Ticket Price</div><div class="text-gray-600">Price not specified</div>`;
-             }
+            // Ticket Price (Assuming event object has a price field or similar)
+            const priceEl = detailsSidebar.querySelector('.fa-ticket-alt').closest('.flex').querySelector('div:last-child');
+            if (priceEl && event.price) { // Assuming event.price exists
+                priceEl.innerHTML = `<div class="font-semibold">Ticket Price</div><div class="text-gray-600">${event.price}</div>`;
+            } else if (priceEl) {
+                priceEl.innerHTML = `<div class="font-semibold">Ticket Price</div><div class="text-gray-600">Price not specified</div>`;
+            }
 
-             // Available Seats (Assuming event object has capacity and current registrations)
-             const attendeesEl = detailsSidebar.querySelector('.fa-users').closest('.flex').querySelector('div:last-child');
-              // This part needs actual backend data for capacity and registrations
-              if (attendeesEl) {
-                 // Placeholder - replace with actual data
-                  const currentAttendees = event.registrations ? event.registrations.length : 0; // Assuming registrations is an array of participant IDs
-                  const totalCapacity = event.capacity || 'N/A'; // Assuming event.capacity field exists
+            // Available Seats (Assuming event object has capacity and current registrations)
+            const attendeesEl = detailsSidebar.querySelector('.fa-users').closest('.flex').querySelector('div:last-child');
+            // This part needs actual backend data for capacity and registrations
+            if (attendeesEl) {
+                // Placeholder - replace with actual data
+                const currentAttendees = event.registrations ? event.registrations.length : 0; // Assuming registrations is an array of participant IDs
+                const totalCapacity = event.capacity || 'N/A'; // Assuming event.capacity field exists
 
-                  attendeesEl.innerHTML = `
+                attendeesEl.innerHTML = `
                      <div class="font-semibold">Attendees</div>
                      <div class="text-gray-600">${currentAttendees}/${totalCapacity} going</div>
                       ${totalCapacity !== 'N/A' ? `
                      <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-                         <div class="bg-indigo-600 h-2.5 rounded-full" style="width: ${ (currentAttendees / totalCapacity) * 100}%"></div>
+                         <div class="bg-indigo-600 h-2.5 rounded-full" style="width: ${(currentAttendees / totalCapacity) * 100}%"></div>
                      </div>
                      ` : ''}
                   `;
-              }
+            }
 
 
         }
 
         // Update Prize Information
         const prizesSection = document.querySelector('.py-16.bg-white .grid.grid-cols-1.md\\:grid-cols-3.gap-4'); // Targeting the prize cards container
-         if (prizesSection && event.prizeInfo) { // Assuming event.prizeInfo is a string with prize details
+        if (prizesSection && event.prizeInfo) { // Assuming event.prizeInfo is a string with prize details
             prizesSection.innerHTML = `<div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100"><div class="text-gray-800">${event.prizeInfo.replace(/\n/g, '<br>')}</div></div>`; // Simple display
             // For more structured prizes, you'd loop through a prizes array if your schema supported it
-         } else if (prizesSection) {
-             prizesSection.innerHTML = ''; // Clear dummy content if no prize info
-         }
+        } else if (prizesSection) {
+            prizesSection.innerHTML = ''; // Clear dummy content if no prize info
+        }
 
 
         // Update Rules & Regulations (Assuming event.rules is a string with rules separated by newlines)
         const rulesSection = document.querySelector('.prose.max-w-none.text-gray-700 ol.list-decimal'); // Targeting the ordered list for rules
-         if (rulesSection && event.rules) { // Assuming event.rules is a string with rules
+        if (rulesSection && event.rules) { // Assuming event.rules is a string with rules
             const rulesListItems = event.rules.split('\n').map(rule => `<li>${rule}</li>`).join('');
-             rulesSection.innerHTML = rulesListItems;
-         } else if (rulesSection) {
-             rulesSection.innerHTML = ''; // Clear dummy content if no rules
-         }
+            rulesSection.innerHTML = rulesListItems;
+        } else if (rulesSection) {
+            rulesSection.innerHTML = ''; // Clear dummy content if no rules
+        }
 
 
         // Note: You'd need similar logic to populate Schedule, Speakers, Gallery, FAQ, and Sponsors sections
@@ -243,69 +245,69 @@ document.addEventListener('DOMContentLoaded', function() {
         const registerButton = document.querySelector('#register .bg-indigo-600'); // The Register Now button
         const registrationFormContainer = document.querySelector('#register form'); // The registration form
 
-         if (event.registrationMethod === 'external' && event.externalLink) {
+        if (event.registrationMethod === 'external' && event.externalLink) {
             // If external link, change the button to a link and potentially hide the form
             if (registerButton) {
                 registerButton.textContent = 'Register on External Site';
                 registerButton.href = event.externalLink;
-                 // Add the external link warning modal logic here if you want to use it for this button too
-                 registerButton.addEventListener('click', function(e) {
+                // Add the external link warning modal logic here if you want to use it for this button too
+                registerButton.addEventListener('click', function (e) {
                     e.preventDefault(); // Prevent default link behavior
                     showExternalLinkModal(event.externalLink); // Show the warning modal
-                 });
+                });
             }
-             if (registrationFormContainer) {
-                 registrationFormContainer.classList.add('hidden'); // Hide the internal form
-             }
+            if (registrationFormContainer) {
+                registrationFormContainer.classList.add('hidden'); // Hide the internal form
+            }
 
-         } else {
+        } else {
             // If platform-based registration, ensure the button is a submit button and form is visible
             if (registerButton) {
-                 registerButton.textContent = 'Register Now';
-                 registerButton.href = '#'; // Or a link to the platform registration form/modal
-                 // Remove any click listeners for external links
-                 const newRegisterButton = registerButton.cloneNode(true); // Clone to remove event listeners
-                 registerButton.parentNode.replaceChild(newRegisterButton, registerButton);
+                registerButton.textContent = 'Register Now';
+                registerButton.href = '#'; // Or a link to the platform registration form/modal
+                // Remove any click listeners for external links
+                const newRegisterButton = registerButton.cloneNode(true); // Clone to remove event listeners
+                registerButton.parentNode.replaceChild(newRegisterButton, registerButton);
             }
-             if (registrationFormContainer) {
-                 registrationFormContainer.classList.remove('hidden'); // Show the internal form
-             }
+            if (registrationFormContainer) {
+                registrationFormContainer.classList.remove('hidden'); // Show the internal form
+            }
             // You'd need to implement the platform-based registration form submission here
-         }
+        }
 
-         // Update Register Now button's anchor
-         const heroRegisterButton = document.querySelector('.event-hero a.animate-pulse');
-         if (heroRegisterButton) {
+        // Update Register Now button's anchor
+        const heroRegisterButton = document.querySelector('.event-hero a.animate-pulse');
+        if (heroRegisterButton) {
             heroRegisterButton.href = '#register'; // Link to the registration section
-         }
+        }
 
 
     }
 
 
-     // --- Modal Logic (for external link warning) ---
-     // You might need to add this modal HTML to your event_page.html
-     // and include the corresponding JavaScript functions here.
+    // --- Modal Logic (for external link warning) ---
+    // You might need to add this modal HTML to your event_page.html
+    // and include the corresponding JavaScript functions here.
 
-     let externalLinkToProceed = '';
+    let externalLinkToProceed = '';
 
-     function showExternalLinkModal(url) {
-         externalLinkToProceed = url;
-         const modal = document.getElementById('external-link-modal'); // Assuming you add this modal HTML
-         if (modal) modal.classList.remove('hidden');
-     }
+    function showExternalLinkModal(url) {
+        externalLinkToProceed = url;
+        const modal = document.getElementById('external-link-modal'); // Assuming you add this modal HTML
+        if (modal) modal.classList.remove('hidden');
+    }
 
-     function hideExternalLinkModal() {
-         const modal = document.getElementById('external-link-modal');
-         if (modal) modal.classList.add('hidden');
-     }
+    function hideExternalLinkModal() {
+        const modal = document.getElementById('external-link-modal');
+        if (modal) modal.classList.add('hidden');
+    }
 
-     function proceedToExternalLink() {
-         if (externalLinkToProceed) {
-             window.open(externalLinkToProceed, '_blank');
-         }
-         hideExternalLinkModal();
-     }
+    function proceedToExternalLink() {
+        if (externalLinkToProceed) {
+            window.open(externalLinkToProceed, '_blank');
+        }
+        hideExternalLinkModal();
+    }
 
 
     // --- Smooth Scrolling for Anchor Links ---

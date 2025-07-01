@@ -187,3 +187,136 @@ function updateNavigation() {
 
 // Run navigation update on page load
 document.addEventListener('DOMContentLoaded', updateNavigation);
+
+// --- Fetch and Display Events ---
+const eventsGrid = document.querySelector('.grid.grid-cols-1.md:grid-cols-2.lg:grid-cols-3.gap-6');
+
+// Function to format date (e.g., "June 15, 2025")
+function formatDate(dateString) {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+}
+
+// Function to generate HTML for a single event card
+function createEventCardHtml(event) {
+    // You might need to adjust how you get image, category, etc., based on your event schema
+    // For now, using placeholder or assuming simple fields exist.
+    const eventImage = event.image || 'https://images.unsplash.com/photo-1511578314322-379afb476865?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80'; // Placeholder image
+    const eventCategory = event.category || 'General'; // Assuming a category field
+    const attendeeCount = event.attendees ? event.attendees.length : 0; // Assuming an attendees array
+    const eventDate = event.date ? formatDate(event.date) : 'Date TBD';
+    const eventLocation = event.location || 'Location TBD';
+    const organizerName = event.organizer ? event.organizer.username : 'Organizer TBD'; // Assuming organizer is populated and has a username
+
+    // Basic date comparison for 'days left' - needs refinement for accuracy
+    const registrationEndDate = event.registrationEndDate ? new Date(event.registrationEndDate) : null;
+    let registrationStatus = '';
+    if (registrationEndDate) {
+        const now = new Date();
+        const timeDiff = registrationEndDate.getTime() - now.getTime();
+        const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+        if (daysLeft > 0) {
+            registrationStatus = `<span class="text-sm font-semibold text-purple-600 dark:text-purple-400">
+                                      <i class="fas fa-clock mr-1"></i> ${daysLeft} days left to register
+                                  </span>`;
+        } else {
+            registrationStatus = `<span class="text-sm font-semibold text-red-600 dark:text-red-400">
+                                      <i class="fas fa-clock mr-1"></i> Registration Closed
+                                  </span>`;
+        }
+    }
+
+    return `
+        <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md event-card smooth-transition" data-event-id="${event._id}">
+            <div class="relative">
+                <img src="${eventImage}" alt="${event.title}" class="w-full h-48 object-cover">
+                <div class="absolute top-2 right-2">
+                    <button class="bg-white dark:bg-gray-800 p-2 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-700 favorite-button">
+                        <i class="far fa-heart text-gray-600 dark:text-gray-300"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs font-semibold px-2.5 py-0.5 rounded">${eventCategory}</span>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-users mr-1"></i> ${attendeeCount} going
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold mb-2 dark:text-white">${event.title}</h3>
+                <p class="text-gray-600 dark:text-gray-300 mb-4">${event.description.substring(0, 100)}...</p>
+
+                <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    <i class="fas fa-calendar-alt mr-2"></i>
+                    <span>${eventDate}</span>
+                </div>
+
+                <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    <i class="fas fa-map-marker-alt mr-2"></i>
+                    <span>${eventLocation}</span>
+                </div>
+
+                <div class="flex justify-between items-center">
+                    ${registrationStatus}
+                    <a href="event_page.html?id=${event._id}" class="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg">
+                        Details
+                    </a>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+async function fetchAndDisplayEvents() {
+    try {
+        const response = await fetch('/events');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const events = await response.json();
+
+        if (events.length === 0) {
+            eventsGrid.innerHTML = '<p class="text-center text-gray-600 dark:text-gray-300 w-full">No approved events found yet.</p>';
+            return;
+        }
+
+        eventsGrid.innerHTML = ''; // Clear existing dummy content
+        events.forEach(event => {
+            const eventCardHtml = createEventCardHtml(event);
+            eventsGrid.innerHTML += eventCardHtml; // Append each event card
+        });
+
+        // Re-attach event listeners for favorite buttons on new elements
+        document.querySelectorAll('.event-card .favorite-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isFavorited = button.querySelector('.fa-heart').classList.contains('fas');
+                if (!isFavorited) {
+                    button.querySelector('.fa-heart').classList.remove('far');
+                    button.querySelector('.fa-heart').classList.add('fas', 'text-red-500');
+                    notification.classList.remove('hidden');
+                    setTimeout(() => {
+                        notification.classList.add('hidden');
+                    }, 3000);
+                } else {
+                    button.querySelector('.fa-heart').classList.remove('fas', 'text-red-500');
+                    button.querySelector('.fa-heart').classList.add('far');
+                }
+            });
+        });
+
+        // Note: You might need to re-attach modal event listeners if the modal is part of the dynamic card.
+        // For now, assuming the modal is outside the dynamically generated cards.
+
+    } catch (error) {
+        console.error('Error fetching events:', error);
+        eventsGrid.innerHTML = '<p class="text-center text-red-500 dark:text-red-400 w-full">Error loading events. Please try again later.</p>';
+    }
+}
+
+// Call the function to fetch and display events when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    updateNavigation(); // Keep existing navigation update
+    fetchAndDisplayEvents(); // Fetch and display events
+});
+

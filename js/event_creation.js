@@ -243,6 +243,19 @@ function populateReviewFields() {
         document.getElementById('review-category').textContent = categorySelect.options[categorySelect.selectedIndex].text || '-';
     }
 
+    //Registration methods
+    const regMethodElement = document.querySelector('input[name="registration-method"]:checked');
+    if (regMethodElement) {
+        formData.set('registrationMethod', regMethodElement.value); // Use 'registrationMethod' key
+
+        // If the method is external, also get the external link
+        if (regMethodElement.value === 'external') {
+             const externalLink = document.getElementById('external-link').value;
+             formData.set('externalLink', externalLink); // Use 'externalLink' key
+        }
+    }
+
+
     // Date and time
     const date = document.getElementById('event-date').value;
     const time = document.getElementById('event-time').value;
@@ -251,6 +264,7 @@ function populateReviewFields() {
     // Location
     const location = document.getElementById('event-location').value;
     const isOnline = document.getElementById('is-online').checked;
+    formData.set('isOnline', isOnline);
     document.getElementById('review-location').textContent = isOnline ? `Online: ${location}` : location || '-';
 
     // Registration
@@ -297,18 +311,45 @@ document.getElementById('event-form').addEventListener('submit', async function(
     // Collect form data
     const formData = new FormData(this);
 
-    // Get data from the rich text editor separately and ensure consistent key
-    const eventDescription = document.getElementById('event-description').innerHTML;
-    formData.set('eventDescription', eventDescription); // Use a consistent name like 'eventDescription'
+    const title = document.getElementById('event-title').value;
+    formData.set('title', title); // Make sure the key 'title' matches your backend schema field name
 
-    // Handle category 'other'
-    const category = formData.get('event-category');
+    const categorySelect = document.getElementById('event-category');
+    const category = categorySelect.value;
+    // Handle 'other' category logic here as you were before
     if (category === 'other') {
         const otherCategory = document.getElementById('other-category').value;
-        formData.set('event-category', otherCategory); // Replace 'other' with the actual category value
+        formData.set('category', otherCategory); // Use 'category' key
     } else {
-        formData.delete('other-category'); // Remove if not 'other' to avoid sending empty field
+        formData.set('category', category); // Use 'category' key
     }
+
+    // Do similarly for date, time, location, registration deadline, prize info, rules
+    const date = document.getElementById('event-date').value;
+    formData.set('date', date); // Use 'date' key
+
+    const time = document.getElementById('event-time').value;
+    formData.set('time', time); // Use 'time' key
+
+    const location = document.getElementById('event-location').value;
+    formData.set('location', location); // Use 'location' key
+
+    const registrationDeadline = document.getElementById('registration-deadline').value;
+     // Only set if a value exists, as it's optional in the frontend but required in schema (we might need to adjust schema or backend handling later)
+    if(registrationDeadline) {
+        formData.set('registrationDeadline', registrationDeadline); // Use 'registrationDeadline' key
+    }
+
+
+    const prizeInfo = document.getElementById('prize-info').value;
+    formData.set('prizeInfo', prizeInfo); // Use 'prizeInfo' key
+
+    const rules = document.getElementById('event-rules').value;
+    formData.set('rules', rules); // Use 'rules' key
+
+    // Get data from the rich text editor separately and ensure consistent key
+    const eventDescription = document.getElementById('event-description').innerHTML;
+    formData.set('description', eventDescription); // Use a consistent name like 'eventDescription'
 
     // Get the registration method and external link if applicable
     const regMethod = document.querySelector('input[name="registration-method"]:checked');

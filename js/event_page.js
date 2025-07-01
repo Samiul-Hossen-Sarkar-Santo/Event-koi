@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Update Prize Information
-        const prizesSection = document.querySelector('.py-16.bg-white .grid.grid-cols-1.md\:grid-cols-3.gap-4'); // Targeting the prize cards container
+        const prizesSection = document.querySelector('.py-16.bg-white .grid.grid-cols-1.md\\:grid-cols-3.gap-4'); // Targeting the prize cards container
          if (prizesSection && event.prizeInfo) { // Assuming event.prizeInfo is a string with prize details
             prizesSection.innerHTML = `<div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100"><div class="text-gray-800">${event.prizeInfo.replace(/\n/g, '<br>')}</div></div>`; // Simple display
             // For more structured prizes, you'd loop through a prizes array if your schema supported it
@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function() {
          }
 
 
-        // Update Rules & Regulations
+        // Update Rules & Regulations (Assuming event.rules is a string with rules separated by newlines)
         const rulesSection = document.querySelector('.prose.max-w-none.text-gray-700 ol.list-decimal'); // Targeting the ordered list for rules
          if (rulesSection && event.rules) { // Assuming event.rules is a string with rules
             const rulesListItems = event.rules.split('\n').map(rule => `<li>${rule}</li>`).join('');

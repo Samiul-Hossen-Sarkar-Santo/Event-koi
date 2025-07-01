@@ -1,5 +1,29 @@
 // This script handles the multi-step form logic for event creation.
 
+// --- Organizer Authentication Check ---
+function checkOrganizerAuthentication() {
+    // For now, we'll check for a simple flag in localStorage.
+    // In a real application, you'd verify a proper session token or cookie.
+    const hasOrganizerSession = localStorage.getItem('organizerSession');
+
+    // Define which pages require organizer authentication
+    const protectedPages = ['event_creation.html', 'organizer.html']; // Add other organizer pages here
+
+    const currentPage = window.location.pathname.split('/').pop();
+
+    // Redirect if on a protected page and not authenticated
+    if (protectedPages.includes(currentPage)) {
+        if (!hasOrganizerSession) {
+            // Redirect to login if no organizer session found
+            alert('You need to be logged in as an Organizer to create events.');
+            window.location.href = 'login_signup.html';
+        }
+    }
+}
+
+// Run authentication check when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', checkOrganizerAuthentication);
+
 // --- Form State and Navigation ---
 let currentStep = 1;
 const totalSteps = 4;
@@ -10,7 +34,7 @@ const totalSteps = 4;
 function updateProgressBar() {
     const progressPercentage = ((currentStep - 1) / (totalSteps - 1)) * 100;
     document.getElementById('progress-bar').style.width = `${progressPercentage}%`;
-    
+
     // Update step indicator styles
     document.querySelectorAll('.step-indicator').forEach((indicator) => {
         const step = parseInt(indicator.dataset.step, 10);
@@ -35,7 +59,7 @@ function showStep(stepNumber) {
     document.getElementById(`step-${stepNumber}`).classList.add('active');
     currentStep = stepNumber;
     updateProgressBar();
-    
+
     // If we're on the final review step, populate the review fields with current form data.
     if (stepNumber === 4) {
         populateReviewFields();
@@ -72,7 +96,7 @@ function validateCurrentStep() {
         const description = document.getElementById('event-description').innerHTML;
         const category = document.getElementById('event-category').value;
         const image = document.getElementById('cover-image').files[0];
-        
+
         if (!title.trim()) { alert('Please enter an event title.'); return false; }
         if (!description.trim() || description === '<br>' || description === '<div><br></div>') { alert('Please enter an event description.'); return false; }
         if (!category) { alert('Please select a category.'); return false; }
@@ -83,7 +107,7 @@ function validateCurrentStep() {
         const date = document.getElementById('event-date').value;
         const time = document.getElementById('event-time').value;
         const location = document.getElementById('event-location').value;
-        
+
         if (!date) { alert('Please select an event date.'); return false; }
         if (!time) { alert('Please select an event time.'); return false; }
         if (!location.trim()) { alert('Please enter a location.'); return false; }
@@ -93,7 +117,7 @@ function validateCurrentStep() {
         if (!registrationMethod) { alert('Please select a registration method.'); return false; }
         if (registrationMethod.value === 'external' && !document.getElementById('external-link').value.trim()) { alert('Please enter an external registration URL.'); return false; }
     }
-    
+
     return true; // Validation passed
 }
 
@@ -113,7 +137,7 @@ document.getElementById('cover-image').addEventListener('change', function(e) {
         reader.onload = function(event) {
             const previewContainer = document.getElementById('image-preview-container');
             const previewImage = document.getElementById('image-preview');
-            
+
             previewImage.src = event.target.result;
             previewContainer.classList.remove('hidden');
         };
@@ -145,15 +169,15 @@ function selectRegistrationOption(option) {
     const platformOption = document.getElementById('platform-option');
     const externalOption = document.getElementById('external-option');
     const externalLinkContainer = document.getElementById('external-link-container');
-    
+
     const isPlatform = option === 'platform';
-    
+
     platformOption.classList.toggle('selected', isPlatform);
     externalOption.classList.toggle('selected', !isPlatform);
-    
+
     document.getElementById('platform-registration').checked = isPlatform;
     document.getElementById('external-registration').checked = !isPlatform;
-    
+
     externalLinkContainer.classList.toggle('hidden', isPlatform);
 }
 
@@ -164,7 +188,7 @@ function validateExternalLink() {
     const urlInput = document.getElementById('external-link');
     const url = urlInput.value;
     const message = document.getElementById('link-validation-message');
-    
+
     message.classList.remove('hidden', 'text-green-600', 'text-yellow-600', 'text-red-600');
 
     if (!url) {
@@ -172,7 +196,7 @@ function validateExternalLink() {
         message.classList.add('text-red-600');
         return;
     }
-    
+
     try {
         const urlObject = new URL(url);
         if (urlObject.protocol !== 'https:') {
@@ -209,45 +233,46 @@ function openFacebookEvent() {
 function populateReviewFields() {
     // Basic info
     document.getElementById('review-title').textContent = document.getElementById('event-title').value || '-';
-    
+
     const categorySelect = document.getElementById('event-category');
     const categoryValue = categorySelect.value;
     if (categoryValue === 'other') {
         document.getElementById('review-category').textContent = document.getElementById('other-category').value || 'Other';
-    } else {
+    }
+    else {
         document.getElementById('review-category').textContent = categorySelect.options[categorySelect.selectedIndex].text || '-';
     }
-    
+
     // Date and time
     const date = document.getElementById('event-date').value;
     const time = document.getElementById('event-time').value;
     document.getElementById('review-datetime').textContent = (date && time) ? new Date(`${date}T${time}`).toLocaleString() : '-';
-    
+
     // Location
     const location = document.getElementById('event-location').value;
     const isOnline = document.getElementById('is-online').checked;
     document.getElementById('review-location').textContent = isOnline ? `Online: ${location}` : location || '-';
-    
+
     // Registration
     const regMethod = document.querySelector('input[name="registration-method"]:checked');
     if (regMethod) {
-        document.getElementById('review-registration').textContent = regMethod.value === 'platform' 
-            ? 'Platform-Based Registration' 
+        document.getElementById('review-registration').textContent = regMethod.value === 'platform'
+            ? 'Platform-Based Registration'
             : `External Link: ${document.getElementById('external-link').value}`;
     } else {
         document.getElementById('review-registration').textContent = '-';
     }
-    
+
     const deadline = document.getElementById('registration-deadline').value;
     document.getElementById('review-deadline').textContent = deadline ? new Date(deadline).toLocaleString() : 'Open until event starts';
-    
+
     // Description and other text areas
     document.getElementById('review-description').innerHTML = document.getElementById('event-description').innerHTML || '<p class="text-gray-500">No description</p>';
     const prizeInfo = document.getElementById('prize-info').value;
     document.getElementById('review-prizes').innerHTML = prizeInfo ? `<p>${prizeInfo.replace(/\n/g, '<br>')}</p>` : '<p class="text-gray-500">No prize info</p>';
     const rules = document.getElementById('event-rules').value;
     document.getElementById('review-rules').innerHTML = rules ? `<p>${rules.replace(/\n/g, '<br>')}</p>` : '<p class="text-gray-500">No rules</p>';
-    
+
     // Cover image
     const fileInput = document.getElementById('cover-image');
     if (fileInput.files && fileInput.files[0]) {
@@ -261,24 +286,28 @@ function populateReviewFields() {
 
 // --- Form Submission ---
 
-document.getElementById('event-form').addEventListener('submit', function(e) {
+document.getElementById('event-form').addEventListener('submit', async function(e) {
     e.preventDefault();
-    
+
     if (!document.getElementById('terms').checked) {
         alert('Please agree to the Terms of Service and Event Guidelines.');
         return;
     }
-    
+
     // Collect form data
     const formData = new FormData(this);
 
-    // Manually add the rich text editor content
-    formData.set('event-description', document.getElementById('event-description').innerHTML);
+    // Get data from the rich text editor separately and ensure consistent key
+    const eventDescription = document.getElementById('event-description').innerHTML;
+    formData.set('eventDescription', eventDescription); // Use a consistent name like 'eventDescription'
 
-    // Add the category from the "other" input if applicable
-    const categorySelect = document.getElementById('event-category');
-    if (categorySelect.value === 'other') {
-        formData.set('event-category', document.getElementById('other-category').value);
+    // Handle category 'other'
+    const category = formData.get('event-category');
+    if (category === 'other') {
+        const otherCategory = document.getElementById('other-category').value;
+        formData.set('event-category', otherCategory); // Replace 'other' with the actual category value
+    } else {
+        formData.delete('other-category'); // Remove if not 'other' to avoid sending empty field
     }
 
     // Get the registration method and external link if applicable
@@ -286,41 +315,56 @@ document.getElementById('event-form').addEventListener('submit', function(e) {
     if (regMethod) {
         formData.set('registration-method', regMethod.value);
         if (regMethod.value === 'external') {
-            formData.set('external-link', document.getElementById('external-link').value);
+            formData.set('externalLink', document.getElementById('external-link').value); // Use consistent key e.g. 'externalLink'
+        } else {
+             formData.delete('external-link'); // Remove if not external to avoid sending empty field
         }
     } else {
-         formData.set('registration-method', ''); // Or handle as validation error if necessary
+         // If no registration method is selected, the backend might expect a default or this should be caught by frontend validation
+         formData.delete('registration-method');
+         formData.delete('external-link');
     }
 
-    // Send data to the backend
-    fetch('/events', {
-        method: 'POST',
-        body: formData // FormData handles the Content-Type header for multipart/form-data
-    })
-    .then(response => {
-        if (response.ok) { // Check for status codes 200-299
+    // Ensure the correct date/time fields are used for FormData
+    formData.set('eventDate', document.getElementById('event-date').value);
+    formData.set('eventTime', document.getElementById('event-time').value);
+    formData.set('location', document.getElementById('event-location').value);
+    formData.set('isOnline', document.getElementById('is-online').checked);
+    formData.set('registrationDeadline', document.getElementById('registration-deadline').value);
+    formData.set('prizeInfo', document.getElementById('prize-info').value);
+    formData.set('rules', document.getElementById('event-rules').value);
+
+
+    try {
+        const response = await fetch('/events', {
+            method: 'POST',
+            body: formData,
+            // Include credentials (cookies) with the request for session authentication
+            credentials: 'include'
+        });
+
+        if (response.ok) {
+            // Event created successfully
+            const result = await response.json();
             alert('Event submitted successfully! It will be reviewed by our team.');
-            // Reset the form and return to the first step upon success
+
+            // Reset the form and return to the first step
             this.reset();
-            document.getElementById('event-description').innerHTML = '';
+            document.getElementById('event-description').innerHTML = ''; // Reset rich text editor
             document.getElementById('image-preview-container').classList.add('hidden');
             document.getElementById('external-link-container').classList.add('hidden');
             document.querySelectorAll('.registration-option').forEach(option => option.classList.remove('selected'));
             showStep(1);
+
         } else {
-            // Handle server errors (e.g., validation errors, internal server error)
-            response.json().then(data => {
-                 alert(`Error submitting event: ${data.message || response.statusText}`);
-            }).catch(() => {
-                 alert(`Error submitting event: ${response.statusText}`);
-            });
+            // Handle errors (e.g., display error message from the backend)
+            const errorData = await response.json();
+            alert(`Error creating event: ${errorData.message || response.statusText}`);
         }
-    })
-    .catch(error => {
-        // Handle network errors
-        alert(`Network error submitting event: ${error.message}`);
-    });
-    
+    } catch (error) {
+        console.error('Error submitting event:', error);
+        alert('An error occurred while submitting the event. Please try again.');
+    }
 });
 
 // --- Modal Logic ---

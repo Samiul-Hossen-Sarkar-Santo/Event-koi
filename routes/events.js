@@ -25,10 +25,10 @@ router.get('/', async (req, res) => {
 });
 
 // GET a single event by ID
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req, res) => { // Corrected route path
   try {
     const eventId = req.params.id;
-    const event = await Event.findById(eventId).populate('organizer', 'username name email');
+    const event = await Event.findById(eventId).populate('organizer', 'username name email'); // Populate organizer field
     
     if (!event) {
       return res.status(404).json({ message: 'Event not found' });

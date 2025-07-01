@@ -14,40 +14,48 @@ if (currentTheme === 'dark') {
 }
 
 // Add a click event listener to the theme toggle button.
-themeToggle.addEventListener('click', () => {
-    html.classList.toggle('dark');
-    // Save the new theme preference to localStorage.
-    const theme = html.classList.contains('dark') ? 'dark' : 'light';
-    localStorage.setItem('theme', theme);
-});
+if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        // Save the new theme preference to localStorage.
+        const theme = html.classList.contains('dark') ? 'dark' : 'light';
+        localStorage.setItem('theme', theme);
+    });
+}
 
 // --- User Menu Toggle ---
 // Shows or hides the user profile dropdown menu.
 const userMenuButton = document.getElementById('user-menu-button');
 const userMenu = document.getElementById('user-menu');
 
-userMenuButton.addEventListener('click', (e) => {
-    e.stopPropagation(); // Prevent the click from bubbling up to the document
-    userMenu.classList.toggle('hidden');
-});
+if (userMenuButton && userMenu) {
+    userMenuButton.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent the click from bubbling up to the document
+        userMenu.classList.toggle('hidden');
+    });
+}
 
 // --- Mobile Menu Toggle ---
 // Shows or hides the main navigation menu on smaller screens.
 const mobileMenuButton = document.getElementById('mobile-menu-button');
 const mobileMenu = document.getElementById('mobile-menu');
 
-mobileMenuButton.addEventListener('click', () => {
-    mobileMenu.classList.toggle('hidden');
-});
+if (mobileMenuButton && mobileMenu) {
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+}
 
 // --- Filter Toggle ---
 // Expands or collapses the advanced search filters.
 const filterButton = document.getElementById('filter-button');
 const expandedFilters = document.getElementById('expanded-filters');
 
-filterButton.addEventListener('click', () => {
-    expandedFilters.classList.toggle('hidden');
-});
+if (filterButton && expandedFilters) {
+    filterButton.addEventListener('click', () => {
+        expandedFilters.classList.toggle('hidden');
+    });
+}
 
 // --- Event Details Modal Functionality ---
 // Handles opening and closing the detailed view for an event.
@@ -56,56 +64,60 @@ const closeModal = document.getElementById('close-modal');
 // Select all "Details" buttons within event cards
 const eventDetailButtons = document.querySelectorAll('.event-card button:not(.rounded-full)');
 
-eventDetailButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        eventModal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+if (eventModal && closeModal) {
+    eventDetailButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            eventModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        });
     });
-});
 
-// Function to close the modal
-function hideModal() {
-    eventModal.classList.add('hidden');
-    document.body.style.overflow = 'auto'; // Restore background scrolling
-}
-
-closeModal.addEventListener('click', hideModal);
-
-// Close modal when clicking on the background overlay
-eventModal.addEventListener('click', (e) => {
-    if (e.target === eventModal) {
-        hideModal();
+    // Function to close the modal
+    function hideModal() {
+        eventModal.classList.add('hidden');
+        document.body.style.overflow = 'auto'; // Restore background scrolling
     }
-});
+
+    closeModal.addEventListener('click', hideModal);
+
+    // Close modal when clicking on the background overlay
+    eventModal.addEventListener('click', (e) => {
+        if (e.target === eventModal) {
+            hideModal();
+        }
+    });
+}
 
 // --- Favorite Button & Notification Functionality ---
 // Toggles the favorite status of an event and shows a confirmation.
 const favoriteButtons = document.querySelectorAll('.fa-heart');
 const notification = document.getElementById('notification');
 
-favoriteButtons.forEach(button => {
-    button.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevent opening the modal when clicking the heart
-        
-        const isFavorited = button.classList.contains('fas');
-
-        if (!isFavorited) {
-            // Add to favorites
-            button.classList.remove('far');
-            button.classList.add('fas', 'text-red-500');
+if (notification) {
+    favoriteButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent opening the modal when clicking the heart
             
-            // Show notification
-            notification.classList.remove('hidden');
-            setTimeout(() => {
-                notification.classList.add('hidden');
-            }, 3000); // Hide notification after 3 seconds
-        } else {
-            // Remove from favorites
-            button.classList.remove('fas', 'text-red-500');
-            button.classList.add('far');
-        }
+            const isFavorited = button.classList.contains('fas');
+
+            if (!isFavorited) {
+                // Add to favorites
+                button.classList.remove('far');
+                button.classList.add('fas', 'text-red-500');
+                
+                // Show notification
+                notification.classList.remove('hidden');
+                setTimeout(() => {
+                    notification.classList.add('hidden');
+                }, 3000); // Hide notification after 3 seconds
+            } else {
+                // Remove from favorites
+                button.classList.remove('fas', 'text-red-500');
+                button.classList.add('far');
+            }
+        });
     });
-});
+}
 
 // --- Smooth Scrolling for Anchor Links ---
 // Makes page jumps to sections like #events or #categories smooth.

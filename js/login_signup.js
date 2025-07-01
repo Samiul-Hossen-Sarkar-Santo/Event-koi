@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const signupPassword = document.getElementById('password');
 
     let currentStep = 1;
-    let selectedRole = 'participant'; // Default role
+    let selectedRole = 'user'; // Default role - changed from 'participant' to 'user'
 
     /**
      * Updates the UI to show the correct step in the signup form.
@@ -95,9 +95,9 @@ document.addEventListener('DOMContentLoaded', function() {
             button.classList.add('active');
 
             // Show/hide role-specific fields for Step 3
-            const isParticipant = selectedRole === 'participant';
-            participantFields.classList.toggle('hidden', !isParticipant);
-            organizerFields.classList.toggle('hidden', isParticipant);
+            const isUser = selectedRole === 'user';
+            participantFields.classList.toggle('hidden', !isUser);
+            organizerFields.classList.toggle('hidden', isUser);
         });
     });
 
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Determine the role based on the selected role button
             // We need to find the currently active role button
-             let role = 'participant'; // Default role
+             let role = 'user'; // Default role - changed from 'participant' to 'user'
              const activeRoleButton = document.querySelector('.role-btn.active');
              if(activeRoleButton) {
                  role = activeRoleButton.dataset.role;
@@ -196,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 password: password,
                 role: role,
                 // Add role-specific fields
-                ...(role === 'participant' && { institution: institution }),
+                ...(role === 'user' && { institution: institution }),
                 ...(role === 'organizer' && { organizationName: organizationName }) // Backend schema needs organizationName
             };
 
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (step === 3) {
              const activeRoleButton = document.querySelector('.role-btn.active');
-             const role = activeRoleButton ? activeRoleButton.dataset.role : 'participant'; // Default to participant if somehow no button is active
+             const role = activeRoleButton ? activeRoleButton.dataset.role : 'user'; // Default to user if somehow no button is active
 
             if (role === 'organizer' && !document.getElementById('organization-name').value.trim()) {
                 alert('Please enter your organization name.');

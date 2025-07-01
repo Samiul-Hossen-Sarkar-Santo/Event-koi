@@ -533,24 +533,45 @@ document.addEventListener('DOMContentLoaded', function () {
         // Get form data
         const formData = new FormData(e.target);
         const registrationData = {
-            eventId: eventId,
-            firstName: formData.get('firstName'),
-            lastName: formData.get('lastName'),
+            name: `${formData.get('firstName')} ${formData.get('lastName')}`,
             email: formData.get('email'),
             phone: formData.get('phone'),
-            organization: formData.get('organization'),
-            referralSource: formData.get('referralSource'),
-            comments: formData.get('comments'),
+            university: formData.get('organization'),
+            motivation: formData.get('comments'),
             agreeTerms: formData.get('agreeTerms') === 'on'
         };
 
-        // Here you would send this to your backend for registration
-        console.log('Registration data:', registrationData);
-        
-        // For now, show a success message
-        alert('Thank you for registering! You will receive a confirmation email shortly.');
-        hideRegistrationModal();
-        e.target.reset();
+        if (!registrationData.agreeTerms) {
+            alert('Please agree to the terms and conditions to register.');
+            return;
+        }
+
+        // Send registration to backend
+        fetch(`/events/${eventId}/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(registrationData),
+            credentials: 'include'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === 'Registration successful!') {
+                alert('Thank you for registering! You will receive a confirmation email shortly.');
+                hideRegistrationModal();
+                e.target.reset();
+                
+                // Refresh the page to update registration count
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                alert(data.message || 'Registration failed. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Registration error:', error);
+            alert('An error occurred during registration. Please try again.');
+        });
     }
 
     // Question modal functions

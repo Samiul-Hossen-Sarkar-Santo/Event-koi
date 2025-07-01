@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (eventTitleEl) eventTitleEl.textContent = event.title || 'Event Details';
 
         const eventDescriptionEl = heroSection.querySelector('p.text-xl'); // Targeting the description below the title
-        if (eventDescriptionEl) eventDescriptionEl.textContent = event.description || '';
+        if (eventDescriptionEl) eventDescriptionEl.innerHTML = '';
 
 
         // Update About Section (using prose for description)

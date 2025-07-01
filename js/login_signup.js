@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressBar = document.getElementById('progress-bar');
     const nextButtons = document.querySelectorAll('.next-btn');
     const backButtons = document.querySelectorAll('.back-btn');
-    
+
     // --- Role Selection Elements ---
     const roleButtons = document.querySelectorAll('.role-btn');
     const participantFields = document.getElementById('participant-fields');
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function showStep(stepNumber) {
         steps.forEach(step => step.classList.remove('active'));
         document.getElementById(`step-${stepNumber}`).classList.add('active');
-        
+
         // Update progress bar
         const progress = (stepNumber / steps.length) * 100;
         progressBar.style.width = `${progress}%`;
@@ -46,10 +46,10 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     function toggleMainView(viewToShow) {
         const isLogin = viewToShow === 'login';
-        
+
         loginFormContainer.classList.toggle('active', isLogin);
         signupContainer.classList.toggle('active', !isLogin);
-        
+
         loginToggle.classList.toggle('active', isLogin);
         signupToggle.classList.toggle('active', !isLogin);
 
@@ -90,10 +90,10 @@ document.addEventListener('DOMContentLoaded', function() {
     roleButtons.forEach(button => {
         button.addEventListener('click', () => {
             selectedRole = button.dataset.role;
-            
+
             roleButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
-            
+
             // Show/hide role-specific fields for Step 3
             const isParticipant = selectedRole === 'participant';
             participantFields.classList.toggle('hidden', !isParticipant);
@@ -117,49 +117,118 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Form Submission Handlers ---
     const loginForm = document.getElementById('loginForm');
-    if(loginForm) {
-        loginForm.addEventListener('submit', function(e) {
+    if (loginForm) {
+        loginForm.addEventListener('submit', async function(e) { // Added async
             e.preventDefault();
-            
-            // Simulate login validation
+
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
-            
-            if(email && password) {
-                // Simulate different user types based on email
-                if(email.includes('admin')) {
-                    localStorage.setItem('adminSession', 'true');
-                    window.location.href = 'admin.html';
-                } else if(email.includes('organizer')) {
-                    localStorage.setItem('organizerSession', 'true');
-                    window.location.href = 'organizer.html';
+
+            try {
+                const response = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password }),
+                    credentials: 'include' // Include cookies for session
+                });
+
+                if (response.ok) {
+                    const user = await response.json();
+                    // Store user info and role in localStorage (or a more secure method)
+                    localStorage.setItem('user', JSON.stringify(user)); // Store user object
+                    if (user.role === 'admin') {
+                        localStorage.setItem('adminSession', 'true');
+                        window.location.href = 'admin.html';
+                    } else if (user.role === 'organizer') {
+                        localStorage.setItem('organizerSession', 'true');
+                        window.location.href = 'organizer.html';
+                    } else { // Default to user
+                        localStorage.setItem('userSession', 'true');
+                        window.location.href = 'user.html';
+                    }
                 } else {
-                    localStorage.setItem('userSession', 'true');
-                    window.location.href = 'user.html';
+                    const errorData = await response.json();
+                    alert(`Login failed: ${errorData.message || response.statusText}`);
                 }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('An error occurred during login. Please try again.');
             }
         });
     }
 
     const signupFormElement = document.getElementById('signupForm');
-    if(signupFormElement) {
-        signupFormElement.addEventListener('submit', function(e) {
+    if (signupFormElement) {
+        signupFormElement.addEventListener('submit', async function(e) { // Added async
             e.preventDefault();
-            
-            // Get the selected role
-            const selectedRole = document.querySelector('input[name="role"]:checked');
-            
-            if(selectedRole) {
-                const role = selectedRole.value;
-                
-                // Redirect based on role after successful signup
-                if(role === 'organizer') {
-                    localStorage.setItem('organizerSession', 'true');
-                    window.location.href = 'organizer.html';
+
+            // Basic validation for the current step before collecting data
+             if (!validateStep(currentStep)) {
+                 return; // Stop if validation fails
+             }
+
+            const fullName = document.getElementById('full-name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const institution = document.getElementById('institution').value.trim();
+            const organizationName = document.getElementById('organization-name').value.trim();
+            const termsChecked = document.getElementById('terms').checked;
+
+            // Determine the role based on the selected role button
+            // We need to find the currently active role button
+             let role = 'participant'; // Default role
+             const activeRoleButton = document.querySelector('.role-btn.active');
+             if(activeRoleButton) {
+                 role = activeRoleButton.dataset.role;
+             }
+
+
+            if (!termsChecked) {
+                 alert('You must agree to the Terms & Policy.');
+                 return;
+             }
+
+            const userData = {
+                username: fullName, // Assuming username is full name for now
+                email: email,
+                password: password,
+                role: role,
+                // Add role-specific fields
+                ...(role === 'participant' && { institution: institution }),
+                ...(role === 'organizer' && { organizationName: organizationName }) // Backend schema needs organizationName
+            };
+
+
+            try {
+                const response = await fetch('/auth/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData),
+                    credentials: 'include' // Include cookies if session is established after signup
+                });
+
+                if (response.ok) {
+                    const newUser = await response.json();
+                    alert('Signup successful! You can now log in.');
+                    // Optionally, automatically log in the user and redirect
+                    // For now, we'll just redirect to the login page
+                    toggleMainView('login'); // Switch back to login form
+                    signupFormElement.reset(); // Reset the signup form
+                    currentStep = 1; // Reset signup steps
+                    showStep(currentStep);
+
+
                 } else {
-                    localStorage.setItem('userSession', 'true');
-                    window.location.href = 'user.html';
+                    const errorData = await response.json();
+                    alert(`Signup failed: ${errorData.message || response.statusText}`);
                 }
+            } catch (error) {
+                console.error('Signup error:', error);
+                alert('An error occurred during signup. Please try again.');
             }
         });
     }
@@ -184,15 +253,19 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         if (step === 3) {
-            if (selectedRole === 'organizer' && !document.getElementById('organization-name').value.trim()) {
+             const activeRoleButton = document.querySelector('.role-btn.active');
+             const role = activeRoleButton ? activeRoleButton.dataset.role : 'participant'; // Default to participant if somehow no button is active
+
+            if (role === 'organizer' && !document.getElementById('organization-name').value.trim()) {
                 alert('Please enter your organization name.');
                 return false;
             }
-            if (!document.getElementById('terms').checked) {
-                alert('You must agree to the Terms & Policy.');
-                return false;
-            }
+            // The terms agreement is checked in the form submission handler before sending data
+            // but you could add a check here for immediate feedback if needed.
         }
         return true;
     }
+
+     // Initialize the first step on page load
+    showStep(currentStep);
 });

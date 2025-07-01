@@ -1,20 +1,38 @@
 // This script handles the multi-step form logic for event creation.
 
 // --- Organizer Authentication Check ---
-function checkOrganizerAuthentication() {
-    // For now, we'll check for a simple flag in localStorage.
-    // In a real application, you'd verify a proper session token or cookie.
-    const hasOrganizerSession = localStorage.getItem('organizerSession');
+async function checkOrganizerAuthentication() {
+    try {
+        // Check if we have a session with the backend
+        const response = await fetch('/auth/check-session', {
+            method: 'GET',
+            credentials: 'include'
+        });
 
-    // Define which pages require organizer authentication
-    const protectedPages = ['event_creation.html', 'organizer.html']; // Add other organizer pages here
+        if (!response.ok) {
+            // No valid session found
+            alert('You need to be logged in as an Organizer to create events.');
+            window.location.href = 'login_signup.html';
+            return;
+        }
 
-    const currentPage = window.location.pathname.split('/').pop();
+        const sessionData = await response.json();
+        if (sessionData.role !== 'organizer') {
+            alert('Only organizers can create events. Please log in with an organizer account.');
+            window.location.href = 'login_signup.html';
+            return;
+        }
 
-    // Redirect if on a protected page and not authenticated
-    if (protectedPages.includes(currentPage)) {
-        if (!hasOrganizerSession) {
-            // Redirect to login if no organizer session found
+        // Valid organizer session found
+        console.log('Organizer authenticated:', sessionData);
+    } catch (error) {
+        console.error('Authentication check failed:', error);
+        // Fallback to localStorage check for now
+        const hasOrganizerSession = localStorage.getItem('organizerSession');
+        const currentPage = window.location.pathname.split('/').pop();
+        const protectedPages = ['event_creation.html', 'organizer.html'];
+
+        if (protectedPages.includes(currentPage) && !hasOrganizerSession) {
             alert('You need to be logged in as an Organizer to create events.');
             window.location.href = 'login_signup.html';
         }
@@ -246,13 +264,11 @@ function populateReviewFields() {
     //Registration methods
     const regMethodElement = document.querySelector('input[name="registration-method"]:checked');
     if (regMethodElement) {
-        formData.set('registrationMethod', regMethodElement.value); // Use 'registrationMethod' key
-
-        // If the method is external, also get the external link
-        if (regMethodElement.value === 'external') {
-             const externalLink = document.getElementById('external-link').value;
-             formData.set('externalLink', externalLink); // Use 'externalLink' key
-        }
+        document.getElementById('review-registration').textContent = regMethodElement.value === 'platform'
+            ? 'Platform-Based Registration'
+            : `External Link: ${document.getElementById('external-link').value}`;
+    } else {
+        document.getElementById('review-registration').textContent = '-';
     }
 
 
@@ -308,97 +324,78 @@ document.getElementById('event-form').addEventListener('submit', async function(
         return;
     }
 
-    // Collect form data
-    const formData = new FormData(this);
+    // Collect form data and map to backend schema fields
+    const eventData = {};
 
-    const title = document.getElementById('event-title').value;
-    formData.set('title', title); // Make sure the key 'title' matches your backend schema field name
-
+    // Required fields - map form names to schema field names
+    eventData.title = document.getElementById('event-title').value;
+    eventData.description = document.getElementById('event-description').innerHTML;
+    
+    // Handle category
     const categorySelect = document.getElementById('event-category');
-    const category = categorySelect.value;
-    // Handle 'other' category logic here as you were before
-    if (category === 'other') {
-        const otherCategory = document.getElementById('other-category').value;
-        formData.set('category', otherCategory); // Use 'category' key
+    if (categorySelect.value === 'other') {
+        eventData.category = document.getElementById('other-category').value;
     } else {
-        formData.set('category', category); // Use 'category' key
+        eventData.category = categorySelect.value;
     }
-
-    // Do similarly for date, time, location, registration deadline, prize info, rules
-    const date = document.getElementById('event-date').value;
-    formData.set('date', date); // Use 'date' key
-
-    const time = document.getElementById('event-time').value;
-    formData.set('time', time); // Use 'time' key
-
-    const location = document.getElementById('event-location').value;
-    formData.set('location', location); // Use 'location' key
-
-    const registrationDeadline = document.getElementById('registration-deadline').value;
-     // Only set if a value exists, as it's optional in the frontend but required in schema (we might need to adjust schema or backend handling later)
-    if(registrationDeadline) {
-        formData.set('registrationDeadline', registrationDeadline); // Use 'registrationDeadline' key
-    }
-
-
-    const prizeInfo = document.getElementById('prize-info').value;
-    formData.set('prizeInfo', prizeInfo); // Use 'prizeInfo' key
-
-    const rules = document.getElementById('event-rules').value;
-    formData.set('rules', rules); // Use 'rules' key
-
-    // Get data from the rich text editor separately and ensure consistent key
-    const eventDescription = document.getElementById('event-description').innerHTML;
-    formData.set('description', eventDescription); // Use a consistent name like 'eventDescription'
-
-    // Get the registration method and external link if applicable
+    
+    eventData.date = document.getElementById('event-date').value;
+    eventData.time = document.getElementById('event-time').value;
+    eventData.location = document.getElementById('event-location').value;
+    eventData.registrationDeadline = document.getElementById('registration-deadline').value;
+    
+    // Registration method (required)
     const regMethod = document.querySelector('input[name="registration-method"]:checked');
     if (regMethod) {
-        formData.set('registration-method', regMethod.value);
+        eventData.registrationMethod = regMethod.value;
         if (regMethod.value === 'external') {
-            formData.set('externalLink', document.getElementById('external-link').value); // Use consistent key e.g. 'externalLink'
-        } else {
-             formData.delete('external-link'); // Remove if not external to avoid sending empty field
+            eventData.externalRegistrationUrl = document.getElementById('external-link').value;
         }
     } else {
-         // If no registration method is selected, the backend might expect a default or this should be caught by frontend validation
-         formData.delete('registration-method');
-         formData.delete('external-link');
+        alert('Please select a registration method.');
+        return;
     }
 
-    // Ensure the correct date/time fields are used for FormData
-    formData.set('eventDate', document.getElementById('event-date').value);
-    formData.set('eventTime', document.getElementById('event-time').value);
-    formData.set('location', document.getElementById('event-location').value);
-    formData.set('isOnline', document.getElementById('is-online').checked);
-    formData.set('registrationDeadline', document.getElementById('registration-deadline').value);
-    formData.set('prizeInfo', document.getElementById('prize-info').value);
-    formData.set('rules', document.getElementById('event-rules').value);
+    // Optional fields
+    eventData.prizeInfo = document.getElementById('prize-info').value;
+    eventData.rules = document.getElementById('event-rules').value;
 
+    // Validate required fields
+    const requiredFields = ['title', 'description', 'category', 'date', 'time', 'location', 'registrationDeadline', 'registrationMethod'];
+    for (const field of requiredFields) {
+        if (!eventData[field] || eventData[field].trim() === '') {
+            alert(`Please fill in the ${field} field.`);
+            return;
+        }
+    }
 
     try {
         const response = await fetch('/events', {
             method: 'POST',
-            body: formData,
-            // Include credentials (cookies) with the request for session authentication
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(eventData),
             credentials: 'include'
         });
 
         if (response.ok) {
-            // Event created successfully
             const result = await response.json();
             alert('Event submitted successfully! It will be reviewed by our team.');
 
             // Reset the form and return to the first step
             this.reset();
-            document.getElementById('event-description').innerHTML = ''; // Reset rich text editor
+            document.getElementById('event-description').innerHTML = '';
             document.getElementById('image-preview-container').classList.add('hidden');
             document.getElementById('external-link-container').classList.add('hidden');
             document.querySelectorAll('.registration-option').forEach(option => option.classList.remove('selected'));
             showStep(1);
 
+        } else if (response.status === 401) {
+            // Authentication failed
+            alert('You need to be logged in as an organizer to create events. Please log in first.');
+            window.location.href = 'login_signup.html';
         } else {
-            // Handle errors (e.g., display error message from the backend)
             const errorData = await response.json();
             alert(`Error creating event: ${errorData.message || response.statusText}`);
         }

@@ -54,13 +54,32 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Logout Button ---
     const logoutBtn = document.getElementById('logoutBtn');
     if(logoutBtn) {
-        logoutBtn.addEventListener('click', function() {
-            // Clear any organizer session data
-            localStorage.removeItem('organizerSession');
-            sessionStorage.clear();
-            
-            // Redirect to login page
-            window.location.href = 'login_signup.html';
+        logoutBtn.addEventListener('click', async function() {
+            try {
+                const response = await fetch('/auth/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    // Clear localStorage and redirect
+                    localStorage.removeItem('userSession');
+                    localStorage.removeItem('organizerSession');
+                    localStorage.removeItem('adminSession');
+                    localStorage.removeItem('user');
+                    sessionStorage.clear();
+                    
+                    window.location.href = 'login_signup.html';
+                } else {
+                    console.error('Logout failed');
+                    localStorage.clear();
+                    window.location.href = 'login_signup.html';
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+                localStorage.clear();
+                window.location.href = 'login_signup.html';
+            }
         });
     }
 

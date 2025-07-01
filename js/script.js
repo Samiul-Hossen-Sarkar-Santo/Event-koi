@@ -189,7 +189,7 @@ function updateNavigation() {
 document.addEventListener('DOMContentLoaded', updateNavigation);
 
 // --- Fetch and Display Events ---
-const eventsGrid = document.querySelector('.grid.grid-cols-1.md:grid-cols-2.lg:grid-cols-3.gap-6');
+const eventsGrid = document.getElementById('events-grid');
 
 // Function to format date (e.g., "June 15, 2025")
 function formatDate(dateString) {
@@ -209,7 +209,7 @@ function createEventCardHtml(event) {
     const organizerName = event.organizer ? event.organizer.username : 'Organizer TBD'; // Assuming organizer is populated and has a username
 
     // Basic date comparison for 'days left' - needs refinement for accuracy
-    const registrationEndDate = event.registrationEndDate ? new Date(event.registrationEndDate) : null;
+    const registrationEndDate = event.registrationDeadline ? new Date(event.registrationDeadline) : null;
     let registrationStatus = '';
     if (registrationEndDate) {
         const now = new Date();
@@ -268,6 +268,11 @@ function createEventCardHtml(event) {
 }
 
 async function fetchAndDisplayEvents() {
+    // Check if we're on a page with an events grid
+    if (!eventsGrid) {
+        return; // Exit if not on the homepage or events grid doesn't exist
+    }
+
     try {
         const response = await fetch('/events');
         if (!response.ok) {
@@ -317,6 +322,10 @@ async function fetchAndDisplayEvents() {
 // Call the function to fetch and display events when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     updateNavigation(); // Keep existing navigation update
-    fetchAndDisplayEvents(); // Fetch and display events
+    
+    // Only fetch events if we're on the homepage with events grid
+    if (eventsGrid) {
+        fetchAndDisplayEvents(); // Fetch and display events
+    }
 });
 

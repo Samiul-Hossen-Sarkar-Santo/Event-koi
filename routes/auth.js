@@ -94,4 +94,31 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// GET /check-session - Check if user has a valid session
+router.get('/check-session', (req, res) => {
+  if (req.session && req.session.userId) {
+    res.json({
+      userId: req.session.userId,
+      role: req.session.userRole,
+      authenticated: true
+    });
+  } else {
+    res.status(401).json({
+      authenticated: false,
+      message: 'No valid session found'
+    });
+  }
+});
+
+// POST /logout - User Logout
+router.post('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      return res.status(500).json({ message: 'Failed to logout' });
+    }
+    res.clearCookie('connect.sid'); // Clear the session cookie
+    res.json({ message: 'Logged out successfully' });
+  });
+});
+
 module.exports = router;

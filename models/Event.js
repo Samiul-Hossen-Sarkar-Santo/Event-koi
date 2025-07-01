@@ -36,7 +36,7 @@ const eventSchema = new mongoose.Schema({
   },
   registrationDeadline: {
     type: Date,
-    required: true
+    required: false // Make it optional as stated in the form
   },
   prizeInfo: {
     type: String,
@@ -84,6 +84,70 @@ const eventSchema = new mongoose.Schema({
       ref: 'User' // Reference to the User model
     }
   ],
+  // Extended fields for future functionality
+  schedule: {
+    type: String,
+    default: ''
+  },
+  speakers: [{
+    name: String,
+    title: String,
+    bio: String,
+    image: String
+  }],
+  gallery: [{
+    type: String // Image filenames
+  }],
+  sponsors: [{
+    name: String,
+    logo: String,
+    website: String,
+    tier: {
+      type: String,
+      enum: ['gold', 'silver', 'bronze', 'partner'],
+      default: 'partner'
+    }
+  }],
+  faqs: [{
+    question: String,
+    answer: String
+  }],
+  contactInfo: {
+    email: String,
+    phone: String,
+    website: String
+  },
+  // For organizer dashboard
+  sponsorInquiries: [{
+    company: String,
+    contact: String,
+    email: String,
+    message: String,
+    submittedAt: {
+      type: Date,
+      default: Date.now
+    },
+    status: {
+      type: String,
+      enum: ['pending', 'contacted', 'approved', 'rejected'],
+      default: 'pending'
+    }
+  }],
+  questions: [{
+    name: String,
+    email: String,
+    question: String,
+    answer: String,
+    submittedAt: {
+      type: Date,
+      default: Date.now
+    },
+    answeredAt: Date,
+    isPublic: {
+      type: Boolean,
+      default: false
+    }
+  }],
 }, {
   timestamps: true // Adds createdAt and updatedAt timestamps
 });

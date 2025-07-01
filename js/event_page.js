@@ -1,5 +1,27 @@
 document.addEventListener('DOMContentLoaded', function () {
 
+    // Helper function to find elements by text content
+    function findElementByText(tagName, textContent) {
+        const elements = document.querySelectorAll(tagName);
+        for (let element of elements) {
+            if (element.textContent.includes(textContent)) {
+                return element;
+            }
+        }
+        return null;
+    }
+
+    // Helper function to find elements by text content
+    function findElementByText(selector, text) {
+        const elements = document.querySelectorAll(selector);
+        for (let element of elements) {
+            if (element.textContent.includes(text)) {
+                return element;
+            }
+        }
+        return null;
+    }
+
     // --- Existing FAQ Toggle Functionality ---
     document.querySelectorAll('.faq-toggle').forEach(button => {
         button.addEventListener('click', () => {
@@ -45,7 +67,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const days = Math.floor(distance / (1000 * 60 * 60 * 24));
         const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        // Add seconds for more precise initial display, though updating every minute is fine for the interval
         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
 
@@ -97,11 +118,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 populateEventPage(event); // Populate the HTML with event data
                 // Start the countdown with the actual event date
                 if (event.date && event.time) {
-                    const eventDateTimeString = `${event.date}T${event.time}`; // Assuming date and time are in compatible formats
-                    updateCountdown(eventDateTimeString);
-                    // Update countdown every minute
+                    // Combine date and time for countdown
+                    const eventDate = new Date(event.date);
+                    const [hours, minutes] = event.time.split(':');
+                    eventDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+                    
+                    updateCountdown(eventDate.toISOString());
+                    // Update countdown every second for real-time updates
                     clearInterval(countdownInterval); // Clear any existing interval
-                    countdownInterval = setInterval(() => updateCountdown(eventDateTimeString), 60000);
+                    countdownInterval = setInterval(() => updateCountdown(eventDate.toISOString()), 1000);
                 }
 
 
@@ -139,18 +164,35 @@ document.addEventListener('DOMContentLoaded', function () {
         // Update Hero Section
         // Update Cover Image
         const heroSection = document.querySelector('.event-hero');
+        
         if (heroSection && event.coverImage) {
-            const imageUrl = `/uploads/${event.coverImage}`; // Construct the URL
-            heroSection.style.backgroundImage = `url('${imageUrl}')`;
-            heroSection.style.backgroundSize = 'cover';
-            heroSection.style.backgroundPosition = 'center';
+            // Handle both old format (full path) and new format (filename only)
+            let imageUrl;
+            if (event.coverImage.startsWith('/uploads/')) {
+                imageUrl = event.coverImage; // Already has the path
+            } else {
+                imageUrl = `/uploads/${event.coverImage}`; // Add the path
+            }
+            
+            // Test if image is accessible before setting as background
+            const testImage = new Image();
+            testImage.onload = function() {
+                // Use setProperty with important to override CSS
+                heroSection.style.setProperty('background-image', `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${imageUrl}')`, 'important');
+                heroSection.style.setProperty('background-size', 'cover', 'important');
+                heroSection.style.setProperty('background-position', 'center', 'important');
+            };
+            testImage.onerror = function() {
+                console.error('Failed to load cover image:', imageUrl);
+            };
+            testImage.src = imageUrl;
         }
 
         const eventTitleEl = heroSection.querySelector('h1');
         if (eventTitleEl) eventTitleEl.textContent = event.title || 'Event Details';
 
         const eventDescriptionEl = heroSection.querySelector('p.text-xl'); // Targeting the description below the title
-        if (eventDescriptionEl) eventDescriptionEl.innerHTML = '';
+        if (eventDescriptionEl) eventDescriptionEl.textContent = event.description || 'Event description not available.';
 
 
         // Update About Section (using prose for description)
@@ -166,8 +208,22 @@ document.addEventListener('DOMContentLoaded', function () {
             const dateTimeEl = detailsSidebar.querySelector('.fa-calendar-alt').closest('.flex').querySelector('div:last-child');
             if (dateTimeEl && event.date && event.time) {
                 try {
-                    const eventDateTime = new Date(`${event.date}T${event.time}`);
-                    dateTimeEl.innerHTML = `<div class="font-semibold">Date & Time</div><div class="text-gray-600">${eventDateTime.toLocaleString()}</div>`;
+                    const eventDate = new Date(event.date);
+                    const [hours, minutes] = event.time.split(':');
+                    eventDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+                    
+                    const formattedDate = eventDate.toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    const formattedTime = eventDate.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    dateTimeEl.innerHTML = `<div class="font-semibold">Date & Time</div><div class="text-gray-600">${formattedDate}<br>${formattedTime}</div>`;
                 } catch (e) {
                     console.error('Error parsing event date/time:', e);
                     dateTimeEl.innerHTML = `<div class="font-semibold">Date & Time</div><div class="text-gray-600">Date and time not available</div>`;
@@ -217,22 +273,58 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Update Prize Information
-        const prizesSection = document.querySelector('.py-16.bg-white .grid.grid-cols-1.md\\:grid-cols-3.gap-4'); // Targeting the prize cards container
-        if (prizesSection && event.prizeInfo) { // Assuming event.prizeInfo is a string with prize details
-            prizesSection.innerHTML = `<div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100"><div class="text-gray-800">${event.prizeInfo.replace(/\n/g, '<br>')}</div></div>`; // Simple display
-            // For more structured prizes, you'd loop through a prizes array if your schema supported it
-        } else if (prizesSection) {
-            prizesSection.innerHTML = ''; // Clear dummy content if no prize info
+        const prizesSection = findElementByText('h3', 'Prizes & Awards'); // Find the prizes section
+        let prizesContainer = null;
+        if (prizesSection) {
+            prizesContainer = prizesSection.nextElementSibling;
+        }
+        if (!prizesContainer) {
+            // Fallback: look for the grid container directly
+            prizesContainer = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-3.gap-4');
+        }
+        
+        if (prizesContainer && event.prizeInfo) {
+            // Parse prize info and create attractive display
+            const prizeLines = event.prizeInfo.split('\n').filter(line => line.trim());
+            if (prizeLines.length > 0) {
+                let prizeHTML = '';
+                prizeLines.forEach((prize, index) => {
+                    const position = index + 1;
+                    const colors = ['indigo', 'purple', 'blue']; // Different colors for different prizes
+                    const color = colors[index % colors.length];
+                    prizeHTML += `
+                        <div class="bg-${color}-50 p-4 rounded-lg border border-${color}-100">
+                            <div class="text-${color}-600 font-bold text-xl mb-2">${position === 1 ? '🥇 ' : position === 2 ? '🥈 ' : position === 3 ? '🥉 ' : '🏆 '}Prize ${position}</div>
+                            <div class="text-gray-800">${prize}</div>
+                        </div>
+                    `;
+                });
+                prizesContainer.innerHTML = prizeHTML;
+            }
+        } else if (prizesContainer) {
+            prizesContainer.innerHTML = '<div class="col-span-full text-center text-gray-500">Prize information will be announced soon!</div>';
         }
 
 
-        // Update Rules & Regulations (Assuming event.rules is a string with rules separated by newlines)
-        const rulesSection = document.querySelector('.prose.max-w-none.text-gray-700 ol.list-decimal'); // Targeting the ordered list for rules
-        if (rulesSection && event.rules) { // Assuming event.rules is a string with rules
-            const rulesListItems = event.rules.split('\n').map(rule => `<li>${rule}</li>`).join('');
-            rulesSection.innerHTML = rulesListItems;
-        } else if (rulesSection) {
-            rulesSection.innerHTML = ''; // Clear dummy content if no rules
+        // Update Rules & Regulations
+        const rulesSection = findElementByText('h3', 'Rules & Regulations');
+        let rulesContainer = null;
+        if (rulesSection) {
+            rulesContainer = rulesSection.nextElementSibling.querySelector('ol.list-decimal');
+        }
+        if (!rulesContainer) {
+            // Fallback: look for the ordered list directly
+            rulesContainer = document.querySelector('.prose.max-w-none.text-gray-700 ol.list-decimal');
+        }
+        
+        if (rulesContainer && event.rules) {
+            const rulesLines = event.rules.split('\n').filter(line => line.trim());
+            if (rulesLines.length > 0) {
+                const rulesListItems = rulesLines.map(rule => `<li class="mb-2">${rule.trim()}</li>`).join('');
+                rulesContainer.innerHTML = rulesListItems;
+            }
+        } else if (rulesContainer) {
+            rulesContainer.innerHTML = '<li class="text-gray-500">Rules and regulations will be published soon.</li>';
         }
 
 
@@ -242,47 +334,277 @@ document.addEventListener('DOMContentLoaded', function () {
         // and corresponding frontend logic to display them dynamically.
 
         // Update Registration Section (Link or Platform)
-        const registerButton = document.querySelector('#register .bg-indigo-600'); // The Register Now button
+        const registerButton = document.querySelector('#register .bg-indigo-600'); // The old Register Now button (now hidden)
         const registrationFormContainer = document.querySelector('#register form'); // The registration form
+        const mainRegisterBtn = document.getElementById('main-register-btn'); // The new big register button
+        const registrationInfo = document.getElementById('registration-info');
 
-        if (event.registrationMethod === 'external' && event.externalLink) {
-            // If external link, change the button to a link and potentially hide the form
-            if (registerButton) {
-                registerButton.textContent = 'Register on External Site';
-                registerButton.href = event.externalLink;
-                // Add the external link warning modal logic here if you want to use it for this button too
-                registerButton.addEventListener('click', function (e) {
-                    e.preventDefault(); // Prevent default link behavior
-                    showExternalLinkModal(event.externalLink); // Show the warning modal
+        if (event.registrationMethod === 'external' && event.externalRegistrationUrl) {
+            // If external link, set up buttons to redirect to external site
+            if (registrationInfo) {
+                registrationInfo.textContent = 'Registration handled externally';
+            }
+            
+            // Set up the main register button for external registration
+            if (mainRegisterBtn) {
+                mainRegisterBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    showExternalLinkModal(event.externalRegistrationUrl);
                 });
             }
+            
+            // Hide the old registration form completely
             if (registrationFormContainer) {
-                registrationFormContainer.classList.add('hidden'); // Hide the internal form
+                registrationFormContainer.classList.add('hidden');
             }
 
         } else {
-            // If platform-based registration, ensure the button is a submit button and form is visible
-            if (registerButton) {
-                registerButton.textContent = 'Register Now';
-                registerButton.href = '#'; // Or a link to the platform registration form/modal
-                // Remove any click listeners for external links
-                const newRegisterButton = registerButton.cloneNode(true); // Clone to remove event listeners
-                registerButton.parentNode.replaceChild(newRegisterButton, registerButton);
+            // If platform-based registration, set up modal
+            if (registrationInfo) {
+                registrationInfo.textContent = 'Secure registration powered by Event Koi';
             }
+            
+            // Set up the main register button for platform registration
+            if (mainRegisterBtn) {
+                mainRegisterBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    showRegistrationModal();
+                });
+            }
+            
+            // Keep the form available but hidden
             if (registrationFormContainer) {
-                registrationFormContainer.classList.remove('hidden'); // Show the internal form
+                registrationFormContainer.classList.add('hidden');
             }
-            // You'd need to implement the platform-based registration form submission here
         }
 
         // Update Register Now button's anchor
         const heroRegisterButton = document.querySelector('.event-hero a.animate-pulse');
         if (heroRegisterButton) {
-            heroRegisterButton.href = '#register'; // Link to the registration section
+            if (event.registrationMethod === 'external' && event.externalRegistrationUrl) {
+                heroRegisterButton.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    showExternalLinkModal(event.externalRegistrationUrl);
+                });
+                heroRegisterButton.textContent = 'Register Now';
+            } else {
+                heroRegisterButton.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    showRegistrationModal();
+                });
+                heroRegisterButton.textContent = 'Register Now';
+            }
         }
 
+        // Initialize social sharing
+        initializeSocialSharing(event);
 
+        // Initialize sponsor and question buttons
+        initializeButtons();
     }
+
+    // Initialize social media sharing
+    function initializeSocialSharing(event) {
+        const currentUrl = window.location.href;
+        const eventTitle = event.title || 'Check out this event';
+        const eventDescription = event.description || 'An amazing event you should attend!';
+
+        // Facebook share
+        const facebookBtn = document.getElementById('share-facebook');
+        if (facebookBtn) {
+            facebookBtn.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`;
+            facebookBtn.target = '_blank';
+        }
+
+        // Twitter share
+        const twitterBtn = document.getElementById('share-twitter');
+        if (twitterBtn) {
+            twitterBtn.href = `https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(eventTitle + ' - ' + eventDescription)}`;
+            twitterBtn.target = '_blank';
+        }
+
+        // LinkedIn share
+        const linkedinBtn = document.getElementById('share-linkedin');
+        if (linkedinBtn) {
+            linkedinBtn.href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}`;
+            linkedinBtn.target = '_blank';
+        }
+
+        // Email share
+        const emailBtn = document.getElementById('share-email');
+        if (emailBtn) {
+            const subject = `Check out this event: ${eventTitle}`;
+            const body = `Hi,\n\nI thought you might be interested in this event:\n\n${eventTitle}\n\n${eventDescription}\n\nCheck it out here: ${currentUrl}\n\nBest regards!`;
+            emailBtn.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
+    }
+
+    // Initialize buttons and their event listeners
+    function initializeButtons() {
+        // Become a sponsor button
+        const sponsorBtn = document.getElementById('become-sponsor-btn');
+        if (sponsorBtn) {
+            sponsorBtn.addEventListener('click', showSponsorModal);
+        }
+
+        // Ask question button
+        const questionBtn = document.getElementById('ask-question-btn');
+        if (questionBtn) {
+            questionBtn.addEventListener('click', showQuestionModal);
+        }
+
+        // Sponsor form submission
+        const sponsorForm = document.getElementById('sponsor-form');
+        if (sponsorForm) {
+            sponsorForm.addEventListener('submit', handleSponsorSubmission);
+        }
+
+        // Question form submission
+        const questionForm = document.getElementById('question-form');
+        if (questionForm) {
+            questionForm.addEventListener('submit', handleQuestionSubmission);
+        }
+
+        // Registration form submission
+        const registrationForm = document.getElementById('event-registration-form');
+        if (registrationForm) {
+            registrationForm.addEventListener('submit', handleRegistrationSubmission);
+        }
+    }
+
+    // Sponsor modal functions
+    function showSponsorModal() {
+        const modal = document.getElementById('sponsor-modal');
+        if (modal) modal.classList.remove('hidden');
+    }
+
+    function hideSponsorModal() {
+        const modal = document.getElementById('sponsor-modal');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    function handleSponsorSubmission(e) {
+        e.preventDefault();
+        const eventId = new URLSearchParams(window.location.search).get('id');
+        
+        // Get form data
+        const formData = {
+            company: document.getElementById('sponsor-company').value,
+            contact: document.getElementById('sponsor-contact').value,
+            email: document.getElementById('sponsor-email').value,
+            message: document.getElementById('sponsor-message').value
+        };
+
+        // Send to backend
+        fetch(`/events/${eventId}/sponsor-inquiry`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('Thank you for your interest in sponsoring! We will contact you soon.');
+            hideSponsorModal();
+            document.getElementById('sponsor-form').reset();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('There was an error submitting your inquiry. Please try again.');
+        });
+    }
+
+    // Registration modal functions
+    function showRegistrationModal() {
+        const modal = document.getElementById('registration-modal');
+        if (modal) modal.classList.remove('hidden');
+    }
+
+    function hideRegistrationModal() {
+        const modal = document.getElementById('registration-modal');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    function handleRegistrationSubmission(e) {
+        e.preventDefault();
+        const eventId = new URLSearchParams(window.location.search).get('id');
+        
+        // Get form data
+        const formData = new FormData(e.target);
+        const registrationData = {
+            eventId: eventId,
+            firstName: formData.get('firstName'),
+            lastName: formData.get('lastName'),
+            email: formData.get('email'),
+            phone: formData.get('phone'),
+            organization: formData.get('organization'),
+            referralSource: formData.get('referralSource'),
+            comments: formData.get('comments'),
+            agreeTerms: formData.get('agreeTerms') === 'on'
+        };
+
+        // Here you would send this to your backend for registration
+        console.log('Registration data:', registrationData);
+        
+        // For now, show a success message
+        alert('Thank you for registering! You will receive a confirmation email shortly.');
+        hideRegistrationModal();
+        e.target.reset();
+    }
+
+    // Question modal functions
+    function showQuestionModal() {
+        const modal = document.getElementById('question-modal');
+        if (modal) modal.classList.remove('hidden');
+    }
+
+    function hideQuestionModal() {
+        const modal = document.getElementById('question-modal');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    function handleQuestionSubmission(e) {
+        e.preventDefault();
+        const eventId = new URLSearchParams(window.location.search).get('id');
+        
+        // Get form data
+        const formData = {
+            name: document.getElementById('question-name').value,
+            email: document.getElementById('question-email').value,
+            question: document.getElementById('question-text').value
+        };
+
+        // Send to backend
+        fetch(`/events/${eventId}/question`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('Thank you for your question! The organizer will respond to you soon.');
+            hideQuestionModal();
+            document.getElementById('question-form').reset();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('There was an error submitting your question. Please try again.');
+        });
+    }
+
+    // Make functions global for onclick handlers
+    window.showExternalLinkModal = showExternalLinkModal;
+    window.hideExternalLinkModal = hideExternalLinkModal;
+    window.proceedToExternalLink = proceedToExternalLink;
+    window.showSponsorModal = showSponsorModal;
+    window.hideSponsorModal = hideSponsorModal;
+    window.showQuestionModal = showQuestionModal;
+    window.hideQuestionModal = hideQuestionModal;
+    window.showRegistrationModal = showRegistrationModal;
+    window.hideRegistrationModal = hideRegistrationModal;
 
 
     // --- Modal Logic (for external link warning) ---

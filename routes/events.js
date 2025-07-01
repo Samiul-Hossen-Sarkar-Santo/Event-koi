@@ -29,7 +29,26 @@ const storage = multer.diskStorage({
     cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
   }
 });
-const upload = multer({ storage: storage });
+
+// Create multer upload instance with better configuration
+const upload = multer({ 
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    // Accept all files for now, you can add validation here
+    cb(null, true);
+  }
+});
+
+// Create a middleware that handles both file uploads and form data
+const handleFormData = (req, res, next) => {
+  upload.single('coverImage')(req, res, (err) => {
+    if (err) {
+      console.error('Multer error:', err);
+      return res.status(400).json({ message: 'File upload error', error: err.message });
+    }
+    next();
+  });
+};
 
 
 // GET all events (placeholder)
@@ -63,17 +82,35 @@ router.get('/:id', async (req, res) => { // Corrected route path
 });
 
 // POST a new event (requires authentication)
-router.post('/', isAuthenticated, upload.single('coverImage'), async (req, res) => {
+router.post('/', isAuthenticated, handleFormData, async (req, res) => {
   try {
     console.log('Received request body:', req.body);
     console.log('Session userId:', req.session.userId);
     console.log('Uploaded file:', req.file);
 
+    // Validate required fields
+    const requiredFields = ['title', 'description', 'category', 'date', 'time', 'location', 'registrationMethod'];
+    for (const field of requiredFields) {
+      if (!req.body[field] || req.body[field].trim() === '') {
+        return res.status(400).json({ message: `${field} is required` });
+      }
+    }
+
     const eventData = {
-      ...req.body,
+      title: req.body.title,
+      description: req.body.description,
+      category: req.body.category,
+      date: req.body.date,
+      time: req.body.time,
+      location: req.body.location,
+      registrationMethod: req.body.registrationMethod,
+      registrationDeadline: req.body.registrationDeadline || null,
+      prizeInfo: req.body.prizeInfo || '',
+      rules: req.body.rules || '',
+      externalRegistrationUrl: req.body.externalRegistrationUrl || null,
       organizer: req.session.userId, // Associate the event with the authenticated user (organizer)
       // Save the path to the uploaded image
-      coverImage: req.file ? `/uploads/${req.file.filename}` : null, // Store the relative path or URL
+      coverImage: req.file ? req.file.filename : null, // Store just the filename
       // Note: Ensure 'coverImage' is defined in your Event Mongoose schema as a String
       approvalStatus: 'pending' // Set the initial approval status to 'pending'
     };
@@ -87,6 +124,69 @@ router.post('/', isAuthenticated, upload.single('coverImage'), async (req, res) 
   } catch (err) {
     console.error('Error creating event:', err);
     res.status(500).json({ message: 'Error creating event', error: err.message });
+  }
+});
+
+// POST sponsor inquiry for an event
+router.post('/:id/sponsor-inquiry', async (req, res) => {
+  try {
+    const eventId = req.params.id;
+    const { company, contact, email, message } = req.body;
+
+    // Validate required fields
+    if (!company || !contact || !email || !message) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    // Add the sponsor inquiry to the event
+    event.sponsorInquiries.push({
+      company,
+      contact,
+      email,
+      message
+    });
+
+    await event.save();
+    res.status(201).json({ message: 'Sponsor inquiry submitted successfully' });
+  } catch (err) {
+    console.error('Error submitting sponsor inquiry:', err);
+    res.status(500).json({ message: 'Error submitting sponsor inquiry', error: err.message });
+  }
+});
+
+// POST question for an event
+router.post('/:id/question', async (req, res) => {
+  try {
+    const eventId = req.params.id;
+    const { name, email, question } = req.body;
+
+    // Validate required fields
+    if (!name || !email || !question) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    // Add the question to the event
+    event.questions.push({
+      name,
+      email,
+      question
+    });
+
+    await event.save();
+    res.status(201).json({ message: 'Question submitted successfully' });
+  } catch (err) {
+    console.error('Error submitting question:', err);
+    res.status(500).json({ message: 'Error submitting question', error: err.message });
   }
 });
 

@@ -97,14 +97,13 @@ function validateCurrentStep() {
         const title = document.getElementById('event-title').value.trim();
         const description = document.getElementById('event-description').innerHTML.trim();
         const category = document.getElementById('event-category').value;
-        const imageInput = document.getElementById('cover-image');
 
         if (!title) { alert('Please enter an event title.'); return false; }
         // Check if description is empty or contains only basic break tags from rich text editor
         if (!description || description === '<br>' || description === '<div><br></div>' || description === '<p><br></p>') { alert('Please enter an event description.'); return false; }
         if (!category) { alert('Please select a category.'); return false; }
         if (category === 'other' && !document.getElementById('other-category').value.trim()) { alert('Please specify a category.'); return false; }
-        if (!imageInput.files || imageInput.files.length === 0) { alert('Please upload a cover image.'); return false; }
+        // Note: Cover image is optional based on backend schema
 
 
     } else if (currentStep === 2) {
@@ -120,7 +119,21 @@ function validateCurrentStep() {
     } else if (currentStep === 3) {
         const registrationMethod = document.querySelector('input[name="registration-method"]:checked');
         if (!registrationMethod) { alert('Please select a registration method.'); return false; }
-        if (registrationMethod.value === 'external' && !document.getElementById('external-link').value.trim()) { alert('Please enter an external registration URL.'); return false; }
+        if (registrationMethod.value === 'external') {
+            const externalUrl = document.getElementById('external-registration-url').value.trim();
+            if (!externalUrl) { 
+                alert('Please enter an external registration URL.'); 
+                return false; 
+            }
+            // Validate the URL format but allow progression even with warnings
+            try {
+                new URL(externalUrl);
+                // URL is valid, allow progression
+            } catch (e) {
+                alert('Please enter a valid URL format.');
+                return false;
+            }
+        }
     }
 
     return true; // Validation passed
@@ -140,41 +153,59 @@ document.getElementById('event-category').addEventListener('change', function ()
 
 // Add event listeners for rich text editor buttons
 document.addEventListener('DOMContentLoaded', () => {
-    const formatButtons = document.querySelectorAll('.rich-text-editor + div.mt-1 button');
+    // Handle format buttons with data-format attribute
+    const formatButtons = document.querySelectorAll('button[data-format]');
     formatButtons.forEach(button => {
-        const command = button.onclick.toString().match(/formatText\('([^']+)'\)/)[1];
+        const command = button.getAttribute('data-format');
         if (command) {
-            button.onclick = null; // Remove inline onclick
             button.addEventListener('click', () => formatText(command));
         }
     });
 
-    // Add event listeners for navigation buttons
-    const nextStepButtons = document.querySelectorAll('.step button[onclick^="nextStep"]');
+    // Handle next step buttons with data-next-step attribute
+    const nextStepButtons = document.querySelectorAll('button[data-next-step]');
     nextStepButtons.forEach(button => {
-        const step = parseInt(button.onclick.toString().match(/nextStep\((\d+)\)/)[1], 10);
+        const step = parseInt(button.getAttribute('data-next-step'), 10);
         if (!isNaN(step)) {
-            button.onclick = null; // Remove inline onclick
             button.addEventListener('click', () => nextStep(step));
         }
     });
 
-    const prevStepButtons = document.querySelectorAll('.step button[onclick^="prevStep"]');
+    // Handle previous step buttons with data-prev-step attribute
+    const prevStepButtons = document.querySelectorAll('button[data-prev-step]');
     prevStepButtons.forEach(button => {
-        const step = parseInt(button.onclick.toString().match(/prevStep\((\d+)\)/)[1], 10);
+        const step = parseInt(button.getAttribute('data-prev-step'), 10);
         if (!isNaN(step)) {
-            button.onclick = null; // Remove inline onclick
             button.addEventListener('click', () => prevStep(step));
         }
     });
 
-    // Add event listeners for registration option divs
-    const registrationOptions = document.querySelectorAll('.registration-option');
+    // Handle registration option divs with data-registration-method attribute
+    const registrationOptions = document.querySelectorAll('[data-registration-method]');
     registrationOptions.forEach(option => {
-        const method = option.onclick.toString().match(/selectRegistrationOption\('([^']+)'\)/)[1];
+        const method = option.getAttribute('data-registration-method');
         if (method) {
-            option.onclick = null; // Remove inline onclick
             option.addEventListener('click', () => selectRegistrationOption(method));
+        }
+    });
+
+    // Handle action buttons with data-action attribute
+    const actionButtons = document.querySelectorAll('button[data-action]');
+    actionButtons.forEach(button => {
+        const action = button.getAttribute('data-action');
+        switch(action) {
+            case 'openFacebookEvent':
+                button.addEventListener('click', openFacebookEvent);
+                break;
+            case 'validateExternalLink':
+                button.addEventListener('click', validateExternalLink);
+                break;
+            case 'proceedToExternalLink':
+                button.addEventListener('click', proceedToExternalLink);
+                break;
+            case 'hideExternalLinkModal':
+                button.addEventListener('click', hideExternalLinkModal);
+                break;
         }
     });
 });
@@ -184,7 +215,12 @@ document.addEventListener('DOMContentLoaded', () => {
 // Display a preview of the uploaded cover image.
 document.getElementById('cover-image').addEventListener('change', function (e) {
     const file = e.target.files[0];
+    const uploadLabel = e.target.closest('.border-dashed').querySelector('label span');
+    
     if (file) {
+        // Show loading state
+        uploadLabel.textContent = 'Processing image...';
+        
         const reader = new FileReader();
         reader.onload = function (event) {
             const previewContainer = document.getElementById('image-preview-container');
@@ -192,20 +228,23 @@ document.getElementById('cover-image').addEventListener('change', function (e) {
 
             previewImage.src = event.target.result;
             previewContainer.classList.remove('hidden');
+            
+            // Update upload label to show success
+            uploadLabel.textContent = `✓ ${file.name}`;
+            uploadLabel.parentElement.classList.add('text-green-600');
         };
         reader.readAsDataURL(file);
     } else {
         // Hide preview if no file is selected
         document.getElementById('image-preview-container').classList.add('hidden');
         document.getElementById('image-preview').src = '#'; // Clear the image source
+        
+        // Reset upload label
+        uploadLabel.textContent = 'Upload a file';
+        uploadLabel.parentElement.classList.remove('text-green-600');
     }
 });
 
-// Add event listener for the Facebook event import button
-document.addEventListener('DOMContentLoaded', () => {
-    const facebookButton = document.querySelector('.p-4.bg-blue-50 button[onclick^="openFacebookEvent"]');
-    if (facebookButton) facebookButton.addEventListener('click', openFacebookEvent);
-});
 
 
 /**
@@ -248,7 +287,7 @@ function selectRegistrationOption(option) {
 
     // Clear external link input if switching to platform registration
     if (isPlatform) {
-        document.getElementById('external-link').value = '';
+        document.getElementById('external-registration-url').value = '';
         document.getElementById('link-validation-message').classList.add('hidden');
     }
 }
@@ -258,7 +297,7 @@ function selectRegistrationOption(option) {
  * Performs a basic validation on the external link URL.
  */
 function validateExternalLink() {
-    const urlInput = document.getElementById('external-link');
+    const urlInput = document.getElementById('external-registration-url');
     const url = urlInput.value.trim();
     const message = document.getElementById('link-validation-message');
 
@@ -292,11 +331,7 @@ function validateExternalLink() {
     }
 }
 
-// Add event listener for the external link validation button
-document.addEventListener('DOMContentLoaded', () => {
-    const validateButton = document.querySelector('#external-link-container button[onclick^="validateExternalLink"]');
-    if (validateButton) validateButton.addEventListener('click', validateExternalLink);
-});
+
 
 
 /**
@@ -341,7 +376,7 @@ function collectFormDataForReview() {
     if (regMethodElement) {
         reviewFormData.set('registrationMethod', regMethodElement.value); // Use a consistent key
         if (regMethodElement.value === 'external') {
-            reviewFormData.set('externalLink', document.getElementById('external-link').value.trim()); // Use a consistent key
+            reviewFormData.set('externalRegistrationUrl', document.getElementById('external-registration-url').value.trim());
         }
     }
     // Handle isOnline checkbox
@@ -432,92 +467,80 @@ function populateReviewFields() {
 }
 
 
-// --- Form Submission ---\n\ndocument.getElementById(\'event-form\').addEventListener(\'submit\', async function(e) {
-e.preventDefault();
+// --- Form Submission ---
 
-if (!document.getElementById('terms').checked) {
-    alert('Please agree to the Terms of Service and Event Guidelines.');
-}
+document.getElementById('event-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
 
-// Collect form data for submission (create a new FormData object)
-const submissionFormData = new FormData(this);
-
-// Manually add rich text editor content
-const eventDescription = document.getElementById('event-description').innerHTML;
-submissionFormData.set('description', eventDescription); // Use schema field name 'description'
-
-// Handle category 'other'
-const categorySelect = document.getElementById('event-category');
-const categoryValue = categorySelect.value;
-if (categoryValue === 'other') {
-    submissionFormData.set('category', document.getElementById('other-category').value.trim()); // Use schema field name 'category'
-} else {
-    submissionFormData.set('category', categoryValue); // Use schema field name 'category'
-}
-
-// Get the registration method and external link if applicable
-const regMethodElement = document.querySelector('input[name="registration-method"]:checked');
-if (regMethodElement) {
-    submissionFormData.set('registrationMethod', regMethodElement.value); // Use schema field name 'registrationMethod'
-    if (regMethodElement.value === 'external') {
-        submissionFormData.set('externalLink', document.getElementById('external-link').value.trim()); // Use schema field name 'externalLink'
-    } else {
-        submissionFormData.delete('externalLink'); // Remove if not external
+    if (!document.getElementById('terms').checked) {
+        alert('Please agree to the Terms of Service and Event Guidelines.');
+        return;
     }
-} else {
-    // If no registration method is selected, handle as validation error or set a default
-    submissionFormData.delete('registrationMethod');
-    submissionFormData.delete('externalLink');
-}
 
-// Ensure correct schema field names are used for other fields
-submissionFormData.set('title', document.getElementById('event-title').value.trim());
-submissionFormData.set('date', document.getElementById('event-date').value);
-submissionFormData.set('time', document.getElementById('event-time').value);
-submissionFormData.set('location', document.getElementById('event-location').value.trim());
-submissionFormData.set('registrationDeadline', document.getElementById('registration-deadline').value); // Schema requires this, frontend can send empty string if not provided
-submissionFormData.set('prizeInfo', document.getElementById('prize-info').value.trim());
-submissionFormData.set('rules', document.getElementById('event-rules').value.trim());
+    // Create FormData manually to ensure correct field names for backend
+    const submissionFormData = new FormData();
 
-// Add the cover image file to the submission FormData
-const coverImageInput = document.getElementById('cover-image');
-if (coverImageInput.files && coverImageInput.files.length > 0) {
-    submissionFormData.set('coverImage', coverImageInput.files[0]); // Use schema field name 'coverImage'
-} else {
-    submissionFormData.delete('coverImage'); // Remove if no file selected
-}
-
-
-try {
-    const response = await fetch('/events', {
-        method: 'POST',
-        body: submissionFormData, // Send the submission FormData
-        // Include credentials (cookies) with the request for session authentication
-        credentials: 'include'
-    });
-
-    if (response.ok) {
-        // Event created successfully
-        const result = await response.json();
-        alert('Event submitted successfully! It will be reviewed by our team.');
-
-        // Reset the form and return to the first step upon success
-        this.reset();
-        document.getElementById('event-description').innerHTML = ''; // Reset rich text editor
-        document.getElementById('image-preview-container').classList.add('hidden');
-        document.getElementById('external-link-container').classList.add('hidden');
-        document.querySelectorAll('.registration-option').forEach(option => option.classList.remove('selected'));
-        showStep(1); // Go back to the first step
-
+    // Manually add all fields with correct backend field names
+    submissionFormData.append('title', document.getElementById('event-title').value.trim());
+    submissionFormData.append('description', document.getElementById('event-description').innerHTML);
+    
+    // Handle category 'other'
+    const categorySelect = document.getElementById('event-category');
+    const categoryValue = categorySelect.value;
+    if (categoryValue === 'other') {
+        submissionFormData.append('category', document.getElementById('other-category').value.trim());
     } else {
-        // Handle errors (e.g., display error message from the backend)
-        const errorData = await response.json();
-        alert(`Error creating event: ${errorData.message || response.statusText}`);
+        submissionFormData.append('category', categoryValue);
     }
-} catch (error) {
-    console.error('Error submitting event:', error);
-    alert('An error occurred while submitting the event. Please try again.');
-}
+
+    submissionFormData.append('date', document.getElementById('event-date').value);
+    submissionFormData.append('time', document.getElementById('event-time').value);
+    submissionFormData.append('location', document.getElementById('event-location').value.trim());
+    submissionFormData.append('registrationDeadline', document.getElementById('registration-deadline').value);
+    submissionFormData.append('prizeInfo', document.getElementById('prize-info').value.trim());
+    submissionFormData.append('rules', document.getElementById('event-rules').value.trim());
+
+    // Get the registration method and external link if applicable
+    const regMethodElement = document.querySelector('input[name="registration-method"]:checked');
+    if (regMethodElement) {
+        submissionFormData.append('registrationMethod', regMethodElement.value);
+        if (regMethodElement.value === 'external') {
+            submissionFormData.append('externalRegistrationUrl', document.getElementById('external-registration-url').value.trim());
+        }
+    } else {
+        // Default to platform if no method selected
+        submissionFormData.append('registrationMethod', 'platform');
+    }
+
+    // Add the cover image file
+    const coverImageInput = document.getElementById('cover-image');
+    if (coverImageInput.files && coverImageInput.files.length > 0) {
+        submissionFormData.append('coverImage', coverImageInput.files[0]);
+    }
+
+    try {
+        const response = await fetch('/events', {
+            method: 'POST',
+            body: submissionFormData,
+            credentials: 'include'
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            alert('Event submitted successfully! It will be reviewed by our team.');
+
+            // Redirect to organizer dashboard
+            window.location.href = 'organizer.html';
+
+        } else {
+            const errorData = await response.json();
+            alert(`Error creating event: ${errorData.message || response.statusText}`);
+        }
+    } catch (error) {
+        console.error('Error submitting event:', error);
+        alert('An error occurred while submitting the event. Please try again.');
+    }
+});
 
 
 

@@ -39,7 +39,7 @@
                 </div>
             </div>
             <h1 class="text-4xl md:text-6xl font-bold mb-4">Tech Conference 2023</h1>
-            <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">The premier technology conference featuring industry leaders, innovative workshops, and networking opportunities</p>
+            <!-- <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">The premier technology conference featuring industry leaders, innovative workshops, and networking opportunities</p> -->
             <a href="#register" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full text-lg animate-pulse inline-block">Register Now</a>
         </div>
     </section>
@@ -173,16 +173,31 @@
                             <div class="pt-4 border-t border-gray-200">
                                 <h4 class="font-semibold mb-2">Share This Event</h4>
                                 <div class="flex space-x-4">
-                                    <a href="#" class="text-blue-500 hover:text-blue-700"><i class="fab fa-facebook-f"></i></a>
-                                    <a href="#" class="text-blue-400 hover:text-blue-600"><i class="fab fa-twitter"></i></a>
-                                    <a href="#" class="text-pink-500 hover:text-pink-700"><i class="fab fa-instagram"></i></a>
-                                    <a href="#" class="text-blue-700 hover:text-blue-900"><i class="fab fa-linkedin-in"></i></a>
-                                    <a href="#" class="text-gray-700 hover:text-gray-900"><i class="fas fa-envelope"></i></a>
+                                    <a href="#" class="text-blue-500 hover:text-blue-700" id="share-facebook"><i class="fab fa-facebook-f"></i></a>
+                                    <a href="#" class="text-blue-400 hover:text-blue-600" id="share-twitter"><i class="fab fa-twitter"></i></a>
+                                    <a href="#" class="text-pink-500 hover:text-pink-700" id="share-instagram"><i class="fab fa-instagram"></i></a>
+                                    <a href="#" class="text-blue-700 hover:text-blue-900" id="share-linkedin"><i class="fab fa-linkedin-in"></i></a>
+                                    <a href="#" class="text-gray-700 hover:text-gray-900" id="share-email"><i class="fas fa-envelope"></i></a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Big Registration CTA Section -->
+    <section id="registration-cta" class="py-16 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">Ready to Join Us?</h2>
+            <p class="text-xl mb-8 max-w-2xl mx-auto">Don't miss out on this amazing opportunity. Register now to secure your spot!</p>
+            <button id="main-register-btn" class="inline-flex items-center px-8 py-4 bg-white text-indigo-600 text-xl font-bold rounded-full shadow-lg hover:bg-gray-50 transform hover:scale-105 transition-all duration-300">
+                <i class="fas fa-ticket-alt mr-3"></i>
+                Register Now
+            </button>
+            <div class="mt-6">
+                <p class="text-sm opacity-90" id="registration-info">Secure registration powered by Event Koi</p>
             </div>
         </div>
     </section>
@@ -255,7 +270,7 @@
     </section>
 
     <!-- Registration Section -->
-    <section id="register" class="py-16 bg-indigo-600 text-white">
+    <section id="register" class="py-16 bg-indigo-600 text-white hidden">
         <div class="container mx-auto px-4">
             <div class="max-w-4xl mx-auto text-center">
                 <h2 class="text-3xl font-bold mb-4">Ready to Join Tech Conference 2023?</h2>
@@ -264,7 +279,7 @@
                 <div class="bg-white rounded-xl shadow-xl p-8 text-gray-800 max-w-2xl mx-auto">
                     <h3 class="text-2xl font-bold mb-6">Register Now</h3>
                     
-                    <form class="space-y-4">
+                    <form class="space-y-4" id="platform-registration-form">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-gray-700 mb-2">First Name</label>
@@ -397,9 +412,14 @@
             
             <div class="text-center mt-12">
                 <p class="text-gray-700 mb-4">Have more questions?</p>
-                <a href="mailto:info@techconf.com" class="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors inline-block">
-                    Contact Our Team
-                </a>
+                <div class="space-x-4">
+                    <button id="ask-question-btn" class="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
+                        Ask a Question
+                    </button>
+                    <a href="mailto:info@eventKoi.com" class="px-6 py-3 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors inline-block">
+                        Contact Our Team
+                    </a>
+                </div>
             </div>
         </div>
     </section>
@@ -419,9 +439,9 @@
             
             <div class="text-center mt-12">
                 <p class="text-gray-700 mb-4">Interested in sponsoring?</p>
-                <a href="#" class="px-6 py-3 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors inline-block">
+                <button id="become-sponsor-btn" class="px-6 py-3 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors">
                     Become a Sponsor
-                </a>
+                </button>
             </div>
         </div>
     </section>
@@ -485,6 +505,162 @@
             </div>
         </div>
     </footer>
+
+    <!-- Registration Modal -->
+    <div id="registration-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-2xl mx-4 w-full max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-semibold">Register for Event</h3>
+                <button onclick="hideRegistrationModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="event-registration-form" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2">First Name *</label>
+                        <input type="text" name="firstName" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Last Name *</label>
+                        <input type="text" name="lastName" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 mb-2">Email Address *</label>
+                    <input type="email" name="email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 mb-2">Phone Number *</label>
+                    <input type="tel" name="phone" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 mb-2">Organization/Company</label>
+                    <input type="text" name="organization" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 mb-2">How did you hear about this event?</label>
+                    <select name="referralSource" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="">Select an option</option>
+                        <option value="social-media">Social Media</option>
+                        <option value="friend">Friend/Colleague</option>
+                        <option value="email">Email Newsletter</option>
+                        <option value="website">Website</option>
+                        <option value="search">Search Engine</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 mb-2">Additional Comments</label>
+                    <textarea name="comments" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Any special requirements or questions?"></textarea>
+                </div>
+                
+                <div class="flex items-center">
+                    <input type="checkbox" id="agree-terms" name="agreeTerms" class="mr-2" required>
+                    <label for="agree-terms" class="text-sm text-gray-700">
+                        I agree to the <a href="#" class="text-indigo-600 hover:underline">Terms and Conditions</a> and <a href="#" class="text-indigo-600 hover:underline">Privacy Policy</a>
+                    </label>
+                </div>
+                
+                <div class="flex justify-end space-x-4 mt-6">
+                    <button type="button" onclick="hideRegistrationModal()" class="px-6 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        Complete Registration
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Ask Question Modal -->
+    <div id="question-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md mx-4 w-full">
+            <h3 class="text-lg font-semibold mb-4">Ask a Question</h3>
+            <form id="question-form">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2">Your Name</label>
+                        <input type="text" id="question-name" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Email</label>
+                        <input type="email" id="question-email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Your Question</label>
+                        <textarea id="question-text" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="What would you like to know about this event?" required></textarea>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-4 mt-6">
+                    <button type="button" onclick="hideQuestionModal()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        Submit Question
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sponsor Inquiry Modal -->
+    <div id="sponsor-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md mx-4 w-full">
+            <h3 class="text-lg font-semibold mb-4">Become a Sponsor</h3>
+            <form id="sponsor-form">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2">Company Name</label>
+                        <input type="text" id="sponsor-company" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Contact Person</label>
+                        <input type="text" id="sponsor-contact" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Email</label>
+                        <input type="email" id="sponsor-email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Message</label>
+                        <textarea id="sponsor-message" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Tell us about your sponsorship interests..."></textarea>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-4 mt-6">
+                    <button type="button" onclick="hideSponsorModal()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        Send Inquiry
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- External Link Warning Modal -->
+    <div id="external-link-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md mx-4">
+            <h3 class="text-lg font-semibold mb-4">Leaving Event Koi?!</h3>
+            <p class="text-gray-700 mb-4">You're about to visit an external website for registration. We'll open it in a new tab for your safety.</p>
+            <div class="flex justify-end space-x-4">
+                <button onclick="hideExternalLinkModal()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50">
+                    Cancel
+                </button>
+                <button onclick="proceedToExternalLink()" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                    Continue
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Link to your new external script -->
     <script src="js/event_page.js"></script>

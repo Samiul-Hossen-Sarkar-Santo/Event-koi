@@ -269,18 +269,58 @@ document.getElementById('event-form').addEventListener('submit', function(e) {
         return;
     }
     
-    // In a real application, you would gather the form data and send it to a server.
-    // For example: const formData = new FormData(this);
+    // Collect form data
+    const formData = new FormData(this);
+
+    // Manually add the rich text editor content
+    formData.set('event-description', document.getElementById('event-description').innerHTML);
+
+    // Add the category from the "other" input if applicable
+    const categorySelect = document.getElementById('event-category');
+    if (categorySelect.value === 'other') {
+        formData.set('event-category', document.getElementById('other-category').value);
+    }
+
+    // Get the registration method and external link if applicable
+    const regMethod = document.querySelector('input[name="registration-method"]:checked');
+    if (regMethod) {
+        formData.set('registration-method', regMethod.value);
+        if (regMethod.value === 'external') {
+            formData.set('external-link', document.getElementById('external-link').value);
+        }
+    } else {
+         formData.set('registration-method', ''); // Or handle as validation error if necessary
+    }
+
+    // Send data to the backend
+    fetch('/events', {
+        method: 'POST',
+        body: formData // FormData handles the Content-Type header for multipart/form-data
+    })
+    .then(response => {
+        if (response.ok) { // Check for status codes 200-299
+            alert('Event submitted successfully! It will be reviewed by our team.');
+            // Reset the form and return to the first step upon success
+            this.reset();
+            document.getElementById('event-description').innerHTML = '';
+            document.getElementById('image-preview-container').classList.add('hidden');
+            document.getElementById('external-link-container').classList.add('hidden');
+            document.querySelectorAll('.registration-option').forEach(option => option.classList.remove('selected'));
+            showStep(1);
+        } else {
+            // Handle server errors (e.g., validation errors, internal server error)
+            response.json().then(data => {
+                 alert(`Error submitting event: ${data.message || response.statusText}`);
+            }).catch(() => {
+                 alert(`Error submitting event: ${response.statusText}`);
+            });
+        }
+    })
+    .catch(error => {
+        // Handle network errors
+        alert(`Network error submitting event: ${error.message}`);
+    });
     
-    alert('Event submitted successfully! It will be reviewed by our team.');
-    
-    // Reset the form and return to the first step
-    this.reset();
-    document.getElementById('event-description').innerHTML = '';
-    document.getElementById('image-preview-container').classList.add('hidden');
-    document.getElementById('external-link-container').classList.add('hidden');
-    document.querySelectorAll('.registration-option').forEach(option => option.classList.remove('selected'));
-    showStep(1);
 });
 
 // --- Modal Logic ---

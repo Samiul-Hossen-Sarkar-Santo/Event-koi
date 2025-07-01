@@ -138,6 +138,49 @@ document.getElementById('event-category').addEventListener('change', function ()
     }
 });
 
+// Add event listeners for rich text editor buttons
+document.addEventListener('DOMContentLoaded', () => {
+    const formatButtons = document.querySelectorAll('.rich-text-editor + div.mt-1 button');
+    formatButtons.forEach(button => {
+        const command = button.onclick.toString().match(/formatText\('([^']+)'\)/)[1];
+        if (command) {
+            button.onclick = null; // Remove inline onclick
+            button.addEventListener('click', () => formatText(command));
+        }
+    });
+
+    // Add event listeners for navigation buttons
+    const nextStepButtons = document.querySelectorAll('.step button[onclick^="nextStep"]');
+    nextStepButtons.forEach(button => {
+        const step = parseInt(button.onclick.toString().match(/nextStep\((\d+)\)/)[1], 10);
+        if (!isNaN(step)) {
+            button.onclick = null; // Remove inline onclick
+            button.addEventListener('click', () => nextStep(step));
+        }
+    });
+
+    const prevStepButtons = document.querySelectorAll('.step button[onclick^="prevStep"]');
+    prevStepButtons.forEach(button => {
+        const step = parseInt(button.onclick.toString().match(/prevStep\((\d+)\)/)[1], 10);
+        if (!isNaN(step)) {
+            button.onclick = null; // Remove inline onclick
+            button.addEventListener('click', () => prevStep(step));
+        }
+    });
+
+    // Add event listeners for registration option divs
+    const registrationOptions = document.querySelectorAll('.registration-option');
+    registrationOptions.forEach(option => {
+        const method = option.onclick.toString().match(/selectRegistrationOption\('([^']+)'\)/)[1];
+        if (method) {
+            option.onclick = null; // Remove inline onclick
+            option.addEventListener('click', () => selectRegistrationOption(method));
+        }
+    });
+});
+
+
+
 // Display a preview of the uploaded cover image.
 document.getElementById('cover-image').addEventListener('change', function (e) {
     const file = e.target.files[0];
@@ -156,6 +199,12 @@ document.getElementById('cover-image').addEventListener('change', function (e) {
         document.getElementById('image-preview-container').classList.add('hidden');
         document.getElementById('image-preview').src = '#'; // Clear the image source
     }
+});
+
+// Add event listener for the Facebook event import button
+document.addEventListener('DOMContentLoaded', () => {
+    const facebookButton = document.querySelector('.p-4.bg-blue-50 button[onclick^="openFacebookEvent"]');
+    if (facebookButton) facebookButton.addEventListener('click', openFacebookEvent);
 });
 
 
@@ -242,6 +291,12 @@ function validateExternalLink() {
         return false;
     }
 }
+
+// Add event listener for the external link validation button
+document.addEventListener('DOMContentLoaded', () => {
+    const validateButton = document.querySelector('#external-link-container button[onclick^="validateExternalLink"]');
+    if (validateButton) validateButton.addEventListener('click', validateExternalLink);
+});
 
 
 /**
@@ -382,7 +437,6 @@ e.preventDefault();
 
 if (!document.getElementById('terms').checked) {
     alert('Please agree to the Terms of Service and Event Guidelines.');
-    return;
 }
 
 // Collect form data for submission (create a new FormData object)

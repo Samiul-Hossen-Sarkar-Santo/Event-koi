@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | Event Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="user.css">
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="bg-white shadow-md rounded-lg p-6 mb-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <a href="#" class="text-3xl font-bold text-indigo-700 mb-4 md:mb-0">Event Platform</a>
+                <div class="flex items-center space-x-4">
+                    <span class="font-semibold">Welcome, John!</span>
+                    <button id="logoutBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-4 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- General User Section -->
+        <section class="bg-white shadow-md rounded-lg p-6">
+            <div class="flex flex-col md:flex-row gap-8">
+                <!-- Sidebar -->
+                <aside class="w-full md:w-1/4">
+                    <div class="bg-indigo-50 rounded-lg p-6 mb-6 text-center md:text-left">
+                        <div class="flex flex-col md:flex-row items-center mb-4">
+                            <div class="relative w-20 h-20 rounded-full bg-indigo-200 flex items-center justify-center text-indigo-600 text-3xl font-bold mr-0 md:mr-4 mb-4 md:mb-0">
+                                <span>U</span>
+                            </div>
+                            <div>
+                                <h2 class="text-xl font-semibold">John Doe</h2>
+                                <p class="text-gray-600">john.doe@example.com</p>
+                            </div>
+                        </div>
+                        <nav class="space-y-2">
+                            <button class="w-full text-left p-3 rounded-lg hover:bg-indigo-100 flex items-center tab-btn active-tab" data-tab="profile">
+                                <i class="fas fa-user w-6 text-center mr-3 text-indigo-600"></i> Profile
+                            </button>
+                            <button class="w-full text-left p-3 rounded-lg hover:bg-indigo-100 flex items-center tab-btn" data-tab="events">
+                                <i class="fas fa-calendar-alt w-6 text-center mr-3 text-indigo-600"></i> My Events
+                            </button>
+                            <button class="w-full text-left p-3 rounded-lg hover:bg-indigo-100 flex items-center relative tab-btn" data-tab="notices">
+                                <i class="fas fa-bell w-6 text-center mr-3 text-indigo-600"></i> Notifications
+                                <span class="notification-badge">3</span>
+                            </button>
+                            <button class="w-full text-left p-3 rounded-lg hover:bg-indigo-100 flex items-center tab-btn" data-tab="settings">
+                                <i class="fas fa-cog w-6 text-center mr-3 text-indigo-600"></i> Settings
+                            </button>
+                        </nav>
+                    </div>
+                </aside>
+                
+                <!-- Main Content -->
+                <main class="w-full md:w-3/4">
+                    <!-- Profile Tab -->
+                    <div id="profile" class="tab-content active">
+                        <h2 class="text-2xl font-bold mb-6 text-gray-800">Personal Information</h2>
+                        <form class="space-y-6 bg-gray-50 p-6 rounded-lg border">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                    <input type="text" value="John Doe" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                    <input type="email" value="john.doe@example.com" readonly class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">University/Organization</label>
+                                    <input type="text" value="State University" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">T-Shirt Size</label>
+                                    <select class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                        <option>Small</option>
+                                        <option selected>Medium</option>
+                                        <option>Large</option>
+                                        <option>XL</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Skills</label>
+                                <textarea class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" rows="3" placeholder="e.g., Web Development, Graphic Design, Public Speaking"></textarea>
+                            </div>
+                            <div class="flex justify-end pt-4 border-t">
+                                <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- My Events Tab -->
+                    <div id="events" class="tab-content">
+                        <h2 class="text-2xl font-bold mb-6 text-gray-800">My Events</h2>
+                        <div class="border-b border-gray-200 mb-6">
+                            <nav class="-mb-px flex space-x-6">
+                                <button class="event-tab-btn py-3 px-1 font-medium text-indigo-600 border-b-2 border-indigo-600" data-event-tab="interested">Interested (12)</button>
+                                <button class="event-tab-btn py-3 px-1 font-medium text-gray-500 hover:text-indigo-600" data-event-tab="registered">Registered (5)</button>
+                                <button class="event-tab-btn py-3 px-1 font-medium text-gray-500 hover:text-indigo-600" data-event-tab="favorites">Favorites (8)</button>
+                                <button class="event-tab-btn py-3 px-1 font-medium text-gray-500 hover:text-indigo-600" data-event-tab="attended">Attended (3)</button>
+                            </nav>
+                        </div>
+                        
+                        <div id="interested" class="event-tab-content active">
+                            <div class="space-y-4">
+                                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                    <div class="flex flex-col md:flex-row justify-between">
+                                        <div>
+                                            <h3 class="font-bold text-lg">Tech Conference 2023</h3>
+                                            <p class="text-gray-600">By Tech Org</p>
+                                            <p class="text-gray-500 text-sm mt-1"><i class="fas fa-calendar-alt mr-2"></i>Oct 15-17, 2023</p>
+                                            <p class="text-gray-500 text-sm"><i class="fas fa-map-marker-alt mr-2"></i>Online</p>
+                                        </div>
+                                        <div class="flex items-center mt-4 md:mt-0">
+                                            <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg mr-2">Register</button>
+                                            <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg"><i class="fas fa-heart text-red-500"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- More event cards would go here -->
+                            </div>
+                        </div>
+                        
+                        <div id="registered" class="event-tab-content"><p class="text-gray-500">Your registered events will appear here.</p></div>
+                        <div id="favorites" class="event-tab-content"><p class="text-gray-500">Your favorite events will appear here.</p></div>
+                        <div id="attended" class="event-tab-content"><p class="text-gray-500">Events you've attended will appear here.</p></div>
+                    </div>
+                    
+                    <!-- Notice Board Tab -->
+                    <div id="notices" class="tab-content">
+                        <h2 class="text-2xl font-bold mb-6 text-gray-800">Notice Board</h2>
+                        <div class="space-y-4">
+                            <div class="border-l-4 border-yellow-500 bg-yellow-50 p-4 rounded-r-lg">
+                                <div class="flex justify-between">
+                                    <h3 class="font-bold text-lg">Warning</h3>
+                                    <span class="text-gray-500 text-sm">2 days ago</span>
+                                </div>
+                                <p class="mt-2 text-gray-700">Your recent report has been reviewed and the content has been removed. Thank you for helping keep our platform safe.</p>
+                            </div>
+                            <div class="border-l-4 border-blue-500 bg-blue-50 p-4 rounded-r-lg">
+                                <div class="flex justify-between">
+                                    <h3 class="font-bold text-lg">Reminder</h3>
+                                    <span class="text-gray-500 text-sm">1 week ago</span>
+                                </div>
+                                <p class="mt-2 text-gray-700">Registration for "Web Development Workshop" closes in 3 days. Don't miss out!</p>
+                            </div>
+                            <div class="border-l-4 border-green-500 bg-green-50 p-4 rounded-r-lg">
+                                <div class="flex justify-between">
+                                    <h3 class="font-bold text-lg">System Update</h3>
+                                    <span class="text-gray-500 text-sm">2 weeks ago</span>
+                                </div>
+                                <p class="mt-2 text-gray-700">We've added new filtering options to help you find events more easily. Check them out!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Settings Tab -->
+                     <div id="settings" class="tab-content">
+                        <h2 class="text-2xl font-bold mb-6 text-gray-800">Settings</h2>
+                        <div class="space-y-6 bg-gray-50 p-6 rounded-lg border">
+                            <div>
+                                <h3 class="text-lg font-semibold mb-2">Notification Settings</h3>
+                                <div class="space-y-2">
+                                    <label class="flex items-center justify-between p-3 bg-white rounded-lg border">
+                                        <span>Email me about new events in my area</span>
+                                        <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" checked>
+                                    </label>
+                                    <label class="flex items-center justify-between p-3 bg-white rounded-lg border">
+                                        <span>Notify me when an event I'm interested in is updated</span>
+                                        <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" checked>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="border-t pt-6">
+                                <h3 class="text-lg font-semibold mb-2">Account Actions</h3>
+                                <div class="flex flex-col sm:flex-row gap-4">
+                                     <button class="w-full sm:w-auto bg-indigo-100 text-indigo-700 font-semibold py-3 px-6 rounded-lg hover:bg-indigo-200">Change Password</button>
+                                     <button class="w-full sm:w-auto bg-red-100 text-red-700 font-semibold py-3 px-6 rounded-lg hover:bg-red-200">Delete Account</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </section>
+    </div>
+    <script src="user.js"></script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Platform - Login & Signup</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/login_signup.css">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-4xl bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="md:flex">
+            <!-- Left Side - Illustration -->
+            <div class="hidden md:block md:w-1/2 bg-gradient-to-br from-blue-500 to-indigo-600 p-8 text-white">
+                <div class="flex flex-col h-full justify-center">
+                    <h2 class="text-3xl font-bold mb-4">Join Our Event Platform</h2>
+                    <p class="mb-6">Connect with events that matter to you. Whether you're attending or organizing, we've got you covered.</p>
+                    <div class="flex space-x-2">
+                        <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                            <i class="fas fa-calendar-check text-xl"></i>
+                        </div>
+                        <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                            <i class="fas fa-users text-xl"></i>
+                        </div>
+                        <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                            <i class="fas fa-ticket-alt text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Side - Forms -->
+            <div class="w-full md:w-1/2 p-8">
+                <!-- Toggle Buttons -->
+                <div class="flex mb-8 border-b">
+                    <button id="login-toggle" class="form-toggle-btn active">Login</button>
+                    <button id="signup-toggle" class="form-toggle-btn">Sign Up</button>
+                </div>
+                
+                <!-- Login Form -->
+                <div id="login-form" class="form-container active">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-800">Welcome Back</h2>
+                    <form id="loginForm">
+                        <div class="mb-4">
+                            <label for="login-email" class="form-label">Email</label>
+                            <input type="email" id="login-email" class="form-input" placeholder="your@email.com" required>
+                        </div>
+                        <div class="mb-6">
+                            <label for="login-password" class="form-label">Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="login-password" class="form-input pr-10" placeholder="••••••••" required>
+                                <i class="fas fa-eye password-toggle-icon" id="toggle-login-password"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between mb-6">
+                            <label class="flex items-center text-sm text-gray-700">
+                                <input type="checkbox" id="remember-me" class="h-4 w-4 text-blue-500 focus:ring-blue-500 border-gray-300 rounded">
+                                <span class="ml-2">Remember me</span>
+                            </label>
+                            <a href="#" class="text-sm text-blue-500 hover:underline">Forgot password?</a>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 font-semibold">
+                            Login
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Signup Form Container -->
+                <div id="signup-container" class="form-container">
+                    <h2 class="text-2xl font-bold mb-2 text-gray-800">Create an Account</h2>
+                    <p class="text-gray-500 mb-6">Just a few steps to get started.</p>
+                    
+                    <!-- Progress Bar -->
+                    <div class="mb-6">
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div id="progress-bar" class="bg-blue-500 h-2 rounded-full transition-all duration-300" style="width: 33.3%;"></div>
+                        </div>
+                    </div>
+
+                    <form id="signupForm">
+                        <!-- Step 1: Role Selection -->
+                        <div id="step-1" class="signup-step active">
+                            <h3 class="font-semibold text-lg mb-4 text-gray-700">Step 1: Choose Your Role</h3>
+                            <div class="space-y-4">
+                                <button type="button" data-role="participant" class="role-btn active">
+                                    <i class="fas fa-user mr-3"></i>
+                                    <span>Participant</span>
+                                    <p class="text-sm font-normal mt-1">Join events, connect with others, and explore opportunities.</p>
+                                </button>
+                                <button type="button" data-role="organizer" class="role-btn">
+                                    <i class="fas fa-calendar-plus mr-3"></i>
+                                    <span>Organizer</span>
+                                    <p class="text-sm font-normal mt-1">Create, manage, and promote your own events on our platform.</p>
+                                </button>
+                            </div>
+                             <div class="mt-8 flex justify-end">
+                                <button type="button" class="next-btn">Next <i class="fas fa-arrow-right ml-2"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Account Info -->
+                        <div id="step-2" class="signup-step">
+                             <h3 class="font-semibold text-lg mb-4 text-gray-700">Step 2: Account Information</h3>
+                             <div class="space-y-4">
+                                <div>
+                                    <label for="full-name" class="form-label">Full Name</label>
+                                    <input type="text" id="full-name" class="form-input" placeholder="John Doe" required>
+                                </div>
+                                <div>
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" id="email" class="form-input" placeholder="your@email.com" required>
+                                </div>
+                                <div>
+                                    <label for="password" class="form-label">Password</label>
+                                    <div class="password-wrapper">
+                                        <input type="password" id="password" class="form-input pr-10" placeholder="••••••••" required>
+                                        <i class="fas fa-eye password-toggle-icon" id="toggle-signup-password"></i>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">At least 8 characters</p>
+                                </div>
+                             </div>
+                             <div class="mt-8 flex justify-between">
+                                <button type="button" class="back-btn"><i class="fas fa-arrow-left mr-2"></i> Back</button>
+                                <button type="button" class="next-btn">Next <i class="fas fa-arrow-right ml-2"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Profile Details -->
+                        <div id="step-3" class="signup-step">
+                            <h3 class="font-semibold text-lg mb-4 text-gray-700">Step 3: Tell Us More</h3>
+                            <div class="space-y-4">
+                                <!-- Fields for Participant -->
+                                <div id="participant-fields">
+                                    <div>
+                                        <label for="institution" class="form-label">Institution/Organization (Optional)</label>
+                                        <input type="text" id="institution" class="form-input" placeholder="Your school or company">
+                                    </div>
+                                </div>
+                                <!-- Fields for Organizer -->
+                                <div id="organizer-fields" class="hidden">
+                                    <div>
+                                        <label for="organization-name" class="form-label">Organization Name</label>
+                                        <input type="text" id="organization-name" class="form-input" placeholder="Your organization's name">
+                                    </div>
+                                </div>
+                                <div class="pt-2">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="terms" class="h-4 w-4 text-blue-500 focus:ring-blue-500 border-gray-300 rounded" required>
+                                        <span class="ml-2 block text-sm text-gray-700">
+                                            I agree to the <a href="#" class="text-blue-500 hover:underline">Terms</a> & <a href="#" class="text-blue-500 hover:underline">Policy</a>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="mt-8 flex justify-between">
+                                <button type="button" class="back-btn"><i class="fas fa-arrow-left mr-2"></i> Back</button>
+                                <button type="submit" class="next-btn">Create Account <i class="fas fa-check ml-2"></i></button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="mt-4 text-center">
+                        <p class="text-sm text-gray-600">Already have an account? <button id="switch-to-login" class="text-blue-500 hover:underline font-semibold">Login</button></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/login_signup.js"></script>
+</body>
+</html>

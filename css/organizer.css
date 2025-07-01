@@ -1,0 +1,44 @@
+/* General styles for tabbed content */
+.org-tab-content, .event-mgmt-tab-content {
+    display: none;
+}
+
+.org-tab-content.active, .event-mgmt-tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Style for the active sidebar navigation button */
+.org-tab-btn.active-tab {
+    background-color: #f5f3ff; /* purple-100 */
+    font-weight: 600;
+}
+
+/* Chart container for analytics */
+.chart-container {
+    position: relative;
+    height: 250px; /* Adjusted height for better visibility */
+    width: 100%;
+}
+
+/* Notification badge on sidebar icons */
+.notification-badge {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background-color: #EF4444; /* red-500 */
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+}

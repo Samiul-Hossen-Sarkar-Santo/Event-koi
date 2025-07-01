@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Conference 2023 | Event Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Link to your new external stylesheet -->
+    <link rel="stylesheet" href="css/event_page.css">
+</head>
+<body class="font-sans bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-indigo-600">EventHub</a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#" class="text-gray-700 hover:text-indigo-600">Home</a>
+                <a href="#" class="text-gray-700 hover:text-indigo-600">Events</a>
+                <a href="#" class="text-gray-700 hover:text-indigo-600">About</a>
+                <a href="#" class="text-gray-700 hover:text-indigo-600">Contact</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="#" class="px-4 py-2 text-indigo-600 border border-indigo-600 rounded-md hover:bg-indigo-50">Login</a>
+                <button class="md:hidden text-gray-700">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="event-hero flex items-center justify-center text-white relative">
+        <div class="container mx-auto px-4 py-16 text-center">
+            <div class="countdown-box inline-block px-6 py-4 rounded-lg mb-8">
+                <h3 class="text-lg font-semibold mb-2">STARTS IN</h3>
+                <div class="flex justify-center space-x-4" id="countdown">
+                    <!-- Countdown timer will be injected here by JavaScript -->
+                </div>
+            </div>
+            <h1 class="text-4xl md:text-6xl font-bold mb-4">Tech Conference 2023</h1>
+            <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">The premier technology conference featuring industry leaders, innovative workshops, and networking opportunities</p>
+            <a href="#register" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full text-lg animate-pulse inline-block">Register Now</a>
+        </div>
+    </section>
+
+    <!-- Event Details -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col lg:flex-row gap-12">
+                <div class="lg:w-2/3">
+                    <h2 class="text-3xl font-bold mb-6 text-gray-800">About The Event</h2>
+                    <div class="prose max-w-none text-gray-700 mb-8">
+                        <p class="mb-4">The Tech Conference 2023 is the most anticipated technology event of the year, bringing together innovators, entrepreneurs, and tech enthusiasts from around the globe. This year's theme is "The Future of Digital Transformation" where we'll explore cutting-edge technologies shaping our world.</p>
+                        
+                        <p class="mb-4">Over three action-packed days, you'll experience:</p>
+                        <ul class="list-disc pl-6 mb-4 space-y-2">
+                            <li>Keynote speeches from industry pioneers</li>
+                            <li>Interactive workshops on AI, Blockchain, and Cloud Computing</li>
+                            <li>Hands-on coding sessions with expert mentors</li>
+                            <li>Startup pitch competitions with $50,000 in prizes</li>
+                            <li>Exclusive networking opportunities with tech leaders</li>
+                        </ul>
+                        
+                        <p>Whether you're a developer, entrepreneur, student, or tech enthusiast, this conference will provide valuable insights, practical skills, and connections to propel your career forward in the digital age.</p>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-semibold mb-4 text-gray-800">Event Schedule</h3>
+                        <div class="space-y-4">
+                            <div class="border-l-4 border-indigo-500 pl-4 py-2">
+                                <div class="font-bold">Day 1 - October 12, 2023</div>
+                                <div class="text-gray-600">Opening Keynote, AI Workshops, Networking Mixer</div>
+                            </div>
+                            <div class="border-l-4 border-indigo-500 pl-4 py-2">
+                                <div class="font-bold">Day 2 - October 13, 2023</div>
+                                <div class="text-gray-600">Cloud Computing Sessions, Startup Pitches, Tech Expo</div>
+                            </div>
+                            <div class="border-l-4 border-indigo-500 pl-4 py-2">
+                                <div class="font-bold">Day 3 - October 14, 2023</div>
+                                <div class="text-gray-600">Blockchain Deep Dive, Closing Ceremony, Awards</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-semibold mb-4 text-gray-800">Prizes & Awards</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
+                                <div class="text-indigo-600 font-bold text-xl mb-2">1st Prize</div>
+                                <div class="text-gray-800">$25,000 Cash + Incubation Program</div>
+                            </div>
+                            <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
+                                <div class="text-indigo-600 font-bold text-xl mb-2">2nd Prize</div>
+                                <div class="text-gray-800">$15,000 Cash + Mentorship</div>
+                            </div>
+                            <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
+                                <div class="text-indigo-600 font-bold text-xl mb-2">3rd Prize</div>
+                                <div class="text-gray-800">$10,000 Cash</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-2xl font-semibold mb-4 text-gray-800">Rules & Regulations</h3>
+                        <div class="prose max-w-none text-gray-700">
+                            <ol class="list-decimal pl-6 space-y-2">
+                                <li>All participants must register before the deadline (October 5, 2023)</li>
+                                <li>Team size for competitions is limited to 3-5 members</li>
+                                <li>Original work only - plagiarism will result in disqualification</li>
+                                <li>Code of conduct must be followed at all times</li>
+                                <li>Judges' decisions are final and binding</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lg:w-1/3">
+                    <div class="bg-gray-50 p-6 rounded-xl sticky top-24">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Event Details</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div class="text-indigo-600 mr-4 mt-1">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold">Date & Time</div>
+                                    <div class="text-gray-600">October 12-14, 2023<br>9:00 AM - 6:00 PM Daily</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="text-indigo-600 mr-4 mt-1">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold">Location</div>
+                                    <div class="text-gray-600">
+                                        San Francisco Convention Center<br>
+                                        747 Howard St, San Francisco, CA 94103
+                                        <a href="https://maps.google.com" class="text-indigo-600 hover:underline block mt-1">View on Map →</a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="text-indigo-600 mr-4 mt-1">
+                                    <i class="fas fa-ticket-alt"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold">Ticket Price</div>
+                                    <div class="text-gray-600">
+                                        <span class="line-through text-red-500">$499</span> 
+                                        <span class="font-bold text-green-600">$399 Early Bird (until Sep 15)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="text-indigo-600 mr-4 mt-1">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold">Available Seats</div>
+                                    <div class="text-gray-600">124/500 remaining</div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                                        <div class="bg-indigo-600 h-2.5 rounded-full" style="width: 75%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="pt-4 border-t border-gray-200">
+                                <h4 class="font-semibold mb-2">Share This Event</h4>
+                                <div class="flex space-x-4">
+                                    <a href="#" class="text-blue-500 hover:text-blue-700"><i class="fab fa-facebook-f"></i></a>
+                                    <a href="#" class="text-blue-400 hover:text-blue-600"><i class="fab fa-twitter"></i></a>
+                                    <a href="#" class="text-pink-500 hover:text-pink-700"><i class="fab fa-instagram"></i></a>
+                                    <a href="#" class="text-blue-700 hover:text-blue-900"><i class="fab fa-linkedin-in"></i></a>
+                                    <a href="#" class="text-gray-700 hover:text-gray-900"><i class="fas fa-envelope"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Speakers Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-12 text-center text-gray-800">Featured Speakers</h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Speaker 1 -->
+                <div class="speaker-card bg-white rounded-xl overflow-hidden shadow-md transition-all duration-300">
+                    <div class="h-64 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=688&q=80" 
+                             alt="Speaker" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-1">Sarah Johnson</h3>
+                        <p class="text-indigo-600 mb-3">CTO, Tech Innovations Inc.</p>
+                        <p class="text-gray-600 text-sm">Expert in AI and Machine Learning with 15+ years of industry experience.</p>
+                    </div>
+                </div>
+                
+                <!-- Speaker 2 -->
+                <div class="speaker-card bg-white rounded-xl overflow-hidden shadow-md transition-all duration-300">
+                    <div class="h-64 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" 
+                             alt="Speaker" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-1">Michael Chen</h3>
+                        <p class="text-indigo-600 mb-3">Lead Developer, Blockchain Solutions</p>
+                        <p class="text-gray-600 text-sm">Pioneer in decentralized technologies and smart contract development.</p>
+                    </div>
+                </div>
+                
+                <!-- Speaker 3 -->
+                <div class="speaker-card bg-white rounded-xl overflow-hidden shadow-md transition-all duration-300">
+                    <div class="h-64 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" 
+                             alt="Speaker" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-1">Emma Rodriguez</h3>
+                        <p class="text-indigo-600 mb-3">Director of Cloud Architecture, Azure</p>
+                        <p class="text-gray-600 text-sm">Specialist in scalable cloud infrastructure and distributed systems.</p>
+                    </div>
+                </div>
+                
+                <!-- Speaker 4 -->
+                <div class="speaker-card bg-white rounded-xl overflow-hidden shadow-md transition-all duration-300">
+                    <div class="h-64 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                             alt="Speaker" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-1">David Kim</h3>
+                        <p class="text-indigo-600 mb-3">Founder, Startup Accelerator</p>
+                        <p class="text-gray-600 text-sm">Venture capitalist with a track record of successful tech investments.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <button class="px-6 py-3 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors">
+                    View All Speakers
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Registration Section -->
+    <section id="register" class="py-16 bg-indigo-600 text-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-3xl font-bold mb-4">Ready to Join Tech Conference 2023?</h2>
+                <p class="text-xl mb-8 max-w-2xl mx-auto">Secure your spot today and be part of the most exciting tech event of the year!</p>
+                
+                <div class="bg-white rounded-xl shadow-xl p-8 text-gray-800 max-w-2xl mx-auto">
+                    <h3 class="text-2xl font-bold mb-6">Register Now</h3>
+                    
+                    <form class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 mb-2">First Name</label>
+                                <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Last Name</label>
+                                <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-2">Email Address</label>
+                            <input type="email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-2">Phone Number</label>
+                            <input type="tel" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-2">Ticket Type</label>
+                            <select class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option>General Admission ($399)</option>
+                                <option>VIP Pass ($599) - Front Row Seating + VIP Lounge</option>
+                                <option>Student Pass ($199) - Valid ID Required</option>
+                            </select>
+                        </div>
+                        
+                        <div class="pt-4">
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md transition-colors">
+                                Complete Registration
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-12 text-center text-gray-800">Event Gallery</h2>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="h-48 overflow-hidden rounded-lg">
+                    <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1412&q=80" 
+                         alt="Event" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                </div>
+                <div class="h-48 overflow-hidden rounded-lg">
+                    <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                         alt="Event" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                </div>
+                <div class="h-48 overflow-hidden rounded-lg">
+                    <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                         alt="Event" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                </div>
+                <div class="h-48 overflow-hidden rounded-lg">
+                    <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                         alt="Event" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                </div>
+            </div>
+            
+            <div class="text-center mt-8">
+                <button class="px-6 py-3 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors">
+                    View More Photos
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-12 text-center text-gray-800">Frequently Asked Questions</h2>
+            
+            <div class="max-w-3xl mx-auto space-y-4">
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button class="faq-toggle w-full px-6 py-4 text-left font-semibold bg-white hover:bg-gray-50 flex justify-between items-center">
+                        <span>What is included in the ticket price?</span>
+                        <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content px-6 py-4 bg-gray-50 hidden">
+                        <p class="text-gray-700">Your ticket includes access to all keynote sessions, workshops, the tech expo, networking events, and conference materials. Meals are not included except for VIP ticket holders who get access to the VIP lounge with catering.</p>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button class="faq-toggle w-full px-6 py-4 text-left font-semibold bg-white hover:bg-gray-50 flex justify-between items-center">
+                        <span>Is there a discount for group registrations?</span>
+                        <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content px-6 py-4 bg-gray-50 hidden">
+                        <p class="text-gray-700">Yes! We offer a 15% discount for groups of 5 or more attendees. Please contact our registration team at registration@techconf.com for group discount codes.</p>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button class="faq-toggle w-full px-6 py-4 text-left font-semibold bg-white hover:bg-gray-50 flex justify-between items-center">
+                        <span>What is the cancellation policy?</span>
+                        <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content px-6 py-4 bg-gray-50 hidden">
+                        <p class="text-gray-700">Cancellations made before September 1, 2023 will receive a full refund minus a $50 processing fee. Cancellations between September 1-30 will receive a 50% refund. No refunds will be issued after October 1, 2023.</p>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button class="faq-toggle w-full px-6 py-4 text-left font-semibold bg-white hover:bg-gray-50 flex justify-between items-center">
+                        <span>Will sessions be recorded for later viewing?</span>
+                        <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content px-6 py-4 bg-gray-50 hidden">
+                        <p class="text-gray-700">Keynote sessions will be recorded and made available to attendees for 30 days after the event. Workshop sessions will not be recorded due to their interactive nature.</p>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button class="faq-toggle w-full px-6 py-4 text-left font-semibold bg-white hover:bg-gray-50 flex justify-between items-center">
+                        <span>What COVID-19 safety measures are in place?</span>
+                        <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content px-6 py-4 bg-gray-50 hidden">
+                        <p class="text-gray-700">We are following all local health guidelines. The venue will have enhanced cleaning protocols, hand sanitizing stations throughout, and optional mask-wearing. We recommend attendees be vaccinated but do not require proof of vaccination.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <p class="text-gray-700 mb-4">Have more questions?</p>
+                <a href="mailto:info@techconf.com" class="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors inline-block">
+                    Contact Our Team
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sponsors Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-12 text-center text-gray-800">Our Sponsors</h2>
+            
+            <div class="flex flex-wrap justify-center items-center gap-8 md:gap-16">
+                <img src="https://via.placeholder.com/180x80?text=TechCorp" alt="Sponsor" class="h-16 opacity-70 hover:opacity-100 transition-opacity">
+                <img src="https://via.placeholder.com/180x80?text=CloudSolutions" alt="Sponsor" class="h-16 opacity-70 hover:opacity-100 transition-opacity">
+                <img src="https://via.placeholder.com/180x80?text=DigitalFuture" alt="Sponsor" class="h-16 opacity-70 hover:opacity-100 transition-opacity">
+                <img src="https://via.placeholder.com/180x80?text=InnovateX" alt="Sponsor" class="h-16 opacity-70 hover:opacity-100 transition-opacity">
+                <img src="https://via.placeholder.com/180x80?text=NextGen" alt="Sponsor" class="h-16 opacity-70 hover:opacity-100 transition-opacity">
+            </div>
+            
+            <div class="text-center mt-12">
+                <p class="text-gray-700 mb-4">Interested in sponsoring?</p>
+                <a href="#" class="px-6 py-3 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors inline-block">
+                    Become a Sponsor
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">EventHub</h3>
+                    <p class="text-gray-400">Connecting people with the best events worldwide since 2015.</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Home</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Events</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">FAQs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Terms of Service</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Refund Policy</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Contact Us</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt mt-1 mr-3"></i>
+                            <span>123 Event Street, San Francisco, CA 94103</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone-alt mr-3"></i>
+                            <span>(415) 555-1234</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-3"></i>
+                            <span>info@eventhub.com</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 mb-4 md:mb-0">© 2023 EventHub. All rights reserved.</p>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Link to your new external script -->
+    <script src="js/event_page.js"></script>
+</body>
+</html>

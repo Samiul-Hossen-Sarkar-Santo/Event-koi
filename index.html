@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Koi?! - Discover Amazing Events</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Link to your new external stylesheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 smooth-transition">
+    <!-- Navigation -->
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="#" class="flex items-center space-x-2">
+                        <i class="fas fa-fish text-2xl"></i>
+                        <span class="text-xl font-bold">Event Koi?!</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#" class="hover:text-gray-200">Home</a>
+                    <a href="event_page.html" class="hover:text-gray-200">Events</a>
+                    <a href="event_creation.html" class="hover:text-gray-200">Categories</a>
+                    <a href="login_signup.html" class="hover:text-gray-200">For Organizers</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-white hover:bg-opacity-20">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:inline"></i>
+                    </button>
+                    
+                    <div class="relative">
+                        <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none">
+                            <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-purple-700 font-bold">
+                                <span>U</span>
+                            </div>
+                            <span class="hidden md:inline">User</span>
+                        </button>
+                        
+                        <!-- Dropdown menu -->
+                        <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Profile</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">My Events</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Settings</a>
+                            <div class="border-t border-gray-200 dark:border-gray-700"></div>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Sign out</a>
+                        </div>
+                    </div>
+                    
+                    <button class="md:hidden" id="mobile-menu-button">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile menu -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4">
+                <a href="#" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Home</a>
+                <a href="#events" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Events</a>
+                <a href="#categories" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Categories</a>
+                <a href="#organizers" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">For Organizers</a>
+                <div class="border-t border-white border-opacity-20 mt-2 pt-2">
+                    <a href="#" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Profile</a>
+                    <a href="#" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">My Events</a>
+                    <a href="#" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Sign out</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-16">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-8 md:mb-0">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-4">Discover Amazing Events Near You</h1>
+                    <p class="text-xl mb-8">Find, attend, and organize hackathons, workshops, competitions and more with Event Koi?!</p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <a href="#events" class="bg-white text-purple-700 hover:bg-gray-100 font-bold py-3 px-6 rounded-lg text-center">Browse Events</a>
+                        <a href="#" class="bg-transparent border-2 border-white hover:bg-white hover:bg-opacity-10 font-bold py-3 px-6 rounded-lg text-center">Create Event</a>
+                    </div>
+                </div>
+                <div class="md:w-1/2">
+                    <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="People at an event" class="rounded-lg shadow-2xl">
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Search and Filter Section -->
+    <section class="bg-white dark:bg-gray-800 py-8 shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+                <div class="w-full md:w-1/2">
+                    <div class="relative">
+                        <input type="text" placeholder="Search events, organizers..." class="w-full py-3 px-4 pr-12 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white">
+                        <button class="absolute right-3 top-3 text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="w-full md:w-auto">
+                    <div class="flex items-center space-x-2">
+                        <button id="filter-button" class="flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 py-2 px-4 rounded-lg">
+                            <i class="fas fa-sliders-h"></i>
+                            <span>Filters</span>
+                        </button>
+                        <button id="map-view-button" class="flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 py-2 px-4 rounded-lg">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Map View</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Expanded Filters (hidden by default) -->
+            <div id="expanded-filters" class="hidden mt-6 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <h3 class="font-semibold mb-2 dark:text-white">Date Range</h3>
+                        <div class="flex space-x-2">
+                            <input type="date" class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-600 dark:text-white">
+                            <span class="flex items-center dark:text-white">to</span>
+                            <input type="date" class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-600 dark:text-white">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="font-semibold mb-2 dark:text-white">Categories</h3>
+                        <select class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-600 dark:text-white">
+                            <option>All Categories</option>
+                            <option>Hackathon</option>
+                            <option>Workshop</option>
+                            <option>Competition</option>
+                            <option>Conference</option>
+                            <option>Networking</option>
+                            <option>Sports</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <h3 class="font-semibold mb-2 dark:text-white">Location</h3>
+                        <div class="flex items-center space-x-2">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="location" class="text-purple-600 dark:text-purple-400" checked>
+                                <span class="ml-2 dark:text-white">Any</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="location" class="text-purple-600 dark:text-purple-400">
+                                <span class="ml-2 dark:text-white">Online</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="location" class="text-purple-600 dark:text-purple-400">
+                                <span class="ml-2 dark:text-white">In-person</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 flex justify-end">
+                    <button class="bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 py-2 px-4 rounded-lg mr-2 dark:text-white">
+                        Reset
+                    </button>
+                    <button class="gradient-bg text-white hover:opacity-90 py-2 px-4 rounded-lg">
+                        Apply Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Events Section -->
+    <section id="events" class="py-12 bg-gray-50 dark:bg-gray-900">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold dark:text-white">Upcoming Events</h2>
+                <div class="flex items-center space-x-2">
+                    <span class="dark:text-white">Sort by:</span>
+                    <select class="py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white">
+                        <option>Most Popular</option>
+                        <option>Newest</option>
+                        <option>Closest Date</option>
+                        <option>Alphabetical</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Event Card 1 -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md event-card smooth-transition">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Hackathon" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 right-2">
+                            <button class="bg-white dark:bg-gray-800 p-2 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="far fa-heart text-gray-600 dark:text-gray-300"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs font-semibold px-2.5 py-0.5 rounded">Hackathon</span>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-users mr-1"></i> 124 going
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 dark:text-white">Global Hackathon 2025</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Join the biggest hackathon of the year with $50,000 in prizes and opportunities to connect with top tech companies.</p>
+                        
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            <i class="fas fa-calendar-alt mr-2"></i>
+                            <span>June 15-17, 2025</span>
+                        </div>
+                        
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span>San Francisco, CA & Online</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-semibold text-purple-600 dark:text-purple-400">
+                                <i class="fas fa-clock mr-1"></i> 3 days left to register
+                            </span>
+                            <button class="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg">
+                                Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Event Card 2 -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md event-card smooth-transition">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80" alt="Workshop" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 right-2">
+                            <button class="bg-white dark:bg-gray-800 p-2 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="fas fa-heart text-red-500"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-semibold px-2.5 py-0.5 rounded">Workshop</span>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-users mr-1"></i> 87 going
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 dark:text-white">AI & Machine Learning Workshop</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Hands-on workshop covering the fundamentals of AI and machine learning with practical applications.</p>
+                        
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            <i class="fas fa-calendar-alt mr-2"></i>
+                            <span>July 5, 2025</span>
+                        </div>
+                        
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span>Online</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                                <i class="fas fa-clock mr-1"></i> 2 weeks left to register
+                            </span>
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg">
+                                Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Event Card 3 -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md event-card smooth-transition">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Competition" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 right-2">
+                            <button class="bg-white dark:bg-gray-800 p-2 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="far fa-heart text-gray-600 dark:text-gray-300"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs font-semibold px-2.5 py-0.5 rounded">Competition</span>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-users mr-1"></i> 56 going
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 dark:text-white">National Data Science Challenge</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Test your data science skills in this national competition with real-world datasets and problems.</p>
+                        
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            <i class="fas fa-calendar-alt mr-2"></i>
+                            <span>August 10-12, 2025</span>
+                        </div>
+                        
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span>New York, NY</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-semibold text-green-600 dark:text-green-400">
+                                <i class="fas fa-clock mr-1"></i> 1 month left to register
+                            </span>
+                            <button class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg">
+                                Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Event Card 4 -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md event-card smooth-transition">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1541178735493-479c1a27ed24?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80" alt="Conference" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 right-2">
+                            <button class="bg-white dark:bg-gray-800 p-2 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="far fa-heart text-gray-600 dark:text-gray-300"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 text-xs font-semibold px-2.5 py-0.5 rounded">Conference</span>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-users mr-1"></i> 210 going
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 dark:text-white">Tech Leadership Summit</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Annual gathering of tech leaders sharing insights on innovation, management, and industry trends.</p>
+                        
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            <i class="fas fa-calendar-alt mr-2"></i>
+                            <span>September 5-7, 2025</span>
+                        </div>
+                        
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span>Chicago, IL</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-semibold text-yellow-600 dark:text-yellow-400">
+                                <i class="fas fa-clock mr-1"></i> Early bird ends in 2 weeks
+                            </span>
+                            <button class="bg-yellow-600 hover:bg-yellow-700 text-white py-2 px-4 rounded-lg">
+                                Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Event Card 5 -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md event-card smooth-transition">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1484&q=80" alt="Networking" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 right-2">
+                            <button class="bg-white dark:bg-gray-800 p-2 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="far fa-heart text-gray-600 dark:text-gray-300"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-xs font-semibold px-2.5 py-0.5 rounded">Networking</span>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-users mr-1"></i> 78 going
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 dark:text-white">Startup Founders Mixer</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Connect with fellow startup founders, investors, and mentors in this casual networking event.</p>
+                        
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            <i class="fas fa-calendar-alt mr-2"></i>
+                            <span>July 20, 2025</span>
+                        </div>
+                        
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span>Austin, TX</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-semibold text-indigo-600 dark:text-indigo-400">
+                                <i class="fas fa-clock mr-1"></i> 3 weeks left to register
+                            </span>
+                            <button class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg">
+                                Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Event Card 6 -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md event-card smooth-transition">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1412&q=80" alt="Workshop" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 right-2">
+                            <button class="bg-white dark:bg-gray-800 p-2 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="fas fa-heart text-red-500"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="bg-pink-100 dark:bg-pink-900 text-pink-800 dark:text-pink-200 text-xs font-semibold px-2.5 py-0.5 rounded">Workshop</span>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-users mr-1"></i> 45 going
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 dark:text-white">UX Design Fundamentals</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Learn the core principles of user experience design through hands-on exercises and real-world examples.</p>
+                        
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            <i class="fas fa-calendar-alt mr-2"></i>
+                            <span>August 5, 2025</span>
+                        </div>
+                        
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span>Online</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-semibold text-pink-600 dark:text-pink-400">
+                                <i class="fas fa-clock mr-1"></i> 1 month left to register
+                            </span>
+                            <button class="bg-pink-600 hover:bg-pink-700 text-white py-2 px-4 rounded-lg">
+                                Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center">
+                <button class="gradient-bg text-white hover:opacity-90 py-3 px-6 rounded-lg font-semibold">
+                    Load More Events
+                </button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Categories Section -->
+    <section id="categories" class="py-12 bg-white dark:bg-gray-800">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-8 text-center dark:text-white">Popular Categories</h2>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg p-4 text-center smooth-transition">
+                    <div class="w-12 h-12 mx-auto mb-2 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center text-purple-600 dark:text-purple-300">
+                        <i class="fas fa-laptop-code text-xl"></i>
+                    </div>
+                    <span class="font-medium dark:text-white">Hackathons</span>
+                </a>
+                
+                <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg p-4 text-center smooth-transition">
+                    <div class="w-12 h-12 mx-auto mb-2 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-300">
+                        <i class="fas fa-chalkboard-teacher text-xl"></i>
+                    </div>
+                    <span class="font-medium dark:text-white">Workshops</span>
+                </a>
+                
+                <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg p-4 text-center smooth-transition">
+                    <div class="w-12 h-12 mx-auto mb-2 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center text-green-600 dark:text-green-300">
+                        <i class="fas fa-trophy text-xl"></i>
+                    </div>
+                    <span class="font-medium dark:text-white">Competitions</span>
+                </a>
+                
+                <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg p-4 text-center smooth-transition">
+                    <div class="w-12 h-12 mx-auto mb-2 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center text-yellow-600 dark:text-yellow-300">
+                        <i class="fas fa-users text-xl"></i>
+                    </div>
+                    <span class="font-medium dark:text-white">Conferences</span>
+                </a>
+                
+                <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg p-4 text-center smooth-transition">
+                    <div class="w-12 h-12 mx-auto mb-2 bg-indigo-100 dark:bg-indigo-900 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-300">
+                        <i class="fas fa-handshake text-xl"></i>
+                    </div>
+                    <span class="font-medium dark:text-white">Networking</span>
+                </a>
+                
+                <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg p-4 text-center smooth-transition">
+                    <div class="w-12 h-12 mx-auto mb-2 bg-pink-100 dark:bg-pink-900 rounded-full flex items-center justify-center text-pink-600 dark:text-pink-300">
+                        <i class="fas fa-graduation-cap text-xl"></i>
+                    </div>
+                    <span class="font-medium dark:text-white">Education</span>
+                </a>
+                
+                <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg p-4 text-center smooth-transition">
+                    <div class="w-12 h-12 mx-auto mb-2 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center text-red-600 dark:text-red-300">
+                        <i class="fas fa-music text-xl"></i>
+                    </div>
+                    <span class="font-medium dark:text-white">Music</span>
+                </a>
+                
+                <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg p-4 text-center smooth-transition">
+                    <div class="w-12 h-12 mx-auto mb-2 bg-orange-100 dark:bg-orange-900 rounded-full flex items-center justify-center text-orange-600 dark:text-orange-300">
+                        <i class="fas fa-utensils text-xl"></i>
+                    </div>
+                    <span class="font-medium dark:text-white">Food & Drink</span>
+                </a>
+                
+                <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg p-4 text-center smooth-transition">
+                    <div class="w-12 h-12 mx-auto mb-2 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center text-teal-600 dark:text-teal-300">
+                        <i class="fas fa-running text-xl"></i>
+                    </div>
+                    <span class="font-medium dark:text-white">Sports</span>
+                </a>
+                
+                <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg p-4 text-center smooth-transition">
+                    <div class="w-12 h-12 mx-auto mb-2 bg-cyan-100 dark:bg-cyan-900 rounded-full flex items-center justify-center text-cyan-600 dark:text-cyan-300">
+                        <i class="fas fa-paint-brush text-xl"></i>
+                    </div>
+                    <span class="font-medium dark:text-white">Arts</span>
+                </a>
+                
+                <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg p-4 text-center smooth-transition">
+                    <div class="w-12 h-12 mx-auto mb-2 bg-lime-100 dark:bg-lime-900 rounded-full flex items-center justify-center text-lime-600 dark:text-lime-300">
+                        <i class="fas fa-leaf text-xl"></i>
+                    </div>
+                    <span class="font-medium dark:text-white">Wellness</span>
+                </a>
+                
+                <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg p-4 text-center smooth-transition">
+                    <div class="w-12 h-12 mx-auto mb-2 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300">
+                        <i class="fas fa-ellipsis-h text-xl"></i>
+                    </div>
+                    <span class="font-medium dark:text-white">More</span>
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- For Organizers Section -->
+    <section id="organizers" class="py-12 bg-gray-50 dark:bg-gray-900">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4 dark:text-white">For Event Organizers</h2>
+                <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">Reach the right audience and manage your events effortlessly with Event Koi?!</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md smooth-transition hover:shadow-lg">
+                    <div class="w-14 h-14 mb-4 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center text-purple-600 dark:text-purple-300 mx-auto">
+                        <i class="fas fa-plus text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3 text-center dark:text-white">Create Events</h3>
+                    <p class="text-gray-600 dark:text-gray-300 text-center">Easily set up your event with our intuitive creation tools. Add details, images, and registration options in minutes.</p>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md smooth-transition hover:shadow-lg">
+                    <div class="w-14 h-14 mb-4 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-300 mx-auto">
+                        <i class="fas fa-bullhorn text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3 text-center dark:text-white">Promote Events</h3>
+                    <p class="text-gray-600 dark:text-gray-300 text-center">Get your event in front of thousands of potential attendees who are actively looking for events like yours.</p>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md smooth-transition hover:shadow-lg">
+                    <div class="w-14 h-14 mb-4 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center text-green-600 dark:text-green-300 mx-auto">
+                        <i class="fas fa-chart-line text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3 text-center dark:text-white">Track Analytics</h3>
+                    <p class="text-gray-600 dark:text-gray-300 text-center">Monitor registrations, track attendee demographics, and gain valuable insights to improve your events.</p>
+                </div>
+            </div>
+            
+            <div class="mt-12 text-center">
+                <button class="gradient-bg text-white hover:opacity-90 py-3 px-6 rounded-lg font-semibold mr-4">
+                    Learn More
+                </button>
+                <button class="bg-white dark:bg-gray-800 border border-purple-600 dark:border-purple-400 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-gray-700 py-3 px-6 rounded-lg font-semibold">
+                    Get Started
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-12 bg-white dark:bg-gray-800">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-12">What Our Users Say</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="User" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-bold text-gray-800 dark:text-white">Sarah Johnson</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Participant</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 mb-4">"Event Koi?! made it so easy to find and register for hackathons. I've attended three through the platform and each experience has been fantastic!"</p>
+                    <div class="flex text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="User" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-bold text-gray-800 dark:text-white">Michael Chen</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Organizer</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 mb-4">"As an event organizer, Event Koi?! has been a game-changer. The registration management and analytics tools save me hours of work."</p>
+                    <div class="flex text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="User" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-bold text-gray-800 dark:text-white">Emma Rodriguez</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Participant</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 mb-4">"I love how I can save events I'm interested in and get reminders about registration deadlines. It's helped me never miss an opportunity!"</p>
+                    <div class="flex text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+ 
+    <!-- Newsletter Section -->
+    <section class="py-12 gradient-bg text-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto text-center">
+                <h2 class="text-3xl font-bold mb-4">Stay Updated</h2>
+                <p class="text-xl mb-6">Subscribe to our newsletter to get the latest event updates and special offers.</p>
+                
+                <div class="flex flex-col sm:flex-row justify-center max-w-md mx-auto">
+                    <input type="email" placeholder="Your email address" class="flex-grow py-3 px-4 rounded-l-lg sm:rounded-r-none rounded-r-lg sm:mb-0 mb-2 focus:outline-none text-gray-900">
+                    <button class="bg-white text-purple-700 hover:bg-gray-100 font-bold py-3 px-6 rounded-r-lg sm:rounded-l-none rounded-l-lg">
+                        Subscribe
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-300 py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-white text-lg font-semibold mb-4">Event Koi?!</h3>
+                    <p class="mb-4">Your one-stop platform for discovering and organizing amazing events.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="hover:text-white">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="hover:text-white">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="hover:text-white">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="hover:text-white">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-white text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white">Home</a></li>
+                        <li><a href="#events" class="hover:text-white">Events</a></li>
+                        <li><a href="#categories" class="hover:text-white">Categories</a></li>
+                        <li><a href="#organizers" class="hover:text-white">For Organizers</a></li>
+                        <li><a href="#" class="hover:text-white">Pricing</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-white text-lg font-semibold mb-4">Support</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white">Help Center</a></li>
+                        <li><a href="#" class="hover:text-white">Community</a></li>
+                        <li><a href="#" class="hover:text-white">Guidelines</a></li>
+                        <li><a href="#" class="hover:text-white">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white">Terms of Service</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-white text-lg font-semibold mb-4">Contact Us</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt mt-1 mr-2"></i>
+                            <span>123 Event Street, San Francisco, CA 94107</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone-alt mr-2"></i>
+                            <span>(123) 456-7890</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-2"></i>
+                            <span>hello@eventkoi.com</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+                <p>&copy; 2025 Event Koi?! All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Notification -->
+    <div id="notification" class="hidden fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg notification">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span>Event added to favorites!</span>
+        </div>
+    </div>
+    
+    <!-- Event Details Modal -->
+    <div id="event-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-screen overflow-y-auto">
+            <div class="relative">
+                <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Event" class="w-full h-64 object-cover rounded-t-lg">
+                <button id="close-modal" class="absolute top-2 right-2 bg-white dark:bg-gray-800 p-2 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fas fa-times text-gray-600 dark:text-gray-300"></i>
+                </button>
+            </div>
+            
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <span class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs font-semibold px-2.5 py-0.5 rounded">Hackathon</span>
+                        <h2 class="text-2xl font-bold mt-2 dark:text-white">Global Hackathon 2025</h2>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="bg-gray-100 dark:bg-gray-700 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600">
+                            <i class="fas fa-share-alt text-gray-600 dark:text-gray-300"></i>
+                        </button>
+                        <button class="bg-gray-100 dark:bg-gray-700 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600">
+                            <i class="fas fa-heart text-red-500"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="flex flex-wrap gap-4 mb-6">
+                    <div class="flex items-center">
+                        <i class="fas fa-calendar-alt mr-2 text-gray-500 dark:text-gray-400"></i>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Date</p>
+                            <p class="font-medium dark:text-white">June 15-17, 2025</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <i class="fas fa-clock mr-2 text-gray-500 dark:text-gray-400"></i>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Time</p>
+                            <p class="font-medium dark:text-white">9:00 AM - 6:00 PM</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <i class="fas fa-map-marker-alt mr-2 text-gray-500 dark:text-gray-400"></i>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Location</p>
+                            <p class="font-medium dark:text-white">San Francisco, CA & Online</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <i class="fas fa-ticket-alt mr-2 text-gray-500 dark:text-gray-400"></i>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Price</p>
+                            <p class="font-medium dark:text-white">Free</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-2 dark:text-white">About This Event</h3>
+                    <p class="text-gray-600 dark:text-gray-300">
+                        Join the biggest hackathon of the year with $50,000 in prizes and opportunities to connect with top tech companies. 
+                        This 48-hour coding marathon brings together developers, designers, and entrepreneurs to build innovative solutions 
+                        to real-world problems. Whether you're a beginner or an experienced hacker, there's something for everyone!
+                    </p>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-2 dark:text-white">Event Schedule</h3>
+                    <div class="space-y-4">
+                        <div class="flex">
+                            <div class="w-16 flex-shrink-0">
+                                <span class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-sm font-medium px-2 py-0.5 rounded">Day 1</span>
+                            </div>
+                            <div>
+                                <p class="font-medium dark:text-white">Registration & Opening Ceremony</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">9:00 AM - 10:30 AM</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex">
+                            <div class="w-16 flex-shrink-0">
+                                <span class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-sm font-medium px-2 py-0.5 rounded">Day 1</span>
+                            </div>
+                            <div>
+                                <p class="font-medium dark:text-white">Hacking Begins</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">11:00 AM</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex">
+                            <div class="w-16 flex-shrink-0">
+                                <span class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-sm font-medium px-2 py-0.5 rounded">Day 2</span>
+                            </div>
+                            <div>
+                                <p class="font-medium dark:text-white">Workshops & Mentoring</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">10:00 AM - 5:00 PM</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex">
+                            <div class="w-16 flex-shrink-0">
+                                <span class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-sm font-medium px-2 py-0.5 rounded">Day 3</span>
+                            </div>
+                            <div>
+                                <p class="font-medium dark:text-white">Project Submissions</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">10:00 AM</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex">
+                            <div class="w-16 flex-shrink-0">
+                                <span class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-sm font-medium px-2 py-0.5 rounded">Day 3</span>
+                            </div>
+                            <div>
+                                <p class="font-medium dark:text-white">Demo Fair & Awards</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">2:00 PM - 6:00 PM</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-2 dark:text-white">Prizes</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                            <h4 class="font-bold text-purple-600 dark:text-purple-400 mb-1">1st Place</h4>
+                            <p class="text-gray-600 dark:text-gray-300">$25,000 cash prize + mentorship</p>
+                        </div>
+                        <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                            <h4 class="font-bold text-blue-600 dark:text-blue-400 mb-1">2nd Place</h4>
+                            <p class="text-gray-600 dark:text-gray-300">$15,000 cash prize</p>
+                        </div>
+                        <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                            <h4 class="font-bold text-green-600 dark:text-green-400 mb-1">3rd Place</h4>
+                            <p class="text-gray-600 dark:text-gray-300">$10,000 cash prize</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-2 dark:text-white">Rules</h3>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-600 dark:text-gray-300">
+                        <li>Teams can have up to 4 members</li>
+                        <li>All code must be written during the event</li>
+                        <li>Use of third-party APIs and libraries is allowed</li>
+                        <li>Projects must be submitted by the deadline</li>
+                        <li>All participants must adhere to the code of conduct</li>
+                    </ul>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row justify-between items-center border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <div class="mb-4 sm:mb-0">
+                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-users mr-1"></i> 124 people are going
+                        </p>
+                    </div>
+                    <button class="gradient-bg text-white hover:opacity-90 py-3 px-6 rounded-lg font-semibold w-full sm:w-auto text-center">
+                        Register Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Link to your new external script -->
+    <script src="js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Event | Event Koi?!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS configuration script -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#10B981',
+                        danger: '#EF4444',
+                        warning: '#F59E0B',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Link to your new external stylesheet -->
+    <link rel="stylesheet" href="css/event_creation.css">
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8 max-w-5xl">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Create New Event</h1>
+            <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-500">Draft autosaved</span>
+                <i class="fas fa-check-circle text-green-500"></i>
+            </div>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="mb-8">
+            <div class="flex justify-between mb-2 text-sm font-medium text-gray-500">
+                <div class="step-indicator active text-primary" data-step="1">Basic Info</div>
+                <div class="step-indicator" data-step="2">Details</div>
+                <div class="step-indicator" data-step="3">Registration</div>
+                <div class="step-indicator" data-step="4">Review</div>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div class="bg-primary h-2.5 rounded-full transition-all duration-500" style="width: 25%" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <!-- Form Steps -->
+        <form id="event-form" class="bg-white rounded-lg shadow-md p-6">
+            <!-- Step 1: Basic Information -->
+            <div class="step active" id="step-1">
+                <h2 class="text-xl font-semibold mb-6 text-gray-800">Basic Information</h2>
+                
+                <!-- Event Title -->
+                <div class="mb-6">
+                    <label for="event-title" class="block text-sm font-medium text-gray-700 mb-1">Event Title *</label>
+                    <input type="text" id="event-title" name="event-title" required 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                    <p class="mt-1 text-sm text-gray-500">Make it catchy and descriptive (50-60 characters ideal)</p>
+                </div>
+                
+                <!-- Event Description -->
+                <div class="mb-6">
+                    <label for="event-description" class="block text-sm font-medium text-gray-700 mb-1">Event Description *</label>
+                    <div class="rich-text-editor" id="event-description" contenteditable="true"></div>
+                    <div class="mt-1 flex space-x-2 border-t pt-2">
+                        <button type="button" class="text-gray-500 hover:text-gray-700 p-2 rounded-md hover:bg-gray-100" onclick="formatText('bold')"><i class="fas fa-bold"></i></button>
+                        <button type="button" class="text-gray-500 hover:text-gray-700 p-2 rounded-md hover:bg-gray-100" onclick="formatText('italic')"><i class="fas fa-italic"></i></button>
+                        <button type="button" class="text-gray-500 hover:text-gray-700 p-2 rounded-md hover:bg-gray-100" onclick="formatText('underline')"><i class="fas fa-underline"></i></button>
+                        <button type="button" class="text-gray-500 hover:text-gray-700 p-2 rounded-md hover:bg-gray-100" onclick="formatText('insertUnorderedList')"><i class="fas fa-list-ul"></i></button>
+                        <button type="button" class="text-gray-500 hover:text-gray-700 p-2 rounded-md hover:bg-gray-100" onclick="formatText('insertOrderedList')"><i class="fas fa-list-ol"></i></button>
+                        <button type="button" class="text-gray-500 hover:text-gray-700 p-2 rounded-md hover:bg-gray-100" onclick="formatText('createLink')"><i class="fas fa-link"></i></button>
+                    </div>
+                    <p class="mt-1 text-sm text-gray-500">Describe your event in detail. What can participants expect?</p>
+                </div>
+                
+                <!-- Event Category -->
+                <div class="mb-6">
+                    <label for="event-category" class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                    <select id="event-category" name="event-category" required 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                        <option value="">Select a category</option>
+                        <option value="music">Music & Concerts</option>
+                        <option value="sports">Sports & Fitness</option>
+                        <option value="food">Food & Drink</option>
+                        <option value="arts">Arts & Culture</option>
+                        <option value="business">Business & Networking</option>
+                        <option value="tech">Technology</option>
+                        <option value="education">Education</option>
+                        <option value="health">Health & Wellness</option>
+                        <option value="other">Other (please specify)</option>
+                    </select>
+                    <div id="other-category-container" class="mt-2 hidden">
+                        <input type="text" id="other-category" name="other-category" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" 
+                               placeholder="Suggest a new category">
+                        <p class="mt-1 text-sm text-gray-500">Your suggestion will be reviewed by our team</p>
+                    </div>
+                </div>
+                
+                <!-- Cover Image -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Cover Image *</label>
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                        <div class="space-y-1 text-center">
+                            <div class="flex text-sm text-gray-600">
+                                <label for="cover-image" class="relative cursor-pointer bg-white rounded-md font-medium text-primary hover:text-indigo-500 focus-within:outline-none">
+                                    <span>Upload a file</span>
+                                    <input id="cover-image" name="cover-image" type="file" class="sr-only" accept="image/*">
+                                </label>
+                                <p class="pl-1">or drag and drop</p>
+                            </div>
+                            <p class="text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
+                        </div>
+                    </div>
+                    <div id="image-preview-container" class="mt-2 hidden text-center">
+                        <img id="image-preview" class="image-preview inline-block rounded-md" src="#" alt="Preview of uploaded image">
+                    </div>
+                </div>
+                
+                <!-- Navigation Buttons -->
+                <div class="flex justify-end mt-8">
+                    <button type="button" onclick="nextStep(2)" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        Next: Event Details <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Event Details -->
+            <div class="step" id="step-2">
+                <h2 class="text-xl font-semibold mb-6 text-gray-800">Event Details</h2>
+                
+                <!-- Date and Time -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label for="event-date" class="block text-sm font-medium text-gray-700 mb-1">Event Date *</label>
+                        <input type="date" id="event-date" name="event-date" required 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                    </div>
+                    <div>
+                        <label for="event-time" class="block text-sm font-medium text-gray-700 mb-1">Event Time *</label>
+                        <input type="time" id="event-time" name="event-time" required 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                    </div>
+                </div>
+                
+                <!-- Location -->
+                <div class="mb-6">
+                    <label for="event-location" class="block text-sm font-medium text-gray-700 mb-1">Location *</label>
+                    <input type="text" id="event-location" name="event-location" required 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" 
+                           placeholder="Venue name or address">
+                    <div class="mt-2">
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" id="is-online" name="is-online" class="rounded border-gray-300 text-primary focus:ring-primary">
+                            <span class="ml-2 text-sm text-gray-700">This is an online event</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Registration Deadline -->
+                <div class="mb-6">
+                    <label for="registration-deadline" class="block text-sm font-medium text-gray-700 mb-1">Registration Deadline</label>
+                    <input type="datetime-local" id="registration-deadline" name="registration-deadline" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                    <p class="mt-1 text-sm text-gray-500">Leave blank if registration remains open until event starts</p>
+                </div>
+                
+                <!-- Facebook Event Import -->
+                <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+                    <h3 class="text-sm font-medium text-blue-800 mb-2">Import from Facebook Event (Optional)</h3>
+                    <div class="flex items-center space-x-2">
+                        <input type="url" id="facebook-event-url" name="facebook-event-url" 
+                               class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" 
+                               placeholder="Paste Facebook Event URL">
+                        <button type="button" onclick="openFacebookEvent()" class="px-3 py-2 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200">
+                            <i class="fab fa-facebook mr-1"></i> Open
+                        </button>
+                    </div>
+                    <p class="mt-2 text-xs text-blue-600">
+                        <i class="fas fa-info-circle mr-1"></i> Open your Facebook event in a new tab and copy-paste the details into the fields below. 
+                        We've organized our form to make this quick and easy!
+                    </p>
+                </div>
+                
+                <!-- Prize Information -->
+                <div class="mb-6">
+                    <label for="prize-info" class="block text-sm font-medium text-gray-700 mb-1">Prize Information (Optional)</label>
+                    <textarea id="prize-info" name="prize-info" rows="3" 
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" 
+                              placeholder="Describe any prizes or awards for participants"></textarea>
+                </div>
+                
+                <!-- Rules -->
+                <div class="mb-6">
+                    <label for="event-rules" class="block text-sm font-medium text-gray-700 mb-1">Rules & Guidelines (Optional)</label>
+                    <textarea id="event-rules" name="event-rules" rows="3" 
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" 
+                              placeholder="List any rules participants should know"></textarea>
+                </div>
+                
+                <!-- Navigation Buttons -->
+                <div class="flex justify-between mt-8">
+                    <button type="button" onclick="prevStep(1)" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        <i class="fas fa-arrow-left mr-2"></i> Back
+                    </button>
+                    <button type="button" onclick="nextStep(3)" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        Next: Registration <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Registration Options -->
+            <div class="step" id="step-3">
+                <h2 class="text-xl font-semibold mb-6 text-gray-800">Registration Options</h2>
+                
+                <div class="space-y-4 mb-8">
+                    <!-- Platform-Based Registration -->
+                    <div class="registration-option p-4 border-2 rounded-lg cursor-pointer" id="platform-option" onclick="selectRegistrationOption('platform')">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 mt-1">
+                                <input type="radio" id="platform-registration" name="registration-method" value="platform" class="h-4 w-4 text-primary focus:ring-primary">
+                            </div>
+                            <div class="ml-3">
+                                <label for="platform-registration" class="block text-sm font-medium text-gray-700">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        Recommended
+                                    </span>
+                                    Platform-Based Registration
+                                </label>
+                                <p class="text-sm text-gray-500 mt-1">
+                                    Use our built-in registration system for seamless participant management and analytics.
+                                    Participant profile data will be auto-filled in the registration form.
+                                </p>
+                                <div class="mt-2 text-sm text-primary">
+                                    <i class="fas fa-chart-line mr-1"></i> Access to analytics dashboard
+                                    <i class="fas fa-user-check ml-3 mr-1"></i> Auto-filled participant profiles
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- External Registration Link -->
+                    <div class="registration-option p-4 border-2 rounded-lg cursor-pointer" id="external-option" onclick="selectRegistrationOption('external')">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 mt-1">
+                                <input type="radio" id="external-registration" name="registration-method" value="external" class="h-4 w-4 text-primary focus:ring-primary">
+                            </div>
+                            <div class="ml-3">
+                                <label for="external-registration" class="block text-sm font-medium text-gray-700">
+                                    External Registration Link
+                                </label>
+                                <p class="text-sm text-gray-500 mt-1">
+                                    Provide a link to an external registration form (e.g., Google Forms, Typeform).
+                                    Note: You won't have access to our analytics dashboard with this option.
+                                </p>
+                                <div id="external-link-container" class="mt-3 hidden">
+                                    <label for="external-link" class="block text-sm font-medium text-gray-700 mb-1">External Registration URL *</label>
+                                    <div class="flex">
+                                        <input type="url" id="external-link" name="external-link" 
+                                               class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary" 
+                                               placeholder="https://">
+                                        <button type="button" onclick="validateExternalLink()" class="px-4 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-md hover:bg-gray-200">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </div>
+                                    <p id="link-validation-message" class="mt-1 text-sm hidden"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Navigation Buttons -->
+                <div class="flex justify-between mt-8">
+                    <button type="button" onclick="prevStep(2)" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        <i class="fas fa-arrow-left mr-2"></i> Back
+                    </button>
+                    <button type="button" onclick="nextStep(4)" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        Next: Review <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 4: Review and Submit -->
+            <div class="step" id="step-4">
+                <h2 class="text-xl font-semibold mb-6 text-gray-800">Review Your Event</h2>
+                
+                <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                    <h3 class="text-lg font-medium text-gray-800 mb-4">Event Overview</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Left Column -->
+                        <div>
+                            <div class="mb-4">
+                                <h4 class="text-sm font-medium text-gray-500">Event Title</h4>
+                                <p id="review-title" class="text-gray-800">-</p>
+                            </div>
+                            <div class="mb-4">
+                                <h4 class="text-sm font-medium text-gray-500">Category</h4>
+                                <p id="review-category" class="text-gray-800">-</p>
+                            </div>
+                            <div class="mb-4">
+                                <h4 class="text-sm font-medium text-gray-500">Date & Time</h4>
+                                <p id="review-datetime" class="text-gray-800">-</p>
+                            </div>
+                            <div class="mb-4">
+                                <h4 class="text-sm font-medium text-gray-500">Location</h4>
+                                <p id="review-location" class="text-gray-800">-</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Column -->
+                        <div>
+                            <div class="mb-4">
+                                <h4 class="text-sm font-medium text-gray-500">Registration Method</h4>
+                                <p id="review-registration" class="text-gray-800">-</p>
+                            </div>
+                            <div class="mb-4">
+                                <h4 class="text-sm font-medium text-gray-500">Registration Deadline</h4>
+                                <p id="review-deadline" class="text-gray-800">-</p>
+                            </div>
+                            <div class="mb-4">
+                                <h4 class="text-sm font-medium text-gray-500">Cover Image</h4>
+                                <div id="review-image" class="mt-1">
+                                    <div class="h-20 w-20 bg-gray-200 rounded-md flex items-center justify-center text-gray-400">
+                                        <i class="fas fa-image"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Description Preview -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-medium text-gray-800 mb-2">Description Preview</h3>
+                    <div id="review-description" class="prose max-w-none border border-gray-200 rounded-md p-4">
+                        <p class="text-gray-500">Your event description will appear here</p>
+                    </div>
+                </div>
+                
+                <!-- Additional Info -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-800 mb-2">Prize Information</h3>
+                        <div id="review-prizes" class="border border-gray-200 rounded-md p-4 min-h-[80px]">
+                            <p class="text-gray-500">No prize information provided</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-800 mb-2">Rules & Guidelines</h3>
+                        <div id="review-rules" class="border border-gray-200 rounded-md p-4 min-h-[80px]">
+                            <p class="text-gray-500">No rules provided</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Terms and Submit -->
+                <div class="mb-6">
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input id="terms" name="terms" type="checkbox" required 
+                                   class="focus:ring-primary h-4 w-4 text-primary rounded border-gray-300">
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label for="terms" class="font-medium text-gray-700">I agree to the <a href="#" class="text-primary hover:text-indigo-500">Terms of Service</a> and <a href="#" class="text-primary hover:text-indigo-500">Event Guidelines</a></label>
+                            <p class="text-gray-500">By checking this box, you confirm that all information provided is accurate and complies with our platform policies.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Navigation Buttons -->
+                <div class="flex justify-between">
+                    <button type="button" onclick="prevStep(3)" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        <i class="fas fa-arrow-left mr-2"></i> Back
+                    </button>
+                    <button type="submit" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        Submit Event <i class="fas fa-check ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- External Link Warning Modal -->
+    <div id="external-link-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div>
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100">
+                        <i class="fas fa-exclamation-triangle text-yellow-600"></i>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-5">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Leaving Event Koi?!</h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">
+                                You are now leaving Event Koi?! to visit an external site. We cannot guarantee the security or content of this external link. Proceed with caution.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                    <button type="button" onclick="proceedToExternalLink()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:col-start-2 sm:text-sm">
+                        Proceed
+                    </button>
+                    <button type="button" onclick="hideExternalLinkModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:col-start-1 sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Link to your new external script -->
+    <script src="js/event_creation.js"></script>
+</body>
+</html>

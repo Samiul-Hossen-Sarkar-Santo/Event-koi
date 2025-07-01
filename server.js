@@ -3,9 +3,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
 
-const authRoutes = require('/home/user/Event-koi/routes/auth');
-const eventRoutes = require('/home/user/Event-koi/routes/events');
-const userRoutes = require('/home/user/Event-koi/routes/users');
+const authRoutes = require('./routes/auth');
+const eventRoutes = require('./routes/events');
+const userRoutes = require('./routes/users');
 
 const app = express();
 const port = process.env.PORT || 3000;

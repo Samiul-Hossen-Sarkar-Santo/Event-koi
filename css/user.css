@@ -35,3 +35,39 @@
     font-size: 12px;
     font-weight: bold;
 }
+
+/* Loading states */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #6366f1;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Card hover effects */
+.event-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.event-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Button transitions */
+button {
+    transition: all 0.2s ease;
+}
+
+/* Smooth scroll for better UX */
+html {
+    scroll-behavior: smooth;
+}

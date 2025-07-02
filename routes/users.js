@@ -440,4 +440,56 @@ router.put('/notices/read-all', isAuthenticated, async (req, res) => {
   }
 });
 
+// GET /users/recent-activity - Get user's recent activity
+router.get('/recent-activity', isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    
+    // Get recent registrations
+    const recentRegistrations = await Registration.find({ user: userId })
+      .populate('event', 'title')
+      .sort({ registrationDate: -1 })
+      .limit(5);
+    
+    // Get user for profile updates (simplified)
+    const user = await User.findById(userId);
+    
+    // Create activity timeline
+    const activities = [];
+    
+    // Add registration activities
+    recentRegistrations.forEach(registration => {
+      if (registration.event) {
+        activities.push({
+          type: 'registered',
+          description: `Registered for "${registration.event.title}"`,
+          date: registration.registrationDate,
+          relatedId: registration.event._id
+        });
+      }
+    });
+    
+    // Add profile update activity if recently updated
+    if (user.updatedAt) {
+      const daysSinceUpdate = (new Date() - user.updatedAt) / (1000 * 60 * 60 * 24);
+      if (daysSinceUpdate <= 7) {
+        activities.push({
+          type: 'profile_updated',
+          description: 'Updated your profile information',
+          date: user.updatedAt
+        });
+      }
+    }
+    
+    // Sort by date (most recent first)
+    activities.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    res.json(activities.slice(0, 10)); // Return last 10 activities
+    
+  } catch (err) {
+    console.error('Error fetching recent activity:', err);
+    res.status(500).json({ message: 'Error fetching recent activity', error: err.message });
+  }
+});
+
 module.exports = router;

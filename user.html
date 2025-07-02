@@ -49,7 +49,7 @@
                             </button>
                             <button class="w-full text-left p-3 rounded-lg hover:bg-indigo-100 flex items-center relative tab-btn" data-tab="notices">
                                 <i class="fas fa-bell w-6 text-center mr-3 text-indigo-600"></i> Notifications
-                                <span class="notification-badge">3</span>
+                                <span class="notification-badge" id="notices-badge">3</span>
                             </button>
                             <button class="w-full text-left p-3 rounded-lg hover:bg-indigo-100 flex items-center tab-btn" data-tab="settings">
                                 <i class="fas fa-cog w-6 text-center mr-3 text-indigo-600"></i> Settings
@@ -179,29 +179,34 @@
                     
                     <!-- Notice Board Tab -->
                     <div id="notices" class="tab-content">
-                        <h2 class="text-2xl font-bold mb-6 text-gray-800">Notice Board</h2>
-                        <div class="space-y-4">
-                            <div class="border-l-4 border-yellow-500 bg-yellow-50 p-4 rounded-r-lg">
-                                <div class="flex justify-between">
-                                    <h3 class="font-bold text-lg">Warning</h3>
-                                    <span class="text-gray-500 text-sm">2 days ago</span>
-                                </div>
-                                <p class="mt-2 text-gray-700">Your recent report has been reviewed and the content has been removed. Thank you for helping keep our platform safe.</p>
-                            </div>
-                            <div class="border-l-4 border-blue-500 bg-blue-50 p-4 rounded-r-lg">
-                                <div class="flex justify-between">
-                                    <h3 class="font-bold text-lg">Reminder</h3>
-                                    <span class="text-gray-500 text-sm">1 week ago</span>
-                                </div>
-                                <p class="mt-2 text-gray-700">Registration for "Web Development Workshop" closes in 3 days. Don't miss out!</p>
-                            </div>
-                            <div class="border-l-4 border-green-500 bg-green-50 p-4 rounded-r-lg">
-                                <div class="flex justify-between">
-                                    <h3 class="font-bold text-lg">System Update</h3>
-                                    <span class="text-gray-500 text-sm">2 weeks ago</span>
-                                </div>
-                                <p class="mt-2 text-gray-700">We've added new filtering options to help you find events more easily. Check them out!</p>
-                            </div>
+                        <h2 class="text-2xl font-bold mb-6 text-gray-800">Notifications & Notices</h2>
+                        
+                        <!-- Filter buttons -->
+                        <div class="mb-6 flex flex-wrap gap-2">
+                            <button onclick="filterNotices('all')" class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 filter-btn active" data-filter="all">
+                                All
+                            </button>
+                            <button onclick="filterNotices('event_status')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 filter-btn" data-filter="event_status">
+                                Event Updates
+                            </button>
+                            <button onclick="filterNotices('admin_action')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 filter-btn" data-filter="admin_action">
+                                Admin Actions
+                            </button>
+                            <button onclick="filterNotices('system')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 filter-btn" data-filter="system">
+                                System Updates
+                            </button>
+                        </div>
+                        
+                        <!-- Notices container -->
+                        <div id="notices-container" class="space-y-4">
+                            <div class="text-center py-8 text-gray-500">Loading your notifications...</div>
+                        </div>
+                        
+                        <!-- Mark all as read button -->
+                        <div class="mt-6 text-center">
+                            <button onclick="markAllNoticesRead()" class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
+                                <i class="fas fa-check-double mr-2"></i>Mark All as Read
+                            </button>
                         </div>
                     </div>
 

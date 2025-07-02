@@ -616,18 +616,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Make functions global for onclick handlers
-    window.showExternalLinkModal = showExternalLinkModal;
-    window.hideExternalLinkModal = hideExternalLinkModal;
-    window.proceedToExternalLink = proceedToExternalLink;
-    window.showSponsorModal = showSponsorModal;
-    window.hideSponsorModal = hideSponsorModal;
-    window.showQuestionModal = showQuestionModal;
-    window.hideQuestionModal = hideQuestionModal;
-    window.showRegistrationModal = showRegistrationModal;
-    window.hideRegistrationModal = hideRegistrationModal;
-
-
     // --- Modal Logic (for external link warning) ---
     // You might need to add this modal HTML to your event_page.html
     // and include the corresponding JavaScript functions here.
@@ -652,6 +640,83 @@ document.addEventListener('DOMContentLoaded', function () {
         hideExternalLinkModal();
     }
 
+    // --- Report Event Functionality ---
+    const reportEventBtn = document.getElementById('reportEventBtn');
+    const reportEventModal = document.getElementById('reportEventModal');
+    const reportEventForm = document.getElementById('reportEventForm');
+
+    if (reportEventBtn) {
+        reportEventBtn.addEventListener('click', function() {
+            showReportModal();
+        });
+    }
+
+    if (reportEventForm) {
+        reportEventForm.addEventListener('submit', handleReportSubmission);
+    }
+
+    function showReportModal() {
+        reportEventModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeReportModal() {
+        reportEventModal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        reportEventForm.reset();
+    }
+
+    async function handleReportSubmission(event) {
+        event.preventDefault();
+        
+        const eventId = getEventIdFromUrl();
+        const reason = document.getElementById('reportReason').value;
+        const details = document.getElementById('reportDetails').value;
+        const reporterEmail = document.getElementById('reporterEmail').value;
+
+        if (!reason) {
+            alert('Please select a reason for reporting.');
+            return;
+        }
+
+        const reportData = {
+            eventId: eventId,
+            reason: reason,
+            details: details,
+            reporterEmail: reporterEmail
+        };
+
+        try {
+            const response = await fetch('/events/report', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify(reportData)
+            });
+
+            if (response.ok) {
+                alert('Thank you for your report. We will review it and take appropriate action if necessary.');
+                closeReportModal();
+            } else if (response.status === 401) {
+                alert('You must be logged in to submit a report. Please log in and try again.');
+                // Optionally redirect to login page
+                window.location.href = '/login_signup.html';
+            } else {
+                const error = await response.json();
+                alert(`Failed to submit report: ${error.message || 'Unknown error'}`);
+            }
+        } catch (error) {
+            console.error('Error submitting report:', error);
+            alert('An error occurred while submitting your report. Please try again later.');
+        }
+    }
+
+    function getEventIdFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('id') || 'demo-event';
+    }
 
     // --- Smooth Scrolling for Anchor Links ---
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -676,5 +741,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // NOTE: The original setInterval for the countdown is no longer needed here
     // because updateCountdown is called after fetching the event and then set with setInterval there.
+
+    // Make functions global for onclick handlers
+    window.closeReportModal = closeReportModal;
 
 });

@@ -445,36 +445,23 @@ router.get('/reports', isAdmin, async (req, res) => {
     if (priority !== 'all') query.priority = priority;
 
     const reports = await Report.find(query)
-      .populate('reportedBy', 'name username email')
-      .populate('resolvedBy', 'name username')
-      .populate({
-        path: 'reportedEntity',
-        model: function(doc) { return doc.reportedEntityModel; },
-        select: 'title name username email'
-      })
       .sort({ priority: -1, createdAt: -1 })
       .limit(limit * 1)
-      .skip((page - 1) * limit);
+      .skip((page - 1) * limit)
+      .lean(); // Use lean() to get plain objects
 
     const total = await Report.countDocuments(query);
 
-    // Get summary stats
-    const stats = await Report.aggregate([
-      {
-        $group: {
-          _id: '$status',
-          count: { $sum: 1 }
-        }
-      }
-    ]);
-
-    const statusStats = stats.reduce((acc, curr) => {
-      acc[curr._id] = curr.count;
-      return acc;
-    }, {});
+    // Simple status stats without aggregation
+    const statusStats = {
+      pending: await Report.countDocuments({ ...query, status: 'pending' }),
+      investigating: await Report.countDocuments({ ...query, status: 'investigating' }),
+      resolved: await Report.countDocuments({ ...query, status: 'resolved' }),
+      dismissed: await Report.countDocuments({ ...query, status: 'dismissed' })
+    };
 
     res.json({
-      reports,
+      reports: reports,
       stats: statusStats,
       pagination: {
         current: Number(page),
@@ -496,8 +483,7 @@ router.put('/reports/:reportId/resolve', isAdmin, async (req, res) => {
     const { action, adminNotes, resolutionAction } = req.body;
 
     const report = await Report.findById(reportId)
-      .populate('reportedBy', 'name email')
-      .populate('reportedEntity');
+      .populate('reportedBy', 'name email');
 
     if (!report) {
       return res.status(404).json({ message: 'Report not found' });
@@ -928,6 +914,206 @@ router.put('/events/:eventId/deletion', isAdmin, async (req, res) => {
   } catch (err) {
     console.error('Error handling deletion request:', err);
     res.status(500).json({ message: 'Error handling deletion request', error: err.message });
+  }
+});
+
+// ==================== BAN APPEALS MANAGEMENT ====================
+
+// GET /admin/banned-warned - Get banned, warned, and suspended users with appeals
+router.get('/banned-warned', isAdmin, async (req, res) => {
+  try {
+    const { 
+      status = 'banned', 
+      days = 'all', 
+      page = 1, 
+      limit = 20 
+    } = req.query;
+    
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+    
+    let query = {};
+    let dateFilter = {};
+    
+    if (status === 'appeals') {
+      query.appealText = { $exists: true, $ne: null };
+      query.accountStatus = 'banned';
+    } else if (status !== 'all') {
+      query.accountStatus = status;
+    } else {
+      query.accountStatus = { $in: ['banned', 'suspended', 'warned'] };
+    }
+    
+    // Apply date filter
+    if (days !== 'all') {
+      const daysAgo = new Date();
+      daysAgo.setDate(daysAgo.getDate() - parseInt(days));
+      
+      if (status === 'appeals') {
+        dateFilter.appealSubmittedAt = { $gte: daysAgo };
+      } else {
+        dateFilter.statusChangedAt = { $gte: daysAgo };
+      }
+      query = { ...query, ...dateFilter };
+    }
+    
+    const users = await User.find(query)
+      .select('username email accountStatus banReason appealText appealSubmittedAt statusChangedAt createdAt warnings')
+      .sort({ statusChangedAt: -1, appealSubmittedAt: -1 })
+      .skip(skip)
+      .limit(limitNum);
+    
+    const total = await User.countDocuments(query);
+    
+    // Get warning counts for each user
+    const usersWithWarnings = await Promise.all(users.map(async (user) => {
+      const warningCount = await Warning.countDocuments({ userId: user._id });
+      return {
+        ...user.toObject(),
+        warningCount
+      };
+    }));
+    
+    res.json({
+      success: true,
+      users: usersWithWarnings,
+      pagination: {
+        current: pageNum,
+        total: Math.ceil(total / limitNum),
+        count: users.length,
+        totalUsers: total
+      }
+    });
+    
+  } catch (err) {
+    console.error('Error fetching banned/warned users:', err);
+    res.status(500).json({ message: 'Error fetching banned/warned users', error: err.message });
+  }
+});
+
+// PUT /admin/handle-appeal/:userId - Handle ban appeal (approve/reject)
+router.put('/handle-appeal/:userId', isAdmin, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { action, adminResponse } = req.body; // action: 'approve' or 'reject'
+    const adminId = req.session.userId;
+    
+    if (!['approve', 'reject'].includes(action)) {
+      return res.status(400).json({ message: 'Invalid action. Must be approve or reject.' });
+    }
+    
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    if (!user.appealText) {
+      return res.status(400).json({ message: 'No appeal found for this user' });
+    }
+    
+    if (action === 'approve') {
+      // Restore user account
+      user.accountStatus = 'active';
+      user.banReason = null;
+      user.appealText = null;
+      user.appealSubmittedAt = null;
+      user.statusChangedAt = new Date();
+      
+      await user.save();
+      
+      // Log admin action
+      await logAdminAction(adminId, 'appeal_approved', 'User', userId, {
+        username: user.username,
+        adminResponse,
+        originalBanReason: user.banReason
+      }, req);
+      
+      res.json({ message: 'Ban appeal approved. User account restored.', user: { id: user._id, username: user.username, accountStatus: user.accountStatus } });
+      
+    } else {
+      // Reject appeal
+      user.appealText = null;
+      user.appealSubmittedAt = null;
+      
+      await user.save();
+      
+      // Log admin action
+      await logAdminAction(adminId, 'appeal_rejected', 'User', userId, {
+        username: user.username,
+        adminResponse,
+        banReason: user.banReason
+      }, req);
+      
+      res.json({ message: 'Ban appeal rejected.', user: { id: user._id, username: user.username, accountStatus: user.accountStatus } });
+    }
+    
+  } catch (err) {
+    console.error('Error handling appeal:', err);
+    res.status(500).json({ message: 'Error handling appeal', error: err.message });
+  }
+});
+
+// PUT /admin/unban-user/:userId - Directly unban a user (without appeal)
+router.put('/unban-user/:userId', isAdmin, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { reason } = req.body;
+    const adminId = req.session.userId;
+    
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    if (user.accountStatus !== 'banned') {
+      return res.status(400).json({ message: 'User is not banned' });
+    }
+    
+    const oldBanReason = user.banReason;
+    
+    user.accountStatus = 'active';
+    user.banReason = null;
+    user.appealText = null;
+    user.appealSubmittedAt = null;
+    user.statusChangedAt = new Date();
+    
+    await user.save();
+    
+    // Log admin action
+    await logAdminAction(adminId, 'user_unbanned', 'User', userId, {
+      username: user.username,
+      reason: reason || 'Admin decision',
+      originalBanReason: oldBanReason
+    }, req);
+    
+    res.json({ message: 'User unbanned successfully', user: { id: user._id, username: user.username, accountStatus: user.accountStatus } });
+    
+  } catch (err) {
+    console.error('Error unbanning user:', err);
+    res.status(500).json({ message: 'Error unbanning user', error: err.message });
+  }
+});
+
+// ==================== USER WARNING HISTORY ====================
+
+// GET /admin/users/:userId/warnings - Get user warning history
+router.get('/users/:userId/warnings', isAdmin, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    const warnings = await Warning.find({ userId })
+      .sort({ createdAt: -1 })
+      .populate('issuedBy', 'username');
+    
+    res.json({
+      success: true,
+      warnings
+    });
+    
+  } catch (err) {
+    console.error('Error fetching user warnings:', err);
+    res.status(500).json({ message: 'Error fetching user warnings', error: err.message });
   }
 });
 

@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load user data on page load
     loadUserProfile();
     loadUserRegistrations();
+    loadUserNotices();
 
     mainTabButtons.forEach(btn => {
         btn.addEventListener('click', function() {
@@ -285,4 +286,205 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // ==================== NOTICES & NOTIFICATIONS ====================
+    
+    async function loadUserNotices() {
+        try {
+            const response = await fetch('/users/notices', {
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                displayUserNotices(data.notices || []);
+                updateNoticesBadge(data.unreadCount || 0);
+            } else {
+                console.error('Failed to load user notices');
+                displayUserNotices([]);
+            }
+        } catch (error) {
+            console.error('Error loading user notices:', error);
+            displayUserNotices([]);
+        }
+    }
+
+    function displayUserNotices(notices) {
+        const container = document.getElementById('notices-container');
+        if (!container) return;
+
+        if (notices.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-12 text-gray-500">
+                    <i class="fas fa-bell-slash text-6xl text-gray-300 mb-4"></i>
+                    <h3 class="text-xl font-medium mb-2">No Notifications</h3>
+                    <p>You're all caught up! New notifications will appear here.</p>
+                </div>
+            `;
+            return;
+        }
+
+        const noticesHTML = notices.map(notice => {
+            const isRead = notice.isRead;
+            const typeColors = {
+                'event_status': { border: 'border-blue-500', bg: 'bg-blue-50', icon: 'calendar-alt', iconColor: 'text-blue-600' },
+                'admin_action': { border: 'border-red-500', bg: 'bg-red-50', icon: 'user-shield', iconColor: 'text-red-600' },
+                'system': { border: 'border-green-500', bg: 'bg-green-50', icon: 'cog', iconColor: 'text-green-600' },
+                'warning': { border: 'border-yellow-500', bg: 'bg-yellow-50', icon: 'exclamation-triangle', iconColor: 'text-yellow-600' },
+                'general': { border: 'border-gray-500', bg: 'bg-gray-50', icon: 'info-circle', iconColor: 'text-gray-600' }
+            };
+
+            const typeStyle = typeColors[notice.type] || typeColors['general'];
+            const timeAgo = formatTimeAgo(new Date(notice.createdAt));
+
+            return `
+                <div class="border-l-4 ${typeStyle.border} ${typeStyle.bg} p-4 rounded-r-lg ${isRead ? 'opacity-75' : ''} relative">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-start">
+                            <i class="fas fa-${typeStyle.icon} ${typeStyle.iconColor} mt-1 mr-3"></i>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="font-bold text-lg text-gray-800">${notice.title}</h3>
+                                    ${!isRead ? '<span class="w-2 h-2 bg-red-500 rounded-full"></span>' : ''}
+                                </div>
+                                <p class="mt-2 text-gray-700">${notice.message}</p>
+                                ${notice.actionUrl ? `
+                                    <a href="${notice.actionUrl}" class="inline-block mt-2 text-indigo-600 hover:text-indigo-800 font-medium">
+                                        <i class="fas fa-external-link-alt mr-1"></i>View Details
+                                    </a>
+                                ` : ''}
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <span class="text-gray-500 text-sm">${timeAgo}</span>
+                            ${!isRead ? `
+                                <button onclick="markNoticeRead('${notice._id}')" class="mt-2 text-sm text-indigo-600 hover:text-indigo-800">
+                                    Mark as read
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        container.innerHTML = noticesHTML;
+    }
+
+    function updateNoticesBadge(count) {
+        const badge = document.getElementById('notices-badge');
+        if (badge) {
+            badge.textContent = count;
+            badge.style.display = count > 0 ? 'block' : 'none';
+        }
+    }
+
+    function formatTimeAgo(date) {
+        const now = new Date();
+        const diffTime = Math.abs(now - date);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+        const diffMinutes = Math.ceil(diffTime / (1000 * 60));
+
+        if (diffMinutes < 60) {
+            return `${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''} ago`;
+        } else if (diffHours < 24) {
+            return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+        } else if (diffDays < 7) {
+            return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+        } else {
+            return date.toLocaleDateString();
+        }
+    }
+
+    // Global functions for notice management
+    window.filterNotices = function(type) {
+        // Update filter button styles
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => {
+            btn.classList.remove('bg-indigo-500', 'text-white', 'active');
+            btn.classList.add('bg-gray-200', 'text-gray-700');
+        });
+        
+        const activeBtn = document.querySelector(`[data-filter="${type}"]`);
+        if (activeBtn) {
+            activeBtn.classList.remove('bg-gray-200', 'text-gray-700');
+            activeBtn.classList.add('bg-indigo-500', 'text-white', 'active');
+        }
+
+        // Filter notices
+        const notices = document.querySelectorAll('#notices-container > div');
+        notices.forEach(notice => {
+            if (type === 'all') {
+                notice.style.display = 'block';
+            } else {
+                // This is a simplified filter - in a real implementation, 
+                // you'd store the notice type in a data attribute
+                notice.style.display = 'block';
+            }
+        });
+    };
+
+    window.markNoticeRead = async function(noticeId) {
+        try {
+            const response = await fetch(`/users/notices/${noticeId}/read`, {
+                method: 'PUT',
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                loadUserNotices(); // Reload to update display
+            } else {
+                console.error('Failed to mark notice as read');
+            }
+        } catch (error) {
+            console.error('Error marking notice as read:', error);
+        }
+    };
+
+    window.markAllNoticesRead = async function() {
+        try {
+            const response = await fetch('/users/notices/read-all', {
+                method: 'PUT',
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                loadUserNotices(); // Reload to update display
+            } else {
+                console.error('Failed to mark all notices as read');
+            }
+        } catch (error) {
+            console.error('Error marking all notices as read:', error);
+        }
+    };
+
+    // Load notices when the notices tab is clicked
+    const originalTabSwitching = mainTabButtons.forEach;
+    mainTabButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tabId = this.getAttribute('data-tab');
+            
+            // Update button styles
+            mainTabButtons.forEach(button => button.classList.remove('active-tab'));
+            this.classList.add('active-tab');
+            
+            // Show the corresponding content
+            mainTabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === tabId) {
+                    content.classList.add('active');
+                }
+            });
+
+            // Load data based on active tab
+            if (tabId === 'events') {
+                loadUserRegistrations();
+            } else if (tabId === 'profile') {
+                loadUserProfile();
+            } else if (tabId === 'notices') {
+                loadUserNotices();
+            }
+        });
+    });
 });

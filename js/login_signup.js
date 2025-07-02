@@ -150,7 +150,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 } else {
                     const errorData = await response.json();
-                    alert(`Login failed: ${errorData.message || response.statusText}`);
+                    
+                    // Handle banned users specially
+                    if (response.status === 403 && errorData.accountStatus === 'banned') {
+                        showBanAppealForm(email, errorData);
+                    } else {
+                        alert(`Login failed: ${errorData.message || response.statusText}`);
+                    }
                 }
             } catch (error) {
                 console.error('Login error:', error);
@@ -265,7 +271,121 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         return true;
     }
+    
+    /**
+     * Shows ban appeal form for banned users
+     * @param {string} email - User's email
+     * @param {object} banData - Ban information from server
+     */
+    function showBanAppealForm(email, banData) {
+        // Create modal backdrop
+        const modalBackdrop = document.createElement('div');
+        modalBackdrop.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modalBackdrop.id = 'banAppealModal';
+        
+        // Create modal content
+        modalBackdrop.innerHTML = `
+            <div class="bg-white rounded-lg p-8 max-w-md mx-4 w-full">
+                <div class="text-center mb-6">
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                        <i class="fas fa-ban text-red-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900">Account Banned</h3>
+                    <p class="mt-2 text-sm text-gray-500">
+                        Your account has been banned for: ${banData.reason}
+                    </p>
+                    ${banData.bannedAt ? `<p class="text-xs text-gray-400 mt-1">Banned on: ${new Date(banData.bannedAt).toLocaleDateString()}</p>` : ''}
+                </div>
+                
+                <form id="banAppealForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Why should your ban be lifted? *
+                        </label>
+                        <select id="appealReason" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="">Select a reason</option>
+                            <option value="misunderstanding">This was a misunderstanding</option>
+                            <option value="learned_lesson">I've learned from my mistake</option>
+                            <option value="false_accusation">I believe this was a false accusation</option>
+                            <option value="account_compromised">My account was compromised</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Please explain your situation *
+                        </label>
+                        <textarea id="appealDetails" required rows="4" 
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+                                  placeholder="Provide a detailed explanation of why you believe the ban should be lifted..."></textarea>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" onclick="closeBanAppealModal()" 
+                                class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                            Submit Appeal
+                        </button>
+                    </div>
+                </form>
+            </div>
+        `;
+        
+        document.body.appendChild(modalBackdrop);
+        document.body.style.overflow = 'hidden';
+        
+        // Handle form submission
+        document.getElementById('banAppealForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const reason = document.getElementById('appealReason').value;
+            const details = document.getElementById('appealDetails').value;
+            
+            if (!reason || !details.trim()) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/auth/appeal-ban', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        reason: reason,
+                        details: details.trim()
+                    })
+                });
+                
+                if (response.ok) {
+                    alert('Your appeal has been submitted successfully. An admin will review your case and contact you via email.');
+                    closeBanAppealModal();
+                } else {
+                    const error = await response.json();
+                    alert(`Failed to submit appeal: ${error.message}`);
+                }
+            } catch (error) {
+                console.error('Error submitting appeal:', error);
+                alert('An error occurred while submitting your appeal. Please try again.');
+            }
+        });
+    }
+    
+    // Global function to close ban appeal modal
+    window.closeBanAppealModal = function() {
+        const modal = document.getElementById('banAppealModal');
+        if (modal) {
+            modal.remove();
+            document.body.style.overflow = 'auto';
+        }
+    };
 
-     // Initialize the first step on page load
+    // Initialize the first step on page load
     showStep(currentStep);
 });

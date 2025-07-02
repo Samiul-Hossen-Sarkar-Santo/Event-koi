@@ -270,10 +270,67 @@ router.post('/', isAuthenticated, handleFormData, async (req, res) => {
       }
     }
 
+    let categoryToUse = req.body.category;
+    let categoryRequiresApproval = false;
+
+    // Handle custom categories
+    if (req.body.category === 'other' && req.body.customCategory) {
+      const customCategoryName = req.body.customCategory.trim().toLowerCase();
+      
+      // Check if the custom category already exists
+      const Category = require('E:\\Projects\\sre\\Event-koi\\models\\Category.js');
+      let existingCategory = await Category.findOne({ 
+        name: { $regex: new RegExp(`^${customCategoryName}$`, 'i') }
+      });
+
+      if (existingCategory) {
+        if (existingCategory.status === 'approved' && existingCategory.isActive) {
+          // Use the existing approved category
+          categoryToUse = existingCategory.name;
+        } else if (existingCategory.status === 'pending') {
+          // Category is pending approval
+          categoryToUse = customCategoryName;
+          categoryRequiresApproval = true;
+        } else {
+          // Category was rejected, treat as new suggestion
+          categoryToUse = customCategoryName;
+          categoryRequiresApproval = true;
+        }
+      } else {
+        // Create new category suggestion
+        const newCategory = new Category({
+          name: customCategoryName,
+          description: `Category suggested by organizer for event: ${req.body.title}`,
+          suggestedBy: req.session.userId,
+          status: 'pending',
+          isActive: false
+        });
+        await newCategory.save();
+        
+        categoryToUse = customCategoryName;
+        categoryRequiresApproval = true;
+        
+        // Log the new category suggestion
+        const AdminLog = require('E:\\Projects\\sre\\Event-koi\\models\\AdminLog.js');
+        const logEntry = new AdminLog({
+          admin: null,
+          action: 'category_suggested',
+          targetType: 'category',
+          targetId: newCategory._id,
+          details: `New category "${customCategoryName}" suggested by organizer`,
+          metadata: {
+            suggestedBy: req.session.userId,
+            eventId: null // Will be updated after event creation
+          }
+        });
+        await logEntry.save();
+      }
+    }
+
     const eventData = {
       title: req.body.title,
       description: req.body.description,
-      category: req.body.category,
+      category: categoryToUse,
       date: req.body.date,
       time: req.body.time,
       location: req.body.location,
@@ -282,17 +339,28 @@ router.post('/', isAuthenticated, handleFormData, async (req, res) => {
       prizeInfo: req.body.prizeInfo || '',
       rules: req.body.rules || '',
       externalRegistrationUrl: req.body.externalRegistrationUrl || null,
-      organizer: req.session.userId, // Associate the event with the authenticated user (organizer)
-      // Save the path to the uploaded image
-      coverImage: req.file ? req.file.filename : null, // Store just the filename
-      // Note: Ensure 'coverImage' is defined in your Event Mongoose schema as a String
-      approvalStatus: 'pending' // Set the initial approval status to 'pending'
+      organizer: req.session.userId,
+      coverImage: req.file ? req.file.filename : null,
+      // If category requires approval, set special status
+      approvalStatus: categoryRequiresApproval ? 'pending' : 'pending',
+      // Add flag for admin to review category
+      adminRemarks: categoryRequiresApproval ? `⚠️ This event uses a new category "${categoryToUse}" that requires approval. Please review the category management section.` : null
     };
 
     console.log('Event data to save:', eventData);
 
     const newEvent = new Event(eventData);
     await newEvent.save();
+
+    // Update the admin log with the event ID if we created a new category
+    if (categoryRequiresApproval) {
+      const AdminLog = require('E:\\Projects\\sre\\Event-koi\\models\\AdminLog.js');
+      await AdminLog.updateOne(
+        { action: 'category_suggested', 'metadata.suggestedBy': req.session.userId },
+        { $set: { 'metadata.eventId': newEvent._id } },
+        { sort: { createdAt: -1 } }
+      );
+    }
 
     res.status(201).json(newEvent);
   } catch (err) {
@@ -839,6 +907,72 @@ router.get('/:id/registrations', isAuthenticated, async (req, res) => {
   } catch (err) {
     console.error('Error fetching registrations:', err);
     res.status(500).json({ message: 'Error fetching registrations', error: err.message });
+  }
+});
+
+// Report Event
+router.post('/report', isAuthenticated, async (req, res) => {
+  try {
+    const { eventId, reason, details, reporterEmail } = req.body;
+    
+    if (!eventId || !reason) {
+      return res.status(400).json({ 
+        message: 'Event ID and reason are required.' 
+      });
+    }
+
+    // Check if event exists
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ 
+        message: 'Event not found.' 
+      });
+    }
+
+    // Map frontend reasons to backend categories
+    const reasonMapping = {
+      'inappropriate_content': 'inappropriate_content',
+      'misleading_information': 'fake_information',
+      'spam': 'spam',
+      'scam': 'spam', // Treat scam as spam for now
+      'copyright_violation': 'copyright_violation',
+      'other': 'other'
+    };
+
+    const category = reasonMapping[reason] || 'other';
+
+    // Create the report
+    const Report = require('E:\\Projects\\sre\\Event-koi\\models\\Report.js');
+    
+    const newReport = new Report({
+      reportType: 'event',
+      reportedBy: req.session.userId, // Now guaranteed to exist due to isAuthenticated middleware
+      reportedEntity: eventId,
+      reportedEntityModel: 'Event',
+      reason: reason,
+      description: details || 'No additional details provided',
+      category: category,
+      status: 'pending',
+      priority: reason === 'scam' || reason === 'inappropriate_content' ? 'high' : 'medium'
+    });
+
+    // Add reporter email to admin notes if provided
+    if (reporterEmail) {
+      newReport.adminNotes = `Reporter email: ${reporterEmail}`;
+    }
+
+    await newReport.save();
+
+    res.status(200).json({ 
+      message: 'Report submitted successfully', 
+      reportId: newReport._id 
+    });
+
+  } catch (error) {
+    console.error('Error submitting event report:', error);
+    res.status(500).json({ 
+      message: 'Internal server error while submitting report' 
+    });
   }
 });
 

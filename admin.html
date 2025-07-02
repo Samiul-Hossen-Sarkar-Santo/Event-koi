@@ -53,6 +53,10 @@
                             <button class="w-full text-left p-3 rounded-lg hover:bg-red-100 flex items-center admin-tab-btn" data-admin-tab="users">
                                 <i class="fas fa-users w-6 text-center mr-3 text-red-600"></i> User Management
                             </button>
+                            <button class="w-full text-left p-3 rounded-lg hover:bg-red-100 flex items-center relative admin-tab-btn" data-admin-tab="banned-warned">
+                                <i class="fas fa-user-slash w-6 text-center mr-3 text-red-600"></i> Banned & Warned
+                                <span class="notification-badge" id="banned-appeals-badge">0</span>
+                            </button>
                             <button class="w-full text-left p-3 rounded-lg hover:bg-red-100 flex items-center relative admin-tab-btn" data-admin-tab="reports">
                                 <i class="fas fa-flag w-6 text-center mr-3 text-red-600"></i> Reports Panel
                                 <span class="notification-badge" id="active-reports-badge">0</span>
@@ -372,6 +376,38 @@
                         <!-- Categories List -->
                         <div id="categories-container" class="space-y-4">
                             <div class="text-center py-8 text-gray-500">Loading categories...</div>
+                        </div>
+                    </div>
+
+                    <!-- Banned & Warned Tab -->
+                    <div id="banned-warned" class="admin-tab-content">
+                        <h2 class="text-2xl font-bold mb-6 text-gray-800">Banned & Warned Users</h2>
+                        
+                        <!-- Ban/Warning Filters -->
+                        <div class="bg-white p-4 rounded-lg mb-6 border">
+                            <div class="flex flex-wrap gap-4">
+                                <select id="ban-status-filter" class="px-3 py-2 border rounded-lg">
+                                    <option value="banned">Banned Users</option>
+                                    <option value="suspended">Suspended Users</option>
+                                    <option value="warned">Warned Users</option>
+                                    <option value="appeals">Ban Appeals</option>
+                                    <option value="all">All Status</option>
+                                </select>
+                                <select id="ban-days-filter" class="px-3 py-2 border rounded-lg">
+                                    <option value="7">Last 7 days</option>
+                                    <option value="30">Last 30 days</option>
+                                    <option value="90">Last 90 days</option>
+                                    <option value="all">All Time</option>
+                                </select>
+                                <button onclick="loadBannedWarned()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                                    <i class="fas fa-refresh mr-2"></i>Refresh
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Banned/Warned Users List -->
+                        <div id="banned-warned-container" class="space-y-4">
+                            <div class="text-center py-8 text-gray-500">Loading banned and warned users...</div>
                         </div>
                     </div>
 

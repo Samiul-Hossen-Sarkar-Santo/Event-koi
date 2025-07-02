@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupAdminLogsFilters();
     setupUserManagementFilters();
     setupDeletionFilters();
+    setupBannedWarnedFilters();
 
     // ==================== AUTHENTICATION ====================
     
@@ -73,6 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 switch(tabId) {
                     case 'dashboard':
                         loadDashboardStats();
+                        loadRecentActivity();
                         break;
                     case 'approvals':
                         loadEventApprovals();
@@ -97,6 +99,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     case 'deletions':
                         loadDeletionRequests();
                         setTimeout(setupDeletionFilters, 100);
+                        break;
+                    case 'banned-warned':
+                        loadBannedWarned();
+                        setTimeout(setupBannedWarnedFilters, 100);
                         break;
                 }
             });
@@ -576,7 +582,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 displayReports(data.reports || []);
                 return Promise.resolve();
             } else {
-                console.error('Failed to load reports');
+                console.error('Failed to load reports, status:', response.status);
                 displayReports([]);
                 return Promise.reject('Failed to load reports');
             }
@@ -1369,7 +1375,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <p class="text-gray-600">Request Date: ${requestDate}</p>
                             <p class="text-gray-600">Event Date: ${eventDate} at ${event.time || 'TBD'}</p>
                             <p class="text-gray-600">Location: ${event.location || 'TBD'}</p>
-                            <p class="text-sm text-gray-500 mt-2">Category: ${event.category || 'Uncategorized'}</p>
+                            <p class="text-gray-600">Category: ${event.category || 'Uncategorized'}</p>
                             ${event.deletionReason ? `<p class="text-sm text-red-600 mt-2"><strong>Reason:</strong> ${event.deletionReason}</p>` : ''}
                             <p class="text-sm text-gray-700 mt-2">${event.description || 'No description provided'}</p>
                             ${event.coverImage ? `<img src="uploads/${event.coverImage}" alt="Event Cover" class="mt-3 w-32 h-20 object-cover rounded">` : ''}
@@ -1413,17 +1419,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function refreshDeletions() {
         document.getElementById('deletion-status-filter').value = 'deletion_requested';
         loadDeletionRequests();
-    }
-
-    // Setup dynamic filtering for deletion requests
-    function setupDeletionFilters() {
-        const statusFilter = document.getElementById('deletion-status-filter');
-        
-        if (statusFilter) {
-            statusFilter.addEventListener('change', function() {
-                loadDeletionRequests();
-            });
-        }
     }
 
     // Deletion action functions
@@ -1491,483 +1486,379 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    // ==================== BANNED & WARNED USERS MANAGEMENT ====================
+    
+    async function loadBannedWarned() {
+        try {
+            const statusFilter = document.getElementById('ban-status-filter')?.value || 'banned';
+            const daysFilter = document.getElementById('ban-days-filter')?.value || 'all';
+            
+            const params = new URLSearchParams({
+                status: statusFilter,
+                days: daysFilter,
+                limit: 50
+            });
+            
+            const response = await fetch(`/admin/banned-warned?${params}`, {
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                displayBannedWarned(data.users || []);
+                return Promise.resolve();
+            } else {
+                console.error('Failed to load banned/warned users');
+                displayBannedWarned([]);
+                return Promise.reject('Failed to load banned/warned users');
+            }
+        } catch (error) {
+            console.error('Error loading banned/warned users:', error);
+            displayBannedWarned([]);
+            return Promise.reject(error);
+        }
+    }
+
+    function displayBannedWarned(users) {
+        const container = document.getElementById('banned-warned-container');
+        if (!container) return;
+
+        if (users.length === 0) {
+            container.innerHTML = '<div class="text-center py-8 text-gray-500">No users found for selected criteria.</div>';
+            return;
+        }
+
+        const usersHTML = users.map(user => {
+            const statusChangeDate = user.statusChangedAt ? 
+                new Date(user.statusChangedAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }) : 'Unknown';
+            
+            const appealDate = user.appealSubmittedAt ? 
+                new Date(user.appealSubmittedAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }) : null;
+
+            const statusColor = {
+                'banned': 'bg-red-100 text-red-800',
+                'suspended': 'bg-yellow-100 text-yellow-800',
+                'warned': 'bg-orange-100 text-orange-800'
+            }[user.accountStatus];
+
+            const hasAppeal = user.appealText && user.appealText.trim() !== '';
+
+            return `
+                <div class="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <h3 class="text-lg font-semibold text-gray-800">${user.username}</h3>
+                                <span class="px-2 py-1 text-xs font-medium rounded-full ${statusColor}">${user.accountStatus}</span>
+                                ${hasAppeal ? '<span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">Has Appeal</span>' : ''}
+                                ${user.warningCount > 0 ? `<span class="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800">${user.warningCount} warnings</span>` : ''}
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2">
+                                <strong>Email:</strong> ${user.email}
+                            </p>
+                            <p class="text-gray-600 text-sm mb-2">
+                                <strong>Status Changed:</strong> ${statusChangeDate}
+                            </p>
+                            ${user.banReason ? `
+                                <div class="mt-2 p-3 bg-red-50 border border-red-200 rounded">
+                                    <p class="text-sm text-red-800"><strong>Reason:</strong></p>
+                                    <p class="text-sm text-red-700">${user.banReason}</p>
+                                </div>
+                            ` : ''}
+                            ${hasAppeal ? `
+                                <div class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded">
+                                    <p class="text-sm text-blue-800"><strong>Appeal (${appealDate}):</strong></p>
+                                    <p class="text-sm text-blue-700">${user.appealText}</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="flex flex-col space-y-2 ml-4">
+                            ${user.accountStatus === 'banned' && !hasAppeal ? `
+                                <button onclick="unbanUser('${user._id}', '${user.username}')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                                    <i class="fas fa-unlock mr-1"></i>Unban
+                                </button>
+                            ` : ''}
+                            ${hasAppeal ? `
+                                <button onclick="handleAppeal('${user._id}', 'approve')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                                    <i class="fas fa-check mr-1"></i>Approve Appeal
+                                </button>
+                                <button onclick="handleAppeal('${user._id}', 'reject')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                                    <i class="fas fa-times mr-1"></i>Reject Appeal
+                                </button>
+                            ` : ''}
+                            ${user.accountStatus === 'suspended' ? `
+                                <button onclick="unsuspendUser('${user._id}', '${user.username}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                                    <i class="fas fa-play mr-1"></i>Unsuspend
+                                </button>
+                            ` : ''}
+                            <button onclick="viewUserWarnings('${user._id}', '${user.username}')" class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                                <i class="fas fa-eye mr-1"></i>View History
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        container.innerHTML = usersHTML;
+    }
+
+    // Ban appeal handling functions
+    window.handleAppeal = async function(userId, action) {
+        const actionText = action === 'approve' ? 'approve' : 'reject';
+        if (!confirm(`Are you sure you want to ${actionText} this ban appeal?`)) return;
+        
+        const adminResponse = prompt(`Please provide your response for ${actionText}ing the appeal:`);
+        if (!adminResponse || adminResponse.trim() === '') {
+            alert('A response is required.');
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/admin/handle-appeal/${userId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    action, 
+                    adminResponse: adminResponse.trim() 
+                }),
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                alert(`Ban appeal ${actionText}ed successfully!`);
+                loadBannedWarned();
+                loadPendingCounts();
+            } else {
+                const error = await response.json();
+                alert(`Failed to ${actionText} appeal: ` + (error.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error(`Error ${actionText}ing appeal:`, error);
+            alert(`Error ${actionText}ing appeal. Please try again.`);
+        }
+    };
+
+    window.unbanUser = async function(userId, username) {
+        if (!confirm(`Are you sure you want to unban user "${username}"?`)) return;
+        
+        const reason = prompt('Please provide a reason for unbanning:');
+        if (!reason || reason.trim() === '') {
+            alert('A reason is required for unbanning.');
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/admin/unban-user/${userId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reason: reason.trim() }),
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                alert('User unbanned successfully!');
+                loadBannedWarned();
+                loadUserManagement();
+                loadPendingCounts();
+            } else {
+                const error = await response.json();
+                alert('Failed to unban user: ' + (error.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error unbanning user:', error);
+            alert('Error unbanning user. Please try again.');
+        }
+    };
+
+    window.unsuspendUser = async function(userId, username) {
+        if (!confirm(`Are you sure you want to unsuspend user "${username}"?`)) return;
+        
+        try {
+            const response = await fetch(`/admin/users/${userId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'active', reason: 'Unsuspended by admin' }),
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                alert('User unsuspended successfully!');
+                loadBannedWarned();
+                loadUserManagement();
+            } else {
+                const error = await response.json();
+                alert('Failed to unsuspend user: ' + error.message);
+            }
+        } catch (error) {
+            console.error('Error unsuspending user:', error);
+            alert('Error unsuspending user');
+        }
+    };
+
+    window.viewUserWarnings = async function(userId, username) {
+        try {
+            const response = await fetch(`/admin/users/${userId}/warnings`, {
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                displayUserWarningsModal(username, data.warnings || []);
+            } else {
+                alert('Failed to load user warnings');
+            }
+        } catch (error) {
+            console.error('Error loading user warnings:', error);
+            alert('Error loading user warnings');
+        }
+    };
+
+    function displayUserWarningsModal(username, warnings) {
+        const warningsHTML = warnings.length > 0 ? warnings.map(warning => `
+            <div class="p-3 border rounded-lg mb-3 ${warning.isActive ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-200'}">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-sm font-medium text-gray-800">${warning.category.replace('_', ' ')}</span>
+                    <span class="text-xs px-2 py-1 rounded ${warning.isActive ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-600'}">
+                        ${warning.isActive ? 'Active' : 'Resolved'}
+                    </span>
+                </div>
+                <p class="text-sm text-gray-700 mb-1"><strong>Reason:</strong> ${warning.reason}</p>
+                <p class="text-sm text-gray-600">${warning.description}</p>
+                <p class="text-xs text-gray-500 mt-2">
+                    Issued: ${new Date(warning.createdAt).toLocaleDateString()}
+                    ${warning.expiryDate ? ` | Expires: ${new Date(warning.expiryDate).toLocaleDateString()}` : ''}
+                </p>
+            </div>
+        `).join('') : '<p class="text-center text-gray-500 py-4">No warnings found for this user.</p>';
+
+        const modalHTML = `
+            <div id="warning-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-96 overflow-y-auto">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Warning History: ${username}</h3>
+                        <button onclick="closeWarningModal()" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div>${warningsHTML}</div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+    }
+
+    window.closeWarningModal = function() {
+        const modal = document.getElementById('warning-modal');
+        if (modal) {
+            modal.remove();
+        }
+    };
+
+    // Update pending counts to include ban appeals
+    async function updateBannedAppealsCount() {
+        try {
+            const response = await fetch('/admin/banned-warned?status=appeals&limit=1', {
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                const badge = document.getElementById('banned-appeals-badge');
+                if (badge) {
+                    const count = data.pagination?.totalUsers || 0;
+                    badge.textContent = count;
+                    badge.style.display = count > 0 ? 'block' : 'none';
+                }
+            }
+        } catch (error) {
+            console.error('Error loading ban appeals count:', error);
+        }
+    }
+
     // Make functions globally available
-    window.loadDeletionRequests = loadDeletionRequests;
-    window.refreshDeletions = refreshDeletions;
+    window.loadBannedWarned = loadBannedWarned;
 
-    // ==================== LOAD ALL DATA ON PAGE LOAD ====================
-    
-    // Initial data load
-    loadDashboardStats();
-    loadPendingCounts();
-    loadEventApprovals();
-    loadUserManagement();
-    loadReports();
-    loadCategories();
-    loadAdminLogs();
-    loadDeletionRequests();
-
-    // ==================== ENHANCEMENTS AND PLACEHOLDER CONTENT ====================
-    
-    // Add content to fill empty spaces in tabs
-    function addAnalyticsCharts() {
-        // This would normally fetch real analytics data
-        const dashboardContainer = document.getElementById('dashboard');
-        if (!dashboardContainer) return;
-
-        const analyticsSection = `
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-                <div class="bg-white p-6 border rounded-lg">
-                    <h3 class="text-lg font-semibold mb-4 text-gray-800">Event Trends (Last 30 Days)</h3>
-                    <div class="h-64 flex items-center justify-center bg-gray-50 rounded">
-                        <div class="text-center">
-                            <i class="fas fa-chart-line text-4xl text-blue-500 mb-2"></i>
-                            <p class="text-gray-500">Analytics charts will be implemented with Chart.js</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white p-6 border rounded-lg">
-                    <h3 class="text-lg font-semibold mb-4 text-gray-800">User Activity</h3>
-                    <div class="h-64 flex items-center justify-center bg-gray-50 rounded">
-                        <div class="text-center">
-                            <i class="fas fa-users text-4xl text-green-500 mb-2"></i>
-                            <p class="text-gray-500">User engagement metrics</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="bg-white p-6 border rounded-lg mt-6">
-                <h3 class="text-lg font-semibold mb-4 text-gray-800">System Overview</h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="text-center p-4 bg-blue-50 rounded-lg">
-                        <div class="text-2xl font-bold text-blue-600" id="total-registrations">0</div>
-                        <div class="text-sm text-blue-600">Total Registrations</div>
-                    </div>
-                    <div class="text-center p-4 bg-green-50 rounded-lg">
-                        <div class="text-2xl font-bold text-green-600" id="avg-rating">0.0</div>
-                        <div class="text-sm text-green-600">Avg Event Rating</div>
-                    </div>
-                    <div class="text-center p-4 bg-purple-50 rounded-lg">
-                        <div class="text-2xl font-bold text-purple-600" id="platform-growth">+0%</div>
-                        <div class="text-sm text-purple-600">Growth Rate</div>
-                    </div>
-                    <div class="text-center p-4 bg-orange-50 rounded-lg">
-                        <div class="text-2xl font-bold text-orange-600" id="revenue">$0</div>
-                        <div class="text-sm text-orange-600">Revenue</div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // Find where to append the analytics section
-        const recentActivityContainer = dashboardContainer.querySelector('#recent-activity').closest('.bg-white');
-        if (recentActivityContainer) {
-            recentActivityContainer.insertAdjacentHTML('afterend', analyticsSection);
-        }
-    }
-
-    function addEventManagementTools() {
-        const approvalsContainer = document.getElementById('approvals-container');
-        if (!approvalsContainer) return;
-
-        // Add bulk actions and stats at the top
-        const bulkActionsHTML = `
-            <div class="bg-blue-50 p-4 rounded-lg mb-6 border border-blue-200">
-                <h3 class="text-lg font-semibold mb-3 text-blue-800">Bulk Actions</h3>
-                <div class="flex flex-wrap gap-3">
-                    <button onclick="bulkApproveEvents()" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
-                        <i class="fas fa-check-double mr-2"></i>Bulk Approve Selected
-                    </button>
-                    <button onclick="exportEventData()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-                        <i class="fas fa-download mr-2"></i>Export Data
-                    </button>
-                    <button onclick="showEventStats()" class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">
-                        <i class="fas fa-chart-bar mr-2"></i>View Statistics
-                    </button>
-                </div>
-            </div>
-        `;
-
-        approvalsContainer.insertAdjacentHTML('afterbegin', bulkActionsHTML);
-    }
-
-    function addUserManagementEnhancements() {
-        const usersContainer = document.getElementById('users-container');
-        if (!usersContainer) return;
-
-        const enhancementsHTML = `
-            <div class="bg-green-50 p-4 rounded-lg mb-6 border border-green-200">
-                <h3 class="text-lg font-semibold mb-3 text-green-800">User Management Tools</h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <button onclick="exportUserData()" class="flex flex-col items-center p-3 bg-white hover:bg-gray-50 rounded-lg border transition-colors">
-                        <i class="fas fa-download text-green-600 mb-2"></i>
-                        <span class="text-sm font-medium">Export Users</span>
-                    </button>
-                    <button onclick="sendBulkEmail()" class="flex flex-col items-center p-3 bg-white hover:bg-gray-50 rounded-lg border transition-colors">
-                        <i class="fas fa-envelope text-blue-600 mb-2"></i>
-                        <span class="text-sm font-medium">Bulk Email</span>
-                    </button>
-                    <button onclick="generateUserReport()" class="flex flex-col items-center p-3 bg-white hover:bg-gray-50 rounded-lg border transition-colors">
-                        <i class="fas fa-chart-line text-purple-600 mb-2"></i>
-                        <span class="text-sm font-medium">Generate Report</span>
-                    </button>
-                    <button onclick="managePermissions()" class="flex flex-col items-center p-3 bg-white hover:bg-gray-50 rounded-lg border transition-colors">
-                        <i class="fas fa-key text-orange-600 mb-2"></i>
-                        <span class="text-sm font-medium">Permissions</span>
-                    </button>
-                </div>
-            </div>
-        `;
-
-        usersContainer.insertAdjacentHTML('afterbegin', enhancementsHTML);
-    }
-
-    // Placeholder functions for new features
-    window.bulkApproveEvents = () => alert('Bulk approve feature coming soon');
-    window.exportEventData = () => alert('Export feature coming soon');
-    window.showEventStats = () => alert('Statistics feature coming soon');
-    window.exportUserData = () => alert('Export users feature coming soon');
-    window.sendBulkEmail = () => alert('Bulk email feature coming soon');
-    window.generateUserReport = () => alert('Report generation feature coming soon');
-    window.managePermissions = () => alert('Permission management feature coming soon');
-
-    // Call enhancement functions when tabs are loaded
-    const originalLoadEventApprovals = loadEventApprovals;
-    loadEventApprovals = function() {
-        originalLoadEventApprovals.call(this);
-        setTimeout(addEventManagementTools, 100);
+    // Add to the setup functions
+    const originalSetupEventListeners = setupEventListeners;
+    setupEventListeners = function() {
+        originalSetupEventListeners.call(this);
+        setupBannedWarnedFilters();
     };
 
-    const originalLoadUserManagement = loadUserManagement;
-    loadUserManagement = function() {
-        originalLoadUserManagement.call(this);
-        setTimeout(addUserManagementEnhancements, 100);
+    // Add to the pending counts function
+    const originalLoadPendingCounts = loadPendingCounts;
+    loadPendingCounts = async function() {
+        await originalLoadPendingCounts.call(this);
+        await updateBannedAppealsCount();
     };
 
-    // Add analytics on dashboard load
-    setTimeout(() => {
-        if (document.getElementById('dashboard').classList.contains('active')) {
-            addAnalyticsCharts();
-        }
-    }, 500);
+    // Load banned/warned users when the tab is first activated
+    setupTabSwitching = function() {
+        const tabButtons = document.querySelectorAll('.admin-tab-btn');
+        const tabContents = document.querySelectorAll('.admin-tab-content');
 
-    // Enhanced display functions for empty tabs
-    function enhanceReportsTab() {
-        const reportsContainer = document.getElementById('reports-container');
-        if (!reportsContainer) return;
-
-        const enhancedContent = `
-            <div class="bg-yellow-50 p-4 rounded-lg mb-6 border border-yellow-200">
-                <h3 class="text-lg font-semibold mb-3 text-yellow-800">Report Management Tools</h3>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <button onclick="createReportTemplate()" class="flex flex-col items-center p-3 bg-white hover:bg-gray-50 rounded-lg border transition-colors">
-                        <i class="fas fa-file-alt text-yellow-600 mb-2"></i>
-                        <span class="text-sm font-medium">Report Templates</span>
-                    </button>
-                    <button onclick="scheduleReports()" class="flex flex-col items-center p-3 bg-white hover:bg-gray-50 rounded-lg border transition-colors">
-                        <i class="fas fa-clock text-blue-600 mb-2"></i>
-                        <span class="text-sm font-medium">Schedule Reports</span>
-                    </button>
-                    <button onclick="reportAnalytics()" class="flex flex-col items-center p-3 bg-white hover:bg-gray-50 rounded-lg border transition-colors">
-                        <i class="fas fa-chart-pie text-purple-600 mb-2"></i>
-                        <span class="text-sm font-medium">Report Analytics</span>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="bg-white p-6 border rounded-lg">
-                <h3 class="text-lg font-semibold mb-4 text-gray-800">Report Statistics</h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="text-center p-4 bg-red-50 rounded-lg">
-                        <div class="text-2xl font-bold text-red-600" id="total-registrations">0</div>
-                        <div class="text-sm text-red-600">Open Reports</div>
-                    </div>
-                    <div class="text-center p-4 bg-yellow-50 rounded-lg">
-                        <div class="text-2xl font-bold text-yellow-600" id="avg-rating">0</div>
-                        <div class="text-sm text-yellow-600">Under Investigation</div>
-                    </div>
-                    <div class="text-center p-4 bg-green-50 rounded-lg">
-                        <div class="text-2xl font-bold text-green-600" id="platform-growth">0</div>
-                        <div class="text-sm text-green-600">Resolved</div>
-                    </div>
-                    <div class="text-center p-4 bg-blue-50 rounded-lg">
-                        <div class="text-2xl font-bold text-blue-600" id="revenue">0</div>
-                        <div class="text-sm text-blue-600">Avg Resolution Time</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="text-center py-12 text-gray-500">
-                <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
-                <h3 class="text-xl font-medium mb-2">No Reports Yet</h3>
-                <p>Reports will appear here when users submit them</p>
-            </div>
-        `;
-
-        reportsContainer.innerHTML = enhancedContent;
-    }
-
-    function enhanceCategoriesTab() {
-        const categoriesContainer = document.getElementById('categories-container');
-        if (!categoriesContainer) return;
-
-        const enhancedContent = `
-            <div class="bg-purple-50 p-4 rounded-lg mb-6 border border-purple-200">
-                <h3 class="text-lg font-semibold mb-3 text-purple-800">Category Management</h3>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <button onclick="createNewCategory()" class="flex flex-col items-center p-3 bg-white hover:bg-gray-50 rounded-lg border transition-colors">
-                        <i class="fas fa-plus text-green-600 mb-2"></i>
-                        <span class="text-sm font-medium">Create Category</span>
-                    </button>
-                    <button onclick="importCategories()" class="flex flex-col items-center p-3 bg-white hover:bg-gray-50 rounded-lg border transition-colors">
-                        <i class="fas fa-upload text-blue-600 mb-2"></i>
-                        <span class="text-sm font-medium">Import Categories</span>
-                    </button>
-                    <button onclick="categoryAnalytics()" class="flex flex-col items-center p-3 bg-white hover:bg-gray-50 rounded-lg border transition-colors">
-                        <i class="fas fa-chart-bar text-purple-600 mb-2"></i>
-                        <span class="text-sm font-medium">Category Stats</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="bg-white p-6 border rounded-lg">
-                <h3 class="text-lg font-semibold mb-4 text-gray-800">Current Categories</h3>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    <div class="p-3 bg-blue-50 rounded-lg border text-center">
-                        <i class="fas fa-laptop-code text-blue-600 mb-2"></i>
-                        <div class="text-sm font-medium">Technology</div>
-                        <div class="text-xs text-gray-500">12 events</div>
-                    </div>
-                    <div class="p-3 bg-green-50 rounded-lg border text-center">
-                        <i class="fas fa-users text-green-600 mb-2"></i>
-                        <div class="text-sm font-medium">Networking</div>
-                        <div class="text-xs text-gray-500">8 events</div>
-                    </div>
-                    <div class="p-3 bg-purple-50 rounded-lg border text-center">
-                        <i class="fas fa-graduation-cap text-purple-600 mb-2"></i>
-                        <div class="text-sm font-medium">Workshop</div>
-                        <div class="text-xs text-gray-500">15 events</div>
-                    </div>
-                    <div class="p-3 bg-yellow-50 rounded-lg border text-center">
-                        <i class="fas fa-handshake text-yellow-600 mb-2"></i>
-                        <div class="text-sm font-medium">Conference</div>
-                        <div class="text-xs text-gray-500">6 events</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="text-center py-8 text-gray-500">
-                <p>No pending category approvals</p>
-            </div>
-        `;
-
-        categoriesContainer.innerHTML = enhancedContent;
-    }
-
-    function enhanceAccountabilityLog() {
-        const logsContainer = document.getElementById('logs-container');
-        if (!logsContainer) return;
-
-        const enhancedContent = `
-            <div class="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-200">
-                <h3 class="text-lg font-semibold mb-3 text-gray-800">Admin Activity Overview</h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="text-center p-4 bg-white rounded-lg border">
-                        <div class="text-2xl font-bold text-blue-600">0</div>
-                        <div class="text-sm text-blue-600">Actions Today</div>
-                    </div>
-                    <div class="text-center p-4 bg-white rounded-lg border">
-                        <div class="text-2xl font-bold text-green-600">0</div>
-                        <div class="text-sm text-green-600">Events Approved</div>
-                    </div>
-                    <div class="text-center p-4 bg-white rounded-lg border">
-                        <div class="text-2xl font-bold text-yellow-600">0</div>
-                        <div class="text-sm text-yellow-600">Users Managed</div>
-                    </div>
-                    <div class="text-center p-4 bg-white rounded-lg border">
-                        <div class="text-2xl font-bold text-red-600">0</div>
-                        <div class="text-sm text-red-600">Reports Handled</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="text-center py-12 text-gray-500">
-                <i class="fas fa-clipboard-list text-6xl text-gray-300 mb-4"></i>
-                <h3 class="text-xl font-medium mb-2">No Admin Actions Yet</h3>
-                <p>Admin activity logs will appear here</p>
-            </div>
-        `;
-
-        logsContainer.innerHTML = enhancedContent;
-    }
-
-    // Placeholder functions for new category features
-    window.createReportTemplate = () => alert('Report template feature coming soon');
-    window.scheduleReports = () => alert('Report scheduling feature coming soon');
-    window.reportAnalytics = () => alert('Report analytics feature coming soon');
-    window.createNewCategory = () => alert('Create category feature coming soon');
-    window.importCategories = () => alert('Import categories feature coming soon');
-    window.categoryAnalytics = () => alert('Category analytics feature coming soon');
-
-    // Override the original load functions to add enhancements
-    const originalLoadReports = loadReports;
-    loadReports = function() {
-        // Try to load real reports first
-        originalLoadReports.call(this).then(() => {
-            // If no reports, enhance the tab
-            const container = document.getElementById('reports-container');
-            if (container && container.innerHTML.includes('Loading reports...')) {
-                enhanceReportsTab();
-            }
-        }).catch(() => {
-            enhanceReportsTab();
-        });
-    };
-
-    const originalLoadCategories = loadCategories;
-    loadCategories = function() {
-        // Try to load real categories first
-        originalLoadCategories.call(this).then(() => {
-            // If no categories, enhance the tab
-            const container = document.getElementById('categories-container');
-            if (container && container.innerHTML.includes('Loading categories...')) {
-                enhanceCategoriesTab();
-            }
-        }).catch(() => {
-            enhanceCategoriesTab();
-        });
-    };
-
-    const originalLoadAdminLogs = loadAdminLogs;
-    loadAdminLogs = function() {
-        // Try to load real logs first
-        originalLoadAdminLogs.call(this).then(() => {
-            // If no logs, enhance the tab
-            const container = document.getElementById('logs-container');
-            if (container && container.innerHTML.includes('Loading logs...')) {
-                enhanceAccountabilityLog();
-            }
-        }).catch(() => {
-            enhanceAccountabilityLog();
-        });
-    };
-
-    // Make core functions globally available
-    window.loadEventApprovals = loadEventApprovals;
-    window.loadUserManagement = loadUserManagement;
-    window.loadReports = loadReports;
-    window.loadCategories = loadCategories;
-    window.loadAdminLogs = loadAdminLogs;
-
-    window.viewEventDetails = function(eventId) {
-        // Navigate to the event page to show full details
-        window.open(`/event_page.html?id=${eventId}`, '_blank');
-    };
-
-    // Setup dynamic filtering for event approvals
-    function setupEventApprovalFilters() {
-        const statusFilter = document.getElementById('event-status-filter');
-        const categoryFilter = document.getElementById('event-category-filter');
-        const dateFilter = document.getElementById('event-date-filter');
-        const createdFilter = document.getElementById('event-created-filter');
-        const searchInput = document.getElementById('event-search-input');
-        
-        // Auto-filter on dropdown changes
-        [statusFilter, categoryFilter, dateFilter, createdFilter].forEach(filter => {
-            if (filter) {
-                filter.addEventListener('change', function() {
-                    loadEventApprovals();
-                });
-            }
-        });
-        
-        // Auto-filter on search input with debouncing
-        if (searchInput) {
-            let searchTimeout;
-            searchInput.addEventListener('input', function() {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    loadEventApprovals();
-                }, 500); // 500ms delay for debouncing
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const targetTab = this.getAttribute('data-admin-tab');
+                
+                // Remove active class from all buttons and contents
+                tabButtons.forEach(btn => btn.classList.remove('active-tab'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Add active class to clicked button and corresponding content
+                this.classList.add('active-tab');
+                const targetContent = document.getElementById(targetTab);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                    
+                    // Load data for the active tab
+                    switch(targetTab) {
+                        case 'dashboard':
+                            loadDashboardStats();
+                            loadRecentActivity();
+                            break;
+                        case 'approvals':
+                            loadEventApprovals();
+                            break;
+                        case 'deletions':
+                            loadDeletionRequests();
+                            break;
+                        case 'users':
+                            loadUserManagement();
+                            break;
+                        case 'banned-warned':
+                            loadBannedWarned();
+                            break;
+                        case 'reports':
+                            loadReports();
+                            break;
+                        case 'categories':
+                            loadCategories();
+                            break;
+                        case 'logs':
+                            loadAdminLogs();
+                            break;
+                    }
+                }
             });
-        }
-    }
-
-    // Setup dynamic filtering for reports
-    function setupReportsFilters() {
-        const statusFilter = document.getElementById('report-status-filter');
-        const typeFilter = document.getElementById('report-type-filter');
-        const priorityFilter = document.getElementById('report-priority-filter');
-        
-        [statusFilter, typeFilter, priorityFilter].forEach(filter => {
-            if (filter) {
-                filter.addEventListener('change', function() {
-                    loadReports();
-                });
-            }
         });
-    }
-
-    // Setup dynamic filtering for categories
-    function setupCategoriesFilters() {
-        const statusFilter = document.getElementById('category-status-filter');
-        
-        if (statusFilter) {
-            statusFilter.addEventListener('change', function() {
-                loadCategories();
-            });
-        }
-    }
-
-    // Setup dynamic filtering for admin logs
-    function setupAdminLogsFilters() {
-        const adminFilter = document.getElementById('log-admin-filter');
-        const actionFilter = document.getElementById('log-action-filter');
-        const daysFilter = document.getElementById('log-days-filter');
-        
-        [adminFilter, actionFilter, daysFilter].forEach(filter => {
-            if (filter) {
-                filter.addEventListener('change', function() {
-                    loadAdminLogs();
-                });
-            }
-        });
-    }
-
-    // Setup dynamic filtering for user management
-    function setupUserManagementFilters() {
-        const roleFilter = document.getElementById('user-role-filter');
-        const statusFilter = document.getElementById('user-status-filter');
-        const searchInput = document.getElementById('user-search');
-        
-        [roleFilter, statusFilter].forEach(filter => {
-            if (filter) {
-                filter.addEventListener('change', function() {
-                    searchUsers();
-                });
-            }
-        });
-
-        // Add real-time search with debouncing
-        if (searchInput) {
-            let searchTimeout;
-            searchInput.addEventListener('input', function() {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    searchUsers();
-                }, 300); // 300ms delay for better performance
-            });
-        }
-    }
-
-    // Reset all filters to default values
-    window.resetEventFilters = function() {
-        document.getElementById('event-status-filter').value = 'pending';
-        document.getElementById('event-category-filter').value = 'all';
-        document.getElementById('event-date-filter').value = 'all';
-        document.getElementById('event-created-filter').value = 'all';
-        document.getElementById('event-search-input').value = '';
-        loadEventApprovals();
     };
+    // Re-initialize tab switching with the new banned-warned tab
+    setupTabSwitching();
 });

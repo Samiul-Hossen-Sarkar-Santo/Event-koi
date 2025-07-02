@@ -338,4 +338,106 @@ router.get('/admin/stats', isAuthenticated, isAdmin, async (req, res) => {
   }
 });
 
+// ==================== USER NOTICES & NOTIFICATIONS ====================
+
+// GET /users/notices - Get user's notices/notifications
+router.get('/notices', isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    
+    // For now, we'll create a simple notices system
+    // In a full implementation, you'd have a Notice model
+    const mockNotices = [
+      {
+        _id: 'notice1',
+        title: 'Event Status Update',
+        message: 'Your event "Tech Workshop 2025" has been approved by admin.',
+        type: 'event_status',
+        isRead: false,
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+        actionUrl: '/event_page.html?id=someEventId'
+      },
+      {
+        _id: 'notice2',
+        title: 'Registration Reminder',
+        message: 'Registration for "Web Development Workshop" closes in 3 days. Don\'t miss out!',
+        type: 'system',
+        isRead: false,
+        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+        actionUrl: '/event_page.html?id=anotherEventId'
+      },
+      {
+        _id: 'notice3',
+        title: 'Account Warning',
+        message: 'Please review our community guidelines to ensure your events comply with our policies.',
+        type: 'admin_action',
+        isRead: true,
+        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 1 week ago
+        actionUrl: null
+      },
+      {
+        _id: 'notice4',
+        title: 'New Features Available',
+        message: 'We\'ve added new filtering options to help you find events more easily. Check them out!',
+        type: 'system',
+        isRead: true,
+        createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // 2 weeks ago
+        actionUrl: null
+      }
+    ];
+    
+    const unreadCount = mockNotices.filter(notice => !notice.isRead).length;
+    
+    res.json({
+      success: true,
+      notices: mockNotices,
+      unreadCount
+    });
+    
+  } catch (err) {
+    console.error('Error fetching user notices:', err);
+    res.status(500).json({ message: 'Error fetching notices', error: err.message });
+  }
+});
+
+// PUT /users/notices/:noticeId/read - Mark a notice as read
+router.put('/notices/:noticeId/read', isAuthenticated, async (req, res) => {
+  try {
+    const { noticeId } = req.params;
+    const userId = req.session.userId;
+    
+    // In a real implementation, you'd update the notice in the database
+    // For now, we'll just return success
+    console.log(`Marking notice ${noticeId} as read for user ${userId}`);
+    
+    res.json({
+      success: true,
+      message: 'Notice marked as read'
+    });
+    
+  } catch (err) {
+    console.error('Error marking notice as read:', err);
+    res.status(500).json({ message: 'Error marking notice as read', error: err.message });
+  }
+});
+
+// PUT /users/notices/read-all - Mark all notices as read
+router.put('/notices/read-all', isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    
+    // In a real implementation, you'd update all notices for the user
+    console.log(`Marking all notices as read for user ${userId}`);
+    
+    res.json({
+      success: true,
+      message: 'All notices marked as read'
+    });
+    
+  } catch (err) {
+    console.error('Error marking all notices as read:', err);
+    res.status(500).json({ message: 'Error marking all notices as read', error: err.message });
+  }
+});
+
 module.exports = router;

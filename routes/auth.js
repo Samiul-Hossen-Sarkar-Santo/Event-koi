@@ -48,6 +48,9 @@ router.post('/signup', async (req, res) => {
     // You might want to automatically log in the user after signup
     req.session.userId = user.id;
     req.session.userRole = user.role;
+    req.session.userName = user.name;
+    req.session.username = user.username;
+    req.session.userEmail = user.email;
 
 
     res.status(201).json({
@@ -97,19 +100,35 @@ router.post('/login', async (req, res) => {
     // Check account status
     if (user.accountStatus === 'banned') {
       return res.status(403).json({
-        message: 'Account banned. Contact administrator.'
+        message: 'Your account has been banned.',
+        reason: user.statusReason || 'Violation of platform policies',
+        bannedAt: user.statusChangedAt,
+        canAppeal: true,
+        accountStatus: 'banned'
       });
     }
 
     if (user.accountStatus === 'suspended') {
       return res.status(403).json({
-        message: 'Account suspended. Contact administrator.'
+        message: 'Your account has been suspended.',
+        reason: user.statusReason || 'Temporary suspension for policy violation',
+        suspendedAt: user.statusChangedAt,
+        accountStatus: 'suspended'
       });
     }
 
-    // Create session
+    // Create session with more user info
     req.session.userId = user._id;
     req.session.userRole = user.role;
+    req.session.userName = user.name;
+    req.session.username = user.username;
+    req.session.userEmail = user.email;
+
+    // Set admin flag for admin users
+    if (user.role === 'admin') {
+      req.session.isAdmin = true;
+      req.session.adminLoginTime = new Date();
+    }
 
     // Update last login
     user.lastLogin = new Date();
@@ -274,6 +293,102 @@ router.get('/admin-check', (req, res) => {
       authenticated: false,
       isAdmin: false,
       message: 'Admin session not found or expired'
+    });
+  }
+});
+
+// GET /auth/check - Check authentication status
+router.get('/check', (req, res) => {
+  if (req.session && req.session.userId) {
+    // Get user details from session if available
+    const user = {
+      id: req.session.userId,
+      role: req.session.userRole,
+      name: req.session.userName,
+      username: req.session.username,
+      email: req.session.userEmail
+    };
+    
+    res.json({
+      authenticated: true,
+      userRole: req.session.userRole,
+      user: user
+    });
+  } else {
+    res.json({
+      authenticated: false,
+      userRole: null,
+      user: null
+    });
+  }
+});
+
+// POST /appeal-ban - Submit ban appeal
+router.post('/appeal-ban', async (req, res) => {
+  try {
+    const { email, reason, details } = req.body;
+
+    if (!email || !reason || !details) {
+      return res.status(400).json({
+        message: 'All fields are required for appeal submission.'
+      });
+    }
+
+    // Check if user exists and is banned
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        message: 'User not found.'
+      });
+    }
+
+    if (user.accountStatus !== 'banned') {
+      return res.status(400).json({
+        message: 'Only banned users can submit appeals.'
+      });
+    }
+
+    // Create appeal using Report model (reusing for appeals)
+    const Report = require('../models/Report');
+    const appeal = new Report({
+      reportType: 'user', // Using existing report type
+      reportedBy: user._id,
+      reportedEntity: user._id,
+      reportedEntityModel: 'User',
+      reason: 'ban_appeal',
+      description: `Appeal Reason: ${reason}\n\nDetails: ${details}`,
+      category: 'other',
+      status: 'pending',
+      priority: 'medium',
+      adminNotes: `Ban appeal submitted. Original ban reason: ${user.statusReason || 'Not specified'}`
+    });
+
+    await appeal.save();
+
+    // Log the appeal for admin dashboard
+    const AdminLog = require('../models/AdminLog');
+    const logEntry = new AdminLog({
+      admin: null,
+      action: 'ban_appeal_submitted',
+      targetType: 'user',
+      targetId: user._id,
+      details: `User ${user.email} submitted ban appeal`,
+      metadata: {
+        appealId: appeal._id,
+        appealReason: reason
+      }
+    });
+    await logEntry.save();
+
+    res.json({
+      message: 'Appeal submitted successfully. An admin will review your case.',
+      appealId: appeal._id
+    });
+
+  } catch (error) {
+    console.error('Error submitting ban appeal:', error);
+    res.status(500).json({
+      message: 'Internal server error while submitting appeal.'
     });
   }
 });

@@ -21,6 +21,9 @@
                 <a href="login_signup.html" class="text-gray-700 hover:text-indigo-600">Login</a>
             </div>
             <div class="flex items-center space-x-4">
+                <button id="reportEventBtn" class="px-3 py-2 text-red-600 border border-red-600 rounded-md hover:bg-red-50 text-sm">
+                    <i class="fas fa-flag mr-1"></i>Report Event
+                </button>
                 <a href="login_signup.html" class="px-4 py-2 text-indigo-600 border border-indigo-600 rounded-md hover:bg-indigo-50">Login</a>
                 <button class="md:hidden text-gray-700">
                     <i class="fas fa-bars text-xl"></i>
@@ -272,48 +275,266 @@
     <!-- Registration Section -->
     <section id="register" class="py-16 bg-indigo-600 text-white hidden">
         <div class="container mx-auto px-4">
-            <div class="max-w-4xl mx-auto text-center">
+            <div class="max-w-5xl mx-auto text-center">
                 <h2 class="text-3xl font-bold mb-4">Ready to Join Tech Conference 2023?</h2>
                 <p class="text-xl mb-8 max-w-2xl mx-auto">Secure your spot today and be part of the most exciting tech event of the year!</p>
                 
-                <div class="bg-white rounded-xl shadow-xl p-8 text-gray-800 max-w-2xl mx-auto">
+                <div class="bg-white rounded-xl shadow-xl p-8 text-gray-800">
                     <h3 class="text-2xl font-bold mb-6">Register Now</h3>
                     
-                    <form class="space-y-4" id="platform-registration-form">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-gray-700 mb-2">First Name</label>
-                                <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 mb-2">Last Name</label>
-                                <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-700 mb-2">Email Address</label>
-                            <input type="email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-700 mb-2">Phone Number</label>
-                            <input type="tel" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-700 mb-2">Ticket Type</label>
-                            <select class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                <option>General Admission ($399)</option>
-                                <option>VIP Pass ($599) - Front Row Seating + VIP Lounge</option>
-                                <option>Student Pass ($199) - Valid ID Required</option>
-                            </select>
-                        </div>
-                        
-                        <div class="pt-4">
-                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md transition-colors">
-                                Complete Registration
+                    <!-- Registration Form Tabs -->
+                    <div class="flex justify-center mb-6">
+                        <div class="flex bg-gray-100 rounded-lg p-1">
+                            <button id="personalTab" class="registration-tab-btn active" data-tab="personal">
+                                <i class="fas fa-user mr-2"></i>Personal Info
                             </button>
+                            <button id="academicTab" class="registration-tab-btn" data-tab="academic">
+                                <i class="fas fa-graduation-cap mr-2"></i>Academic/Professional
+                            </button>
+                            <button id="eventTab" class="registration-tab-btn" data-tab="event">
+                                <i class="fas fa-ticket-alt mr-2"></i>Event Details
+                            </button>
+                            <button id="reviewTab" class="registration-tab-btn" data-tab="review">
+                                <i class="fas fa-check mr-2"></i>Review
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <form id="platform-registration-form">
+                        <!-- Personal Information Tab -->
+                        <div id="personal" class="registration-tab-content active">
+                            <h4 class="text-lg font-semibold mb-4">Personal Information</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 mb-2">First Name *</label>
+                                    <input type="text" id="firstName" name="firstName" required 
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Last Name *</label>
+                                    <input type="text" id="lastName" name="lastName" required 
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Email Address *</label>
+                                    <input type="email" id="email" name="email" required 
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Phone Number *</label>
+                                    <input type="tel" id="phone" name="phone" required 
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Date of Birth</label>
+                                    <input type="date" id="dateOfBirth" name="dateOfBirth" 
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Gender</label>
+                                    <select id="gender" name="gender" 
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option value="">Prefer not to say</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-gray-700 mb-2">Emergency Contact Name</label>
+                                    <input type="text" id="emergencyContact" name="emergencyContact" 
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-gray-700 mb-2">Emergency Contact Phone</label>
+                                    <input type="tel" id="emergencyPhone" name="emergencyPhone" 
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Academic/Professional Tab -->
+                        <div id="academic" class="registration-tab-content">
+                            <h4 class="text-lg font-semibold mb-4">Academic/Professional Information</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Current Status *</label>
+                                    <select id="status" name="status" required 
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option value="">Select Status</option>
+                                        <option value="student">Student</option>
+                                        <option value="professional">Professional</option>
+                                        <option value="entrepreneur">Entrepreneur</option>
+                                        <option value="researcher">Researcher</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Institution/Company</label>
+                                    <input type="text" id="institution" name="institution" 
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Field of Study/Work</label>
+                                    <input type="text" id="field" name="field" 
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Year of Study/Experience Level</label>
+                                    <select id="level" name="level" 
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option value="">Select Level</option>
+                                        <option value="1st year">1st Year</option>
+                                        <option value="2nd year">2nd Year</option>
+                                        <option value="3rd year">3rd Year</option>
+                                        <option value="4th year">4th Year</option>
+                                        <option value="graduate">Graduate</option>
+                                        <option value="entry">Entry Level (0-2 years)</option>
+                                        <option value="mid">Mid Level (3-7 years)</option>
+                                        <option value="senior">Senior Level (8+ years)</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-gray-700 mb-2">Skills/Interests (comma separated)</label>
+                                    <input type="text" id="skills" name="skills" 
+                                           placeholder="e.g., Python, Machine Learning, Web Development"
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-gray-700 mb-2">LinkedIn Profile (optional)</label>
+                                    <input type="url" id="linkedin" name="linkedin" 
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Event Details Tab -->
+                        <div id="event" class="registration-tab-content">
+                            <h4 class="text-lg font-semibold mb-4">Event Preferences</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Ticket Type *</label>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div class="border rounded-lg p-4 cursor-pointer ticket-option" data-ticket="general">
+                                            <div class="text-center">
+                                                <h5 class="font-semibold text-lg">General Admission</h5>
+                                                <p class="text-2xl font-bold text-indigo-600">$399</p>
+                                                <p class="text-sm text-gray-600">Access to all sessions</p>
+                                            </div>
+                                        </div>
+                                        <div class="border rounded-lg p-4 cursor-pointer ticket-option" data-ticket="vip">
+                                            <div class="text-center">
+                                                <h5 class="font-semibold text-lg">VIP Pass</h5>
+                                                <p class="text-2xl font-bold text-indigo-600">$599</p>
+                                                <p class="text-sm text-gray-600">Front row + VIP lounge</p>
+                                            </div>
+                                        </div>
+                                        <div class="border rounded-lg p-4 cursor-pointer ticket-option" data-ticket="student">
+                                            <div class="text-center">
+                                                <h5 class="font-semibold text-lg">Student Pass</h5>
+                                                <p class="text-2xl font-bold text-indigo-600">$199</p>
+                                                <p class="text-sm text-gray-600">Valid ID required</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="ticketType" name="ticketType" required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Dietary Restrictions</label>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="dietary" value="vegetarian" class="mr-2">
+                                            Vegetarian
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="dietary" value="vegan" class="mr-2">
+                                            Vegan
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="dietary" value="gluten-free" class="mr-2">
+                                            Gluten-free
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="dietary" value="halal" class="mr-2">
+                                            Halal
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-gray-700 mb-2">T-Shirt Size</label>
+                                    <select id="tshirtSize" name="tshirtSize" 
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option value="">Select Size</option>
+                                        <option value="XS">XS</option>
+                                        <option value="S">S</option>
+                                        <option value="M">M</option>
+                                        <option value="L">L</option>
+                                        <option value="XL">XL</option>
+                                        <option value="XXL">XXL</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-gray-700 mb-2">How did you hear about this event?</label>
+                                    <select id="hearAbout" name="hearAbout" 
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option value="">Select Option</option>
+                                        <option value="social-media">Social Media</option>
+                                        <option value="friend">Friend/Colleague</option>
+                                        <option value="university">University</option>
+                                        <option value="website">Website</option>
+                                        <option value="newsletter">Newsletter</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Special Requirements/Notes</label>
+                                    <textarea id="specialNotes" name="specialNotes" rows="3" 
+                                              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                              placeholder="Any accessibility needs, allergies, or special requests..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Review Tab -->
+                        <div id="review" class="registration-tab-content">
+                            <h4 class="text-lg font-semibold mb-4">Review Your Registration</h4>
+                            <div id="registrationSummary" class="bg-gray-50 rounded-lg p-6 mb-4">
+                                <!-- Summary will be populated by JavaScript -->
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="agreeTerms" name="agreeTerms" required class="mr-2">
+                                    I agree to the <a href="#" class="text-indigo-600 underline">terms and conditions</a> and 
+                                    <a href="#" class="text-indigo-600 underline">privacy policy</a>
+                                </label>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="agreeMarketing" name="agreeMarketing" class="mr-2">
+                                    I'd like to receive updates about future events and opportunities
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Navigation Buttons -->
+                        <div class="flex justify-between mt-6">
+                            <button type="button" id="prevRegBtn" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 hidden">
+                                <i class="fas fa-arrow-left mr-2"></i>Previous
+                            </button>
+                            <div class="flex space-x-4">
+                                <button type="button" id="nextRegBtn" class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                                    Next<i class="fas fa-arrow-right ml-2"></i>
+                                </button>
+                                <button type="submit" id="submitRegBtn" class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 hidden">
+                                    <i class="fas fa-check mr-2"></i>Complete Registration
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -640,6 +861,49 @@
                     </button>
                     <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
                         Send Inquiry
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Report Event Modal -->
+    <div id="reportEventModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md mx-4 w-full">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-red-600"><i class="fas fa-flag mr-2"></i>Report Event</h3>
+                <button onclick="closeReportModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="reportEventForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Reason for reporting *</label>
+                    <select id="reportReason" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <option value="">Select a reason</option>
+                        <option value="inappropriate_content">Inappropriate Content</option>
+                        <option value="misleading_information">Misleading Information</option>
+                        <option value="spam">Spam</option>
+                        <option value="scam">Potential Scam</option>
+                        <option value="copyright_violation">Copyright Violation</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Additional details</label>
+                    <textarea id="reportDetails" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Please provide more details about your report..."></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Your email (optional)</label>
+                    <input type="email" id="reporterEmail" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="your@email.com">
+                    <p class="text-xs text-gray-500 mt-1">We may contact you for additional information</p>
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" onclick="closeReportModal()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                        <i class="fas fa-flag mr-2"></i>Submit Report
                     </button>
                 </div>
             </form>

@@ -139,8 +139,11 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 // --- Global Click Listener to Close Menus ---
 // Closes the user menu if a click occurs outside of it.
 document.addEventListener('click', (e) => {
-    // Close user menu if the click is outside
-    if (!userMenu.classList.contains('hidden') && !userMenu.contains(e.target) && !userMenuButton.contains(e.target)) {
+    // Close user menu if the click is outside (only if elements exist)
+    if (userMenu && userMenuButton && 
+        !userMenu.classList.contains('hidden') && 
+        !userMenu.contains(e.target) && 
+        !userMenuButton.contains(e.target)) {
         userMenu.classList.add('hidden');
     }
 });

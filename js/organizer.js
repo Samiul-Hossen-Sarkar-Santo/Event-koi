@@ -35,6 +35,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadSponsorInquiries();
             } else if (tabId === 'questions') {
                 loadQuestions();
+            } else if (tabId === 'rejections') {
+                loadRejectedEvents();
+            } else if (tabId === 'changes') {
+                loadChangesRequiredEvents();
             }
         });
     });
@@ -465,4 +469,268 @@ document.addEventListener('DOMContentLoaded', function() {
             default: return 'bg-gray-100 text-gray-800';
         }
     }
+    
+    // ==================== REJECTED EVENTS ====================
+    
+    async function loadRejectedEvents() {
+        try {
+            const response = await fetch('/events/organizer/my-events?status=rejected', {
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                displayRejectedEvents(data.events || []);
+                updateBadge('rejection-badge', data.events?.length || 0);
+            } else {
+                console.error('Failed to load rejected events');
+                displayRejectedEvents([]);
+            }
+        } catch (error) {
+            console.error('Error loading rejected events:', error);
+            displayRejectedEvents([]);
+        }
+    }
+    
+    function displayRejectedEvents(events) {
+        const container = document.getElementById('rejected-events-list');
+        if (!container) return;
+        
+        if (events.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-12">
+                    <i class="fas fa-check-circle text-6xl text-green-300 mb-4"></i>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-2">No Rejected Events</h3>
+                    <p class="text-gray-500">All your events are approved or pending review!</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const eventsHTML = events.map(event => {
+            const eventDate = new Date(event.date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            const canResubmit = event.canResubmit && event.resubmissionCount < 3;
+            
+            return `
+                <div class="bg-white border-l-4 border-red-500 rounded-lg p-6 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <h3 class="text-lg font-semibold text-gray-800">${event.title}</h3>
+                                <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">Rejected</span>
+                                ${event.resubmissionCount > 0 ? 
+                                    `<span class="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">
+                                        Resubmitted ${event.resubmissionCount}x
+                                    </span>` : ''
+                                }
+                            </div>
+                            <p class="text-gray-600 mb-2">Date: ${eventDate} • Category: ${event.category}</p>
+                            <p class="text-gray-700 mb-3">${event.description.substring(0, 150)}...</p>
+                            
+                            ${event.rejectionReason ? `
+                                <div class="bg-red-50 border border-red-200 rounded p-3 mb-3">
+                                    <h4 class="font-semibold text-red-800 mb-1">Rejection Reason:</h4>
+                                    <p class="text-red-700 text-sm">${event.rejectionReason}</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="flex flex-col space-y-2 ml-4">
+                            ${canResubmit ? `
+                                <button onclick="resubmitEvent('${event._id}')" 
+                                        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm transition-colors">
+                                    <i class="fas fa-redo mr-1"></i>Resubmit
+                                </button>
+                            ` : `
+                                <span class="text-gray-500 text-sm px-4 py-2 border border-gray-300 rounded">
+                                    Cannot Resubmit
+                                </span>
+                            `}
+                            <button onclick="viewEvent('${event._id}')" 
+                                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm transition-colors">
+                                <i class="fas fa-eye mr-1"></i>View Event
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        container.innerHTML = eventsHTML;
+    }
+    
+    // ==================== CHANGES REQUIRED EVENTS ====================
+    
+    async function loadChangesRequiredEvents() {
+        try {
+            const response = await fetch('/events/organizer/my-events?status=changes_requested', {
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                displayChangesRequiredEvents(data.events || []);
+                updateBadge('changes-badge', data.events?.length || 0);
+            } else {
+                console.error('Failed to load events requiring changes');
+                displayChangesRequiredEvents([]);
+            }
+        } catch (error) {
+            console.error('Error loading events requiring changes:', error);
+            displayChangesRequiredEvents([]);
+        }
+    }
+    
+    function displayChangesRequiredEvents(events) {
+        const container = document.getElementById('changes-events-list');
+        if (!container) return;
+        
+        if (events.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-12">
+                    <i class="fas fa-check-circle text-6xl text-green-300 mb-4"></i>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-2">No Changes Required</h3>
+                    <p class="text-gray-500">All your events are approved or pending review!</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const eventsHTML = events.map(event => {
+            const eventDate = new Date(event.date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            return `
+                <div class="bg-white border-l-4 border-yellow-500 rounded-lg p-6 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <h3 class="text-lg font-semibold text-gray-800">${event.title}</h3>
+                                <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Changes Required</span>
+                            </div>
+                            <p class="text-gray-600 mb-2">Date: ${eventDate} • Category: ${event.category}</p>
+                            <p class="text-gray-700 mb-3">${event.description.substring(0, 150)}...</p>
+                            
+                            ${event.requestedChanges && event.requestedChanges.length > 0 ? `
+                                <div class="bg-yellow-50 border border-yellow-200 rounded p-3 mb-3">
+                                    <h4 class="font-semibold text-yellow-800 mb-2">Requested Changes:</h4>
+                                    <ul class="list-disc list-inside text-yellow-700 text-sm space-y-1">
+                                        ${event.requestedChanges.map(change => 
+                                            `<li><strong>${change.field}:</strong> ${change.comment}</li>`
+                                        ).join('')}
+                                    </ul>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="flex flex-col space-y-2 ml-4">
+                            <button onclick="editAndResubmitEvent('${event._id}')" 
+                                    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm transition-colors">
+                                <i class="fas fa-edit mr-1"></i>Make Changes & Resubmit
+                            </button>
+                            <button onclick="viewEvent('${event._id}')" 
+                                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm transition-colors">
+                                <i class="fas fa-eye mr-1"></i>View Event
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        container.innerHTML = eventsHTML;
+    }
+    
+    // ==================== RESUBMISSION FUNCTIONS ====================
+    
+    window.resubmitEvent = async function(eventId) {
+        try {
+            const event = await fetchEventDetails(eventId);
+            if (!event) return;
+            
+            // Open event creation form pre-filled with event data
+            openResubmissionModal(event);
+            
+        } catch (error) {
+            console.error('Error preparing event resubmission:', error);
+            alert('Error loading event details. Please try again.');
+        }
+    };
+    
+    window.editAndResubmitEvent = async function(eventId) {
+        try {
+            const event = await fetchEventDetails(eventId);
+            if (!event) return;
+            
+            // Open event creation form pre-filled with event data and highlight required changes
+            openResubmissionModal(event, true);
+            
+        } catch (error) {
+            console.error('Error preparing event for changes:', error);
+            alert('Error loading event details. Please try again.');
+        }
+    };
+    
+    async function fetchEventDetails(eventId) {
+        try {
+            const response = await fetch(`/events/${eventId}`, {
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                return await response.json();
+            } else {
+                console.error('Failed to fetch event details');
+                return null;
+            }
+        } catch (error) {
+            console.error('Error fetching event details:', error);
+            return null;
+        }
+    }
+    
+    function openResubmissionModal(event, highlightChanges = false) {
+        // For now, redirect to event creation page with pre-filled data
+        // In a real implementation, you'd have a modal or separate edit page
+        const params = new URLSearchParams({
+            resubmit: 'true',
+            eventId: event._id,
+            title: event.title,
+            description: event.description,
+            category: event.category,
+            date: event.date.split('T')[0],
+            time: event.time,
+            location: event.location,
+            highlightChanges: highlightChanges ? 'true' : 'false'
+        });
+        
+        window.open(`/event_creation.html?${params.toString()}`, '_blank');
+    }
+    
+    window.viewEvent = function(eventId) {
+        window.open(`/event_page.html?id=${eventId}`, '_blank');
+    };
+    
+    // Helper function to update notification badges
+    function updateBadge(badgeId, count) {
+        const badge = document.getElementById(badgeId);
+        if (badge) {
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    }
+    
+    // Load rejection and changes data on page load
+    loadRejectedEvents();
+    loadChangesRequiredEvents();
 });

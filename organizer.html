@@ -57,6 +57,16 @@
                             <a href="event_creation.html" class="w-full text-left p-3 rounded-lg hover:bg-purple-100 flex items-center text-purple-700 font-medium">
                                 <i class="fas fa-plus w-6 text-center mr-3 text-purple-600"></i> Create Event
                             </a>
+                            <button class="w-full text-left p-3 rounded-lg hover:bg-purple-100 flex items-center org-tab-btn" data-tab="rejections">
+                                <i class="fas fa-exclamation-triangle w-6 text-center mr-3 text-orange-600"></i> 
+                                <span>Rejected Events</span>
+                                <span id="rejection-badge" class="notification-badge" style="display: none;">0</span>
+                            </button>
+                            <button class="w-full text-left p-3 rounded-lg hover:bg-purple-100 flex items-center org-tab-btn" data-tab="changes">
+                                <i class="fas fa-edit w-6 text-center mr-3 text-yellow-600"></i> 
+                                <span>Pending Changes</span>
+                                <span id="changes-badge" class="notification-badge" style="display: none;">0</span>
+                            </button>
                         </nav>
                     </div>
                 </aside>
@@ -177,6 +187,46 @@
                                 <div class="chart-container">
                                     <canvas id="categoryChart"></canvas>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rejected Events Tab -->
+                    <div id="rejections" class="org-tab-content">
+                        <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center">
+                            <i class="fas fa-exclamation-triangle text-red-500 mr-3"></i>
+                            Rejected Events
+                        </h2>
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                            <p class="text-red-800">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                These events were rejected by the admin. Review the rejection reasons and make necessary changes before resubmitting.
+                            </p>
+                        </div>
+                        <div id="rejected-events-list" class="space-y-4">
+                            <div class="text-center py-8">
+                                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto"></div>
+                                <p class="mt-4 text-gray-500">Loading rejected events...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pending Changes Tab -->
+                    <div id="changes" class="org-tab-content">
+                        <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center">
+                            <i class="fas fa-edit text-yellow-500 mr-3"></i>
+                            Events Requiring Changes
+                        </h2>
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                            <p class="text-yellow-800">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                These events need changes before approval. Review the admin's feedback and update your events accordingly.
+                            </p>
+                        </div>
+                        <div id="changes-events-list" class="space-y-4">
+                            <div class="text-center py-8">
+                                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto"></div>
+                                <p class="mt-4 text-gray-500">Loading events requiring changes...</p>
                             </div>
                         </div>
                     </div>

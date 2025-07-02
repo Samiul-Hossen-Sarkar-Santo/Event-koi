@@ -6,6 +6,7 @@ const session = require('express-session');
 const authRoutes = require('./routes/auth');
 const eventRoutes = require('./routes/events');
 const userRoutes = require('./routes/users');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -43,6 +44,7 @@ app.use('/uploads', express.static('E:/Projects/sre/Event-koi/uploads'));
 
 app.use('/events', eventRoutes);
 app.use('/users', userRoutes);
+app.use('/admin', adminRoutes);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

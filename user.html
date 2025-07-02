@@ -63,16 +63,59 @@
                     <!-- Profile Tab -->
                     <div id="profile" class="tab-content active">
                         <h2 class="text-2xl font-bold mb-6 text-gray-800">Personal Information</h2>
-                        <form class="space-y-6 bg-gray-50 p-6 rounded-lg border">
+                        <form id="profile-form" class="space-y-6 bg-gray-50 p-6 rounded-lg border">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                                    <input type="text" value="John Doe" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    <input type="text" id="profile-name" name="name" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                                    <input type="text" id="profile-username" name="username" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                    <input type="email" value="john.doe@example.com" readonly class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed">
+                                    <input type="email" id="profile-email" name="email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                                 </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">University/Organization</label>
+                                    <input type="text" id="profile-university" name="university" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Year of Study</label>
+                                    <select id="profile-year" name="yearOfStudy" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                        <option value="">Select Year</option>
+                                        <option value="1st Year">1st Year</option>
+                                        <option value="2nd Year">2nd Year</option>
+                                        <option value="3rd Year">3rd Year</option>
+                                        <option value="4th Year">4th Year</option>
+                                        <option value="Graduate">Graduate</option>
+                                        <option value="Professional">Professional</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Skills (comma separated)</label>
+                                    <input type="text" id="profile-skills" name="skills" placeholder="e.g. JavaScript, Python, UI Design" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                                <textarea id="profile-bio" name="bio" rows="4" placeholder="Tell us about yourself..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Interests (comma separated)</label>
+                                <input type="text" id="profile-interests" name="interests" placeholder="e.g. Technology, Entrepreneurship, Design" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            
+                            <div class="flex justify-end">
+                                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg">
+                                    <i class="fas fa-save mr-2"></i>Save Profile
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">University/Organization</label>
                                     <input type="text" value="State University" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">

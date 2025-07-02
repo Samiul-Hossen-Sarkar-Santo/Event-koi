@@ -69,9 +69,41 @@ const eventSchema = new mongoose.Schema({
   },
   approvalStatus: {
     type: String,
-    enum: ['pending', 'approved', 'rejected'],
+    enum: ['pending', 'approved', 'rejected', 'changes_requested'],
     default: 'pending'
   },
+  adminRemarks: {
+    type: String,
+    trim: true
+  },
+  rejectionReason: {
+    type: String,
+    trim: true
+  },
+  requestedChanges: [{
+    field: String,
+    comment: String,
+    resolved: { type: Boolean, default: false }
+  }],
+  approvedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  approvedAt: {
+    type: Date
+  },
+  reviewHistory: [{
+    reviewedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    action: {
+      type: String,
+      enum: ['approved', 'rejected', 'changes_requested', 'resubmitted']
+    },
+    reason: String,
+    timestamp: { type: Date, default: Date.now }
+  }],
   registrations: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -148,6 +180,43 @@ const eventSchema = new mongoose.Schema({
       default: false
     }
   }],
+  // Event deletion management
+  deletionStatus: {
+    type: String,
+    enum: ['none', 'requested', 'admin_review', 'approved', 'denied'],
+    default: 'none'
+  },
+  deletionRequestedBy: {
+    type: String,
+    enum: ['organizer', 'admin'],
+    default: null
+  },
+  deletionRequestedAt: {
+    type: Date
+  },
+  deletionReason: {
+    type: String,
+    trim: true
+  },
+  deletionApprovedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  deletionApprovedAt: {
+    type: Date
+  },
+  // Enhanced moderation and resubmission workflow
+  canResubmit: {
+    type: Boolean,
+    default: true
+  },
+  resubmissionCount: {
+    type: Number,
+    default: 0
+  },
+  lastResubmittedAt: {
+    type: Date
+  },
 }, {
   timestamps: true // Adds createdAt and updatedAt timestamps
 });

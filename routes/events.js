@@ -512,6 +512,170 @@ router.put('/:id', isAuthenticated, isOrganizer, handleFormData, async (req, res
   }
 });
 
+// PUT /events/:eventId/resubmit - Resubmit a rejected/changes requested event
+router.put('/:eventId/resubmit', isAuthenticated, isOrganizer, async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const organizerId = req.session.userId;
+    
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+    
+    // Check if user is the organizer
+    if (event.organizer.toString() !== organizerId) {
+      return res.status(403).json({ message: 'Forbidden: You can only resubmit your own events' });
+    }
+    
+    // Check if event can be resubmitted
+    if (!event.canResubmit) {
+      return res.status(400).json({ 
+        message: 'This event cannot be resubmitted. Please contact admin for assistance.' 
+      });
+    }
+    
+    // Check if event status allows resubmission
+    if (!['rejected', 'changes_requested'].includes(event.approvalStatus)) {
+      return res.status(400).json({ 
+        message: 'Only rejected or events with requested changes can be resubmitted' 
+      });
+    }
+    
+    // Update event for resubmission
+    const updateData = req.body;
+    
+    // Reset status to pending
+    event.approvalStatus = 'pending';
+    event.resubmissionCount = (event.resubmissionCount || 0) + 1;
+    event.lastResubmittedAt = new Date();
+    
+    // Clear previous rejection/change request data
+    event.rejectionReason = '';
+    event.adminRemarks = '';
+    
+    // Mark requested changes as resolved if provided
+    if (event.requestedChanges && event.requestedChanges.length > 0) {
+      event.requestedChanges.forEach(change => {
+        change.resolved = true;
+      });
+    }
+    
+    // Update event fields with new data
+    Object.keys(updateData).forEach(key => {
+      if (key !== 'approvalStatus' && key !== 'organizer' && updateData[key] !== undefined) {
+        event[key] = updateData[key];
+      }
+    });
+    
+    // Add to review history
+    event.reviewHistory.push({
+      reviewedBy: organizerId,
+      action: 'resubmitted',
+      reason: `Resubmitted after ${event.resubmissionCount > 1 ? 'changes' : 'rejection'}`,
+      timestamp: new Date()
+    });
+    
+    await event.save();
+    
+    res.json({ 
+      message: 'Event resubmitted successfully',
+      event: {
+        id: event._id,
+        title: event.title,
+        approvalStatus: event.approvalStatus,
+        resubmissionCount: event.resubmissionCount
+      }
+    });
+    
+  } catch (error) {
+    console.error('Error resubmitting event:', error);
+    res.status(500).json({ message: 'Error resubmitting event', error: error.message });
+  }
+});
+
+// GET /events/organizer/my-events - Get organizer's events with status info
+router.get('/organizer/my-events', isAuthenticated, isOrganizer, async (req, res) => {
+  try {
+    const organizerId = req.session.userId;
+    const { status, page = 1, limit = 10 } = req.query;
+    
+    let query = { organizer: organizerId };
+    if (status && status !== 'all') {
+      query.approvalStatus = status;
+    }
+    
+    const events = await Event.find(query)
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .select('title description category date time location approvalStatus canResubmit resubmissionCount rejectionReason requestedChanges deletionStatus createdAt');
+    
+    const total = await Event.countDocuments(query);
+    
+    res.json({
+      events,
+      pagination: {
+        current: Number(page),
+        total: Math.ceil(total / limit),
+        count: events.length,
+        totalEvents: total
+      }
+    });
+    
+  } catch (error) {
+    console.error('Error fetching organizer events:', error);
+    res.status(500).json({ message: 'Error fetching events', error: error.message });
+  }
+});
+
+// PUT /events/:eventId/request-deletion - Request event deletion
+router.put('/:eventId/request-deletion', isAuthenticated, isOrganizer, async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const { reason } = req.body;
+    const organizerId = req.session.userId;
+    
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+    
+    // Check if user is the organizer
+    if (event.organizer.toString() !== organizerId) {
+      return res.status(403).json({ message: 'Forbidden: You can only request deletion of your own events' });
+    }
+    
+    // Check if event is already in deletion process
+    if (['requested', 'admin_review', 'approved'].includes(event.deletionStatus)) {
+      return res.status(400).json({ 
+        message: 'Event deletion is already in progress' 
+      });
+    }
+    
+    // Update deletion status
+    event.deletionStatus = 'requested';
+    event.deletionRequestedBy = 'organizer';
+    event.deletionRequestedAt = new Date();
+    event.deletionReason = reason || 'Organizer requested deletion';
+    
+    await event.save();
+    
+    res.json({ 
+      message: 'Event deletion request submitted successfully. Admin will review and approve.',
+      event: {
+        id: event._id,
+        title: event.title,
+        deletionStatus: event.deletionStatus
+      }
+    });
+    
+  } catch (error) {
+    console.error('Error requesting event deletion:', error);
+    res.status(500).json({ message: 'Error requesting deletion', error: error.message });
+  }
+});
+
 // GET all events for admin (including pending and rejected)
 router.get('/admin/all-events', isAuthenticated, isAdmin, async (req, res) => {
   try {

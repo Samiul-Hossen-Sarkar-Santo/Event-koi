@@ -1,0 +1,64 @@
+/* General styles for tabbed content */
+.org-tab-content, .event-mgmt-tab-content {
+    display: none;
+}
+
+.org-tab-content.active, .event-mgmt-tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Style for the active sidebar navigation button */
+.org-tab-btn.active-tab {
+    background-color: #f5f3ff; /* purple-100 */
+    font-weight: 600;
+}
+
+/* Chart container for analytics */
+.chart-container {
+    position: relative;
+    height: 250px; /* Adjusted height for better visibility */
+    width: 100%;
+}
+
+/* Notification badge on sidebar icons */
+.notification-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: #dc2626; /* red-600 */
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 0.2rem 0.4rem;
+    border-radius: 9999px;
+    min-width: 1.2rem;
+    height: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 2px solid white;
+    z-index: 10;
+    line-height: 1;
+}
+
+/* Make sure the parent button has relative positioning */
+.org-tab-btn {
+    position: relative;
+}
+
+/* Enhanced event display styles */
+.event-card {
+    transition: all 0.2s ease-in-out;
+}
+
+.event-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}

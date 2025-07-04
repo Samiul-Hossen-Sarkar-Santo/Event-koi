@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal | Event Koi?!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .admin-portal {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="admin-portal">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <!-- Header -->
+            <div class="text-center">
+                <div class="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-red-100">
+                    <i class="fas fa-shield-alt text-red-600 text-xl"></i>
+                </div>
+                <h2 class="mt-6 text-3xl font-extrabold text-white">
+                    Admin Portal
+                </h2>
+                <p class="mt-2 text-sm text-gray-200">
+                    Secure administrative access
+                </p>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-section">
+                <form id="admin-login-form" class="mt-8 space-y-6">
+                    <div class="bg-white rounded-lg p-6 shadow-xl">
+                        <div class="space-y-4">
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                                <input id="email" name="email" type="email" required 
+                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
+                            </div>
+                            
+                            <div>
+                                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                                <input id="password" name="password" type="password" required 
+                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
+                            </div>
+                            
+                            <div>
+                                <label for="security-code" class="block text-sm font-medium text-gray-700">Admin Security Code</label>
+                                <input id="security-code" name="adminSecurityCode" type="password" required 
+                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
+                                       placeholder="Contact system administrator">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <button type="submit" 
+                                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                <i class="fas fa-sign-in-alt mr-2"></i>
+                                Secure Login
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Registration Form (Hidden by default) -->
+            <div id="register-section" class="hidden">
+                <form id="admin-register-form" class="mt-8 space-y-6">
+                    <div class="bg-white rounded-lg p-6 shadow-xl">
+                        <div class="space-y-4">
+                            <div>
+                                <label for="reg-name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                                <input id="reg-name" name="name" type="text" required 
+                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
+                            </div>
+                            
+                            <div>
+                                <label for="reg-username" class="block text-sm font-medium text-gray-700">Username</label>
+                                <input id="reg-username" name="username" type="text" required 
+                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
+                            </div>
+                            
+                            <div>
+                                <label for="reg-email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                                <input id="reg-email" name="email" type="email" required 
+                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
+                            </div>
+                            
+                            <div>
+                                <label for="reg-password" class="block text-sm font-medium text-gray-700">Password</label>
+                                <input id="reg-password" name="password" type="password" required 
+                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
+                            </div>
+                            
+                            <div>
+                                <label for="invite-code" class="block text-sm font-medium text-gray-700">Admin Invitation Code</label>
+                                <input id="invite-code" name="adminInviteCode" type="password" required 
+                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
+                                       placeholder="Provided by existing administrator">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <button type="submit" 
+                                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                <i class="fas fa-user-plus mr-2"></i>
+                                Create Admin Account
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Toggle Links -->
+            <div class="text-center">
+                <button id="toggle-form" class="text-gray-200 hover:text-white text-sm underline">
+                    Need admin access? Contact administrator
+                </button>
+            </div>
+
+            <!-- Security Notice -->
+            <div class="text-center text-xs text-gray-300 mt-4">
+                <p><i class="fas fa-shield-alt mr-1"></i> Secure administrative portal</p>
+                <p>All access attempts are logged and monitored</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginSection = document.getElementById('login-section');
+            const registerSection = document.getElementById('register-section');
+            const toggleButton = document.getElementById('toggle-form');
+            const loginForm = document.getElementById('admin-login-form');
+            const registerForm = document.getElementById('admin-register-form');
+            
+            let showingRegister = false;
+
+            // Toggle between login and register
+            toggleButton.addEventListener('click', function() {
+                if (!showingRegister) {
+                    loginSection.classList.add('hidden');
+                    registerSection.classList.remove('hidden');
+                    toggleButton.textContent = 'Back to Login';
+                    showingRegister = true;
+                } else {
+                    registerSection.classList.add('hidden');
+                    loginSection.classList.remove('hidden');
+                    toggleButton.textContent = 'Need admin access? Contact administrator';
+                    showingRegister = false;
+                }
+            });
+
+            // Admin Login
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(loginForm);
+                const loginData = {
+                    email: formData.get('email'),
+                    password: formData.get('password'),
+                    adminSecurityCode: formData.get('adminSecurityCode')
+                };
+
+                try {
+                    const response = await fetch('/auth/admin-login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(loginData),
+                        credentials: 'include'
+                    });
+
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        alert('Admin login successful!');
+                        localStorage.setItem('adminSession', 'true');
+                        localStorage.setItem('userRole', 'admin');
+                        window.location.href = 'admin.html';
+                    } else {
+                        alert(result.message || 'Admin login failed');
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    alert('Login error occurred');
+                }
+            });
+
+            // Admin Registration
+            registerForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(registerForm);
+                const registerData = {
+                    name: formData.get('name'),
+                    username: formData.get('username'),
+                    email: formData.get('email'),
+                    password: formData.get('password'),
+                    adminInviteCode: formData.get('adminInviteCode')
+                };
+
+                try {
+                    const response = await fetch('/auth/admin-register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(registerData),
+                        credentials: 'include'
+                    });
+
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        alert('Admin account created successfully! Please login with your credentials.');
+                        registerSection.classList.add('hidden');
+                        loginSection.classList.remove('hidden');
+                        toggleButton.textContent = 'Need admin access? Contact administrator';
+                        showingRegister = false;
+                        registerForm.reset();
+                    } else {
+                        alert(result.message || 'Admin registration failed');
+                    }
+                } catch (error) {
+                    console.error('Registration error:', error);
+                    alert('Registration error occurred');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

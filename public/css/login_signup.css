@@ -1,0 +1,132 @@
+/* General Form Container Styles */
+.form-container {
+    display: none;
+}
+.form-container.active {
+    display: block;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Toggle Button Styles */
+.form-toggle-btn {
+    flex: 1;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #6b7280; /* gray-500 */
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+.form-toggle-btn.active {
+    color: #3b82f6; /* blue-500 */
+    border-bottom-color: #3b82f6; /* blue-500 */
+}
+.form-toggle-btn:focus {
+    outline: none;
+}
+
+/* Multi-step Signup Form Styles */
+.signup-step {
+    display: none;
+}
+.signup-step.active {
+    display: block;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Role Selection Button Styles */
+.role-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #e5e7eb; /* gray-200 */
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.role-btn:hover {
+    border-color: #93c5fd; /* blue-300 */
+    background-color: #f9fafb; /* gray-50 */
+}
+.role-btn.active {
+    border-color: #3b82f6; /* blue-500 */
+    background-color: #eff6ff; /* blue-50 */
+    color: #2563eb; /* blue-600 */
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+/* Standardized Form Input and Label Styles */
+.form-label {
+    display: block;
+    color: #374151; /* gray-700 */
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+.form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db; /* gray-300 */
+    border-radius: 0.5rem;
+    background-color: #f9fafb; /* gray-50 */
+    color: #1f2937; /* gray-800 */
+    transition: all 0.2s ease-in-out;
+}
+.form-input::placeholder {
+    color: #9ca3af; /* gray-400 */
+}
+.form-input:focus {
+    outline: none;
+    border-color: #3b82f6; /* blue-500 */
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* Password field icon positioning */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.password-toggle-icon {
+    position: absolute;
+    right: 1rem;
+    cursor: pointer;
+    color: #9ca3af; /* gray-400 */
+}
+.password-toggle-icon:hover {
+    color: #4b5563; /* gray-600 */
+}
+
+/* Navigation Button Styles for Signup Form */
+.next-btn, .back-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.next-btn {
+    background-color: #3b82f6; /* blue-500 */
+    color: white;
+}
+.next-btn:hover {
+    background-color: #2563eb; /* blue-600 */
+}
+.back-btn {
+    background-color: transparent;
+    color: #4b5563; /* gray-600 */
+}
+.back-btn:hover {
+    background-color: #f3f4f6; /* gray-100 */
+}

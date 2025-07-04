@@ -1,0 +1,44 @@
+{
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/auth/**",
+        "function": "api"
+      },
+      {
+        "source": "/events/**",
+        "function": "api"
+      },
+      {
+        "source": "/users/**",
+        "function": "api"
+      },
+      {
+        "source": "/admin/**",
+        "function": "api"
+      },
+      {
+        "source": "/categories/**",
+        "function": "api"
+      },
+      {
+        "source": "/uploads/**",
+        "function": "api"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs18"
+  }
+}

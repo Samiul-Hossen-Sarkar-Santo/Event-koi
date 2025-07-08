@@ -1,4 +1,6 @@
-/* Events Grid Layout - Final Production Version */
+/* Nexus - Elegant Event Platform Styles */
+
+/* Events Grid Layout - Production Version */
 .events-grid-container {
     display: flex !important;
     flex-wrap: wrap !important;
@@ -14,6 +16,11 @@
     box-sizing: border-box !important;
     margin: 0 !important;
     min-height: auto !important;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Responsive breakpoints */
@@ -38,7 +45,8 @@
 /* Hover effects */
 .event-card:hover {
     transform: translateY(-8px) !important;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+    border-color: #9ca3af;
 }
 
 /* Override any conflicting styles */
@@ -64,7 +72,7 @@
     overflow: hidden;
 }
 
-/* Custom CSS for elements that need more specific styling */
+/* Premium styling for event cards */
 .event-card {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     max-width: 100%;
@@ -75,53 +83,34 @@
 
 .event-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
 }
 
-.dark .event-card:hover {
-    box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.4);
-}
-
+/* Elegant gradient backgrounds */
 .gradient-bg {
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
-}
-
-.dark .gradient-bg {
-    background: linear-gradient(135deg, #1e40af 0%, #7c3aed 50%, #be185d 100%);
+    background: linear-gradient(135deg, #374151 0%, #4b5563 50%, #6b7280 100%);
 }
 
 .smooth-transition {
     transition: all 0.3s ease;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar - elegant gray theme */
 ::-webkit-scrollbar {
     width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: #f3f4f6;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #888;
+    background: #9ca3af;
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
-.dark ::-webkit-scrollbar-track {
-    background: #374151;
-}
-
-.dark ::-webkit-scrollbar-thumb {
     background: #6b7280;
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
 }
 
 /* Animation for notifications */
@@ -134,57 +123,37 @@
     animation: slideIn 0.3s ease forwards;
 }
 
-/* Events page specific styles */
+/* Category filter styling - elegant design */
 .category-filter {
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1.5rem;
     border-radius: 9999px;
     border: 2px solid #e5e7eb;
-    color: #374151;
+    color: #4b5563;
     background-color: #ffffff;
     transition: all 0.3s ease;
     cursor: pointer;
     font-weight: 500;
+    font-size: 0.875rem;
 }
 
 .category-filter:hover {
-    background-color: #f8fafc;
-    border-color: #3b82f6;
-    color: #3b82f6;
+    background-color: #f9fafb;
+    border-color: #6b7280;
+    color: #374151;
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .category-filter.active {
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    background: #374151;
     color: white;
     border-color: transparent;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 4px 12px rgba(55, 65, 81, 0.3);
 }
 
 .category-filter.active:hover {
-    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+    background: #4b5563;
     transform: translateY(-1px);
-}
-
-.dark .category-filter {
-    background-color: #374151;
-    border-color: #4b5563;
-    color: #d1d5db;
-}
-
-.dark .category-filter:hover {
-    background-color: #4b5563;
-    border-color: #60a5fa;
-    color: #60a5fa;
-}
-
-/* Dark mode styles for category filters */
-.dark .category-filter {
-    border-color: #4b5563;
-    color: #d1d5db;
-}
-
-.dark .category-filter:hover {
-    background-color: #374151;
 }
 
 /* Event card hover effects */
@@ -193,7 +162,7 @@
 }
 
 .event-card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-4px);
 }
 
 /* Favorite button animation */
@@ -203,6 +172,7 @@
 
 .favorite-btn:hover {
     transform: scale(1.1);
+    color: #ef4444;
 }
 
 /* Loading spinner */
@@ -222,7 +192,7 @@
 
 /* Modal backdrop blur */
 .modal-backdrop {
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(8px);
 }
 
 /* Advanced filters animation */
@@ -262,10 +232,75 @@
     height: auto;
 }
 
+/* Premium shadow effects */
+.shadow-elegant {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-elegant-lg {
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+}
+
+/* Elegant hero background pattern */
+.hero-pattern {
+    background-image: 
+        radial-gradient(circle at 20% 80%, rgba(107, 114, 128, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(75, 85, 99, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(156, 163, 175, 0.1) 0%, transparent 50%);
+}
+
+/* Category card styling */
+.category-card {
+    transition: all 0.3s ease;
+    border: 1px solid #e5e7eb;
+}
+
+.category-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    border-color: #9ca3af;
+}
+
+/* Input styling */
+input[type="email"], 
+input[type="text"] {
+    transition: all 0.2s ease;
+}
+
+input[type="email"]:focus, 
+input[type="text"]:focus {
+    border-color: #6b7280;
+    box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.1);
+}
+
+/* Button hover effects */
+button, .btn {
+    transition: all 0.2s ease;
+}
+
+button:hover, .btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Professional spacing */
+.section-padding {
+    padding: 5rem 0;
+}
+
+/* Typography improvements */
+.text-hero {
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .category-filter {
-        font-size: 0.875rem;
-        padding: 0.25rem 0.75rem;
+        font-size: 0.75rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    .section-padding {
+        padding: 3rem 0;
     }
 }

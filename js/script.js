@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateNavigationForUser(userData) {
-        const navLinks = document.querySelector('.hidden.md\\:flex.items-center.space-x-6');
+        const navLinks = document.querySelector('.hidden.md\\:flex.items-center.space-x-8');
         const userSection = document.querySelector('.flex.items-center.space-x-4');
         const mobileMenu = document.getElementById('mobile-menu');
 
@@ -52,18 +52,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Update main navigation
         let navHTML = `
-            <a href="index.html" class="hover:text-gray-200">Home</a>
-            <a href="events.html" class="hover:text-gray-200">Events</a>
+            <a href="index.html" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Home</a>
+            <a href="events.html" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Events</a>
         `;
 
         if (userData.role === 'organizer' || userData.role === 'admin') {
-            navHTML += `<a href="event_creation.html" class="hover:text-gray-200">Create Event</a>`;
+            navHTML += `<a href="event_creation.html" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Host Event</a>`;
         }
 
         navLinks.innerHTML = navHTML;
 
-        // Insert user menu between theme toggle and mobile menu button
-        const themeToggle = document.getElementById('theme-toggle');
+        // Insert user menu between mobile menu button
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         
         // Remove existing user menu if present
@@ -75,44 +74,44 @@ document.addEventListener('DOMContentLoaded', function() {
         // Create user menu element
         const userMenuHTML = `
             <div class="relative">
-                <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none">
-                    <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-purple-700 font-bold">
+                <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none bg-gray-100 hover:bg-gray-200 py-2 px-3 rounded-lg transition-colors">
+                    <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-white font-bold text-sm">
                         <span>${userData.username ? userData.username.charAt(0).toUpperCase() : 'U'}</span>
                     </div>
-                    <span class="hidden md:inline">${userData.username || 'User'}</span>
-                    <i class="fas fa-chevron-down text-sm"></i>
+                    <span class="hidden md:inline text-gray-700 font-medium">${userData.username || 'User'}</span>
+                    <i class="fas fa-chevron-down text-sm text-gray-500"></i>
                 </button>
                 
-                <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50">
-                    <a href="${getUserDashboardUrl(userData.role)}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Dashboard</a>
-                    <a href="${getUserDashboardUrl(userData.role)}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">My Events</a>
-                    <a href="${getUserDashboardUrl(userData.role)}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Profile</a>
-                    <div class="border-t border-gray-200 dark:border-gray-700"></div>
-                    <button id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Sign out</button>
+                <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 z-50 border border-gray-200">
+                    <a href="${getUserDashboardUrl(userData.role)}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg mx-2">Dashboard</a>
+                    <a href="${getUserDashboardUrl(userData.role)}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg mx-2">My Events</a>
+                    <a href="${getUserDashboardUrl(userData.role)}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg mx-2">Profile</a>
+                    <div class="border-t border-gray-200 my-2"></div>
+                    <button id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg mx-2">Sign out</button>
                 </div>
             </div>
         `;
 
         // Insert before mobile menu button
-        if (mobileMenuButton && themeToggle) {
+        if (mobileMenuButton) {
             mobileMenuButton.insertAdjacentHTML('beforebegin', userMenuHTML);
         }
 
         // Update mobile menu
         let mobileHTML = `
-            <a href="index.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Home</a>
-            <a href="events.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Events</a>
+            <a href="index.html" class="block py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg">Home</a>
+            <a href="events.html" class="block py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg">Events</a>
         `;
 
         if (userData.role === 'organizer' || userData.role === 'admin') {
-            mobileHTML += `<a href="event_creation.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Create Event</a>`;
+            mobileHTML += `<a href="event_creation.html" class="block py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg">Host Event</a>`;
         }
 
         mobileHTML += `
-            <div class="border-t border-white border-opacity-20 mt-2 pt-2">
-                <a href="${getUserDashboardUrl(userData.role)}" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Dashboard</a>
-                <a href="${getUserDashboardUrl(userData.role)}" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">My Events</a>
-                <button id="mobile-logout-btn" class="block w-full text-left py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Sign out</button>
+            <div class="border-t border-gray-200 mt-4 pt-4">
+                <a href="${getUserDashboardUrl(userData.role)}" class="block py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg">Dashboard</a>
+                <a href="${getUserDashboardUrl(userData.role)}" class="block py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg">My Events</a>
+                <button id="mobile-logout-btn" class="block w-full text-left py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg">Sign out</button>
             </div>
         `;
 
@@ -123,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateNavigationForGuest() {
-        const navLinks = document.querySelector('.hidden.md\\:flex.items-center.space-x-6');
+        const navLinks = document.querySelector('.hidden.md\\:flex.items-center.space-x-8');
         const userSection = document.querySelector('.flex.items-center.space-x-4');
         const mobileMenu = document.getElementById('mobile-menu');
 
@@ -131,9 +130,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Update main navigation for guests
         navLinks.innerHTML = `
-            <a href="index.html" class="hover:text-gray-200">Home</a>
-            <a href="events.html" class="hover:text-gray-200">Events</a>
-            <a href="login_signup.html" class="hover:text-gray-200">Sign Up as Organizer</a>
+            <a href="index.html" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Home</a>
+            <a href="events.html" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Events</a>
+            <a href="login_signup.html" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Join as Creator</a>
         `;
 
         // Remove existing user menu if present
@@ -152,8 +151,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         if (mobileMenuButton) {
             const loginButtonHTML = `
-                <a href="login_signup.html" class="bg-white text-purple-700 hover:bg-gray-100 font-semibold py-2 px-4 rounded-lg">
-                    Login / Sign Up
+                <a href="login_signup.html" class="bg-gradient-to-r from-gray-700 to-gray-800 text-white px-6 py-2 rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all duration-200 font-medium">
+                    Join Now
                 </a>
             `;
             mobileMenuButton.insertAdjacentHTML('beforebegin', loginButtonHTML);
@@ -161,10 +160,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Update mobile menu for guests
         mobileMenu.innerHTML = `
-            <a href="index.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Home</a>
-            <a href="events.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Events</a>
-            <a href="login_signup.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Sign Up as Organizer</a>
-            <a href="login_signup.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Login</a>
+            <a href="index.html" class="block py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg">Home</a>
+            <a href="events.html" class="block py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg">Events</a>
+            <a href="login_signup.html" class="block py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg">Join as Creator</a>
+            <a href="login_signup.html" class="block py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg">Sign In</a>
         `;
     }
 
@@ -227,10 +226,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function setupEventListeners() {
-        // Theme toggle will be set up after navigation update
-        setupThemeToggle();
-        
-        // Mobile menu toggle will be set up after navigation update
+        // Mobile menu toggle
         setupMobileMenu();
         
         // Filter button (if exists)
@@ -241,24 +237,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 expandedFilters.classList.toggle('hidden');
             });
         }
-    }
-
-    function setupThemeToggle() {
-        // Set theme from localStorage
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        if (currentTheme === 'dark') {
-            document.documentElement.classList.add('dark');
-        }
-
-        // Theme toggle functionality
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('#theme-toggle')) {
-                const html = document.documentElement;
-                html.classList.toggle('dark');
-                const theme = html.classList.contains('dark') ? 'dark' : 'light';
-                localStorage.setItem('theme', theme);
-            }
-        });
     }
 
     function setupMobileMenu() {
@@ -327,7 +305,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function createCategoryCard(category) {
         return `
-            <div class="category-card bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-transform transform hover:scale-105">
+            <div class="category-card bg-white rounded-lg shadow-md overflow-hidden transition-transform transform hover:scale-105">
                 <a href="events.html?category=${category.slug}" class="block p-4">
                     <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">${category.name}</h4>
                     <p class="text-gray-600 dark:text-gray-300 text-sm line-clamp-2">${category.description}</p>
@@ -391,12 +369,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleHomeCategoryFilter(filterButton) {
         // Update active state
         document.querySelectorAll('.home-category-filter').forEach(btn => {
-            btn.classList.remove('bg-purple-100', 'dark:bg-purple-900', 'text-purple-700', 'dark:text-purple-300');
-            btn.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
+            btn.classList.remove('bg-gray-200', 'text-gray-800');
+            btn.classList.add('bg-gray-100', 'text-gray-600');
         });
         
-        filterButton.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
-        filterButton.classList.add('bg-purple-100', 'dark:bg-purple-900', 'text-purple-700', 'dark:text-purple-300');
+        filterButton.classList.remove('bg-gray-100', 'text-gray-600');
+        filterButton.classList.add('bg-gray-200', 'text-gray-800');
 
         const category = filterButton.dataset.category;
         
@@ -457,7 +435,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const isPast = new Date() > eventDate;
 
         return `
-            <div class="event-card bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden" data-event-id="${event._id}">
+            <div class="event-card bg-white dark:bg-gray-100 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden" data-event-id="${event._id}">
                 <div class="relative">
                     ${event.coverImage ? `
                                         <img src="/uploads/${event.coverImage}" alt="${event.title}" class="w-full h-48 object-cover rounded-lg mr-4">
@@ -466,7 +444,7 @@ document.addEventListener('DOMContentLoaded', function() {
                          alt="${event.title}" class="w-full h-48 object-cover">
                                     `}
                     <div class="absolute top-3 left-3">
-                        <span class="bg-purple-600 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                        <span class="bg-gray-800 text-white px-2 py-1 rounded-full text-xs font-semibold">
                             ${event.category}
                         </span>
                     </div>
@@ -479,14 +457,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 
                 <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">${event.title}</h3>
-                    
+                    <h3 class="text-xl font-bold text-gray-800 mb-2 line-clamp-2">${event.title}</h3>
                     <div class="space-y-2 mb-4">
-                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                        <div class="flex items-center text-sm text-gray-500">
                             <i class="fas fa-calendar-alt w-4 mr-2"></i>
                             <span>${formattedDate} at ${formattedTime}</span>
                         </div>
-                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                        <div class="flex items-center text-sm text-gray-500">
                             <i class="fas ${isOnline ? 'fa-globe' : 'fa-map-marker-alt'} w-4 mr-2"></i>
                             <span class="line-clamp-1">${event.location}</span>
                         </div>
@@ -494,11 +471,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-2">
-                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                            <span class="text-sm text-gray-500">
                                 ${event.registrations?.length || 0} registered
                             </span>
                         </div>
-                        <a href="event_page.html?id=${event._id}" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
+                        <a href="event_page.html?id=${event._id}" class="bg-gradient-to-r from-gray-700 to-gray-800 text-white hover:from-gray-800 hover:to-gray-900 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
                             View Details
                         </a>
                     </div>

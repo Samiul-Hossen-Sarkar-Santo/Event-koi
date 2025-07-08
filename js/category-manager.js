@@ -119,12 +119,12 @@ class CategoryManager {
             const categories = await this.getHomepageCategories();
             
             container.innerHTML = categories.map(category => `
-                <a href="${category.url}" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg p-4 text-center smooth-transition">
+                <a href="${category.url}" class="bg-gray-100 hover:scale-105 rounded-lg p-4 text-center smooth-transition border-2 border-gray-300 shadow-lg transform transition-all duration-300">
                     <div class="w-12 h-12 mx-auto mb-2 rounded-full flex items-center justify-center text-xl" 
                          style="background-color: ${category.color}20; color: ${category.color};">
                         <i class="${category.icon}"></i>
                     </div>
-                    <span class="font-medium dark:text-white">${category.displayName}</span>
+                    <span class="font-medium  text-gray-800">${category.displayName}</span>
                 </a>
             `).join('');
             
@@ -149,14 +149,14 @@ class CategoryManager {
             
             // Create "All" button
             let buttonsHTML = `
-                <button class="home-category-filter ${activeCategory === 'all' ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'} hover:bg-purple-200 dark:hover:bg-purple-800 px-4 py-2 rounded-full text-sm" data-category="all">
+                <button class="home-category-filter ${activeCategory === 'all' ? 'bg-gray-100 text-gray-700 border border-gray-700 font-medium' : 'bg-gray-100 text-gray-700 border border-gray-700 font-medium'} hover:bg-gray-200 px-4 py-2 rounded-full text-sm" data-category="all">
                     All
                 </button>
             `;
             
             // Add category buttons using category names
             buttonsHTML += categories.map(category => `
-                <button class="home-category-filter ${activeCategory === category.value ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'} hover:bg-gray-200 dark:hover:bg-gray-600 px-4 py-2 rounded-full text-sm" data-category="${category.value}">
+                <button class="home-category-filter ${activeCategory === category.value ? 'bg-gray-100 text-gray-700 border border-gray-700 font-medium' : 'bg-gray-100 text-gray-700 border border-gray-700 font-medium'} hover:bg-gray-200 px-4 py-2 rounded-full text-sm" data-category="${category.value}">
                     ${category.label}
                 </button>
             `).join('');

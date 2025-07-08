@@ -23,6 +23,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load categories
     loadEditCategories();
     
+    // Initialize the first tab
+    showTab(0);
+    
     // Tab navigation
     document.querySelectorAll('.edit-tab-btn').forEach((btn, index) => {
         btn.addEventListener('click', () => showTab(index));
@@ -405,41 +408,50 @@ document.addEventListener('DOMContentLoaded', function() {
     async function submitChanges(event) {
         event.preventDefault();
         
-        const formData = new FormData(event.target);
-        const eventId = formData.get('eventId');
+        const form = event.target;
+        const formData = new FormData(form);
         
-        // Collect all form data including dynamic content
-        const eventData = {
-            title: formData.get('title'),
-            description: formData.get('description'),
-            category: formData.get('category') === 'other' ? formData.get('customCategory') : formData.get('category'),
-            date: formData.get('date'),
-            time: formData.get('time'),
-            location: formData.get('location'),
-            registrationMethod: formData.get('registrationMethod'),
-            externalRegistrationUrl: formData.get('externalRegistrationUrl'),
-            registrationDeadline: formData.get('registrationDeadline'),
-            schedule: formData.get('schedule'),
-            prizeInfo: formData.get('prizeInfo'),
-            rules: formData.get('rules'),
-            contactInfo: {
-                email: formData.get('contactEmail'),
-                phone: formData.get('contactPhone'),
-                website: formData.get('contactWebsite')
-            },
-            speakers: collectSpeakers(),
-            faqs: collectFaqs(),
-            sponsors: collectSponsors()
+        // Collect dynamic fields and add them to FormData
+        const speakers = collectSpeakers();
+        const faqs = collectFaqs();
+        const sponsors = collectSponsors();
+        
+        console.log('Collected data:');
+        console.log('speakers:', speakers);
+        console.log('faqs:', faqs);
+        console.log('sponsors:', sponsors);
+        
+        // Add complex fields as JSON strings to FormData
+        const speakersJSON = JSON.stringify(speakers);
+        const faqsJSON = JSON.stringify(faqs);
+        const sponsorsJSON = JSON.stringify(sponsors);
+        
+        console.log('JSON strings:');
+        console.log('speakersJSON:', speakersJSON);
+        console.log('faqsJSON:', faqsJSON);
+        console.log('sponsorsJSON:', sponsorsJSON);
+        
+        formData.append('speakers_json', speakersJSON);
+        formData.append('faqs_json', faqsJSON);
+        formData.append('sponsors_json', sponsorsJSON);
+        
+        // Handle contact info properly
+        const contactInfo = {
+            email: formData.get('contactEmail'),
+            phone: formData.get('contactPhone'),
+            website: formData.get('contactWebsite')
         };
+        formData.append('contactInfo', JSON.stringify(contactInfo));
+        
+        // Handle category selection
+        const category = formData.get('category') === 'other' ? formData.get('customCategory') : formData.get('category');
+        formData.set('category', category);
         
         try {
-            const response = await fetch(`/events/${eventId}`, {
+            const response = await fetch(`/events/${formData.get('eventId')}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
                 credentials: 'include',
-                body: JSON.stringify(eventData)
+                body: formData // Send FormData directly, no Content-Type header needed
             });
             
             if (response.ok) {
@@ -456,42 +468,69 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function collectSpeakers() {
-        const speakers = [];
-        document.querySelectorAll('[name^="speakers["]').forEach((input, index) => {
+        const speakersMap = {};
+        const speakerInputs = document.querySelectorAll('[name^="speakers["]');
+        
+        console.log('Found speaker inputs:', speakerInputs.length);
+        
+        speakerInputs.forEach((input) => {
             const match = input.name.match(/speakers\[(\d+)\]\[(\w+)\]/);
             if (match) {
                 const [, speakerIndex, field] = match;
-                if (!speakers[speakerIndex]) speakers[speakerIndex] = {};
-                speakers[speakerIndex][field] = input.value;
+                if (!speakersMap[speakerIndex]) speakersMap[speakerIndex] = {};
+                speakersMap[speakerIndex][field] = input.value;
+                console.log(`Speaker ${speakerIndex}.${field}:`, input.value);
             }
         });
-        return speakers.filter(speaker => speaker.name); // Only include speakers with names
+        
+        // Convert to array and filter
+        const result = Object.values(speakersMap).filter(speaker => speaker && speaker.name);
+        console.log('Final speakers result:', result);
+        return result;
     }
     
     function collectFaqs() {
-        const faqs = [];
-        document.querySelectorAll('[name^="faqs["]').forEach((input, index) => {
+        const faqsMap = {};
+        const faqInputs = document.querySelectorAll('[name^="faqs["]');
+        
+        console.log('Found FAQ inputs:', faqInputs.length);
+        
+        faqInputs.forEach((input) => {
             const match = input.name.match(/faqs\[(\d+)\]\[(\w+)\]/);
             if (match) {
                 const [, faqIndex, field] = match;
-                if (!faqs[faqIndex]) faqs[faqIndex] = {};
-                faqs[faqIndex][field] = input.value;
+                if (!faqsMap[faqIndex]) faqsMap[faqIndex] = {};
+                faqsMap[faqIndex][field] = input.value;
+                console.log(`FAQ ${faqIndex}.${field}:`, input.value);
             }
         });
-        return faqs.filter(faq => faq.question); // Only include FAQs with questions
+        
+        // Convert to array and filter
+        const result = Object.values(faqsMap).filter(faq => faq && faq.question);
+        console.log('Final FAQs result:', result);
+        return result;
     }
     
     function collectSponsors() {
-        const sponsors = [];
-        document.querySelectorAll('[name^="sponsors["]').forEach((input, index) => {
+        const sponsorsMap = {};
+        const sponsorInputs = document.querySelectorAll('[name^="sponsors["]');
+        
+        console.log('Found sponsor inputs:', sponsorInputs.length);
+        
+        sponsorInputs.forEach((input) => {
             const match = input.name.match(/sponsors\[(\d+)\]\[(\w+)\]/);
             if (match) {
                 const [, sponsorIndex, field] = match;
-                if (!sponsors[sponsorIndex]) sponsors[sponsorIndex] = {};
-                sponsors[sponsorIndex][field] = input.value;
+                if (!sponsorsMap[sponsorIndex]) sponsorsMap[sponsorIndex] = {};
+                sponsorsMap[sponsorIndex][field] = input.value;
+                console.log(`Sponsor ${sponsorIndex}.${field}:`, input.value);
             }
         });
-        return sponsors.filter(sponsor => sponsor.name); // Only include sponsors with names
+        
+        // Convert to array and filter
+        const result = Object.values(sponsorsMap).filter(sponsor => sponsor && sponsor.name);
+        console.log('Final sponsors result:', result);
+        return result;
     }
     
     // Load categories dynamically for edit form

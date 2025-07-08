@@ -367,6 +367,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Initialize sponsor and question buttons
         initializeButtons();
+
+        // Populate dynamic sections with database data
+        populateSpeakersSection(event.speakers);
+        populateGallerySection(event.gallery);
+        populateFAQSection(event.faqs);
+        populateSponsorsSection(event.sponsors);
     }
 
     // Initialize social media sharing
@@ -1223,6 +1229,190 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.error('Logout failed:', error);
                     window.location.href = 'index.html';
                 }
+            });
+        }
+    }
+
+    // Function to populate speakers section
+    function populateSpeakersSection(speakers) {
+        const speakersSection = findElementByText('h2', 'Featured Speakers')?.closest('section');
+        
+        if (!speakers || speakers.length === 0) {
+            // Hide the entire speakers section if no speakers
+            if (speakersSection) {
+                speakersSection.style.display = 'none';
+            }
+            return;
+        }
+
+        // Show the section
+        if (speakersSection) {
+            speakersSection.style.display = 'block';
+        }
+
+        const speakersGrid = speakersSection.querySelector('.grid');
+        if (speakersGrid) {
+            speakersGrid.innerHTML = ''; // Clear existing content
+            
+            speakers.forEach(speaker => {
+                const speakerCard = document.createElement('div');
+                speakerCard.className = 'speaker-card bg-white rounded-xl overflow-hidden shadow-md transition-all duration-300';
+                speakerCard.innerHTML = `
+                    <div class="h-64 overflow-hidden bg-gray-200 flex items-center justify-center">
+                        <i class="fas fa-user text-gray-400 text-6xl"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-1">${speaker.name || 'Speaker Name'}</h3>
+                        <p class="text-indigo-600 mb-3">${speaker.title || 'Speaker Title'}</p>
+                        <p class="text-gray-600 text-sm">${speaker.bio || 'Speaker biography not available.'}</p>
+                    </div>
+                `;
+                speakersGrid.appendChild(speakerCard);
+            });
+        }
+    }
+
+    // Function to populate gallery section
+    function populateGallerySection(gallery) {
+        const gallerySection = findElementByText('h2', 'Event Gallery')?.closest('section');
+        
+        if (!gallery || gallery.length === 0) {
+            // Hide the entire gallery section if no images
+            if (gallerySection) {
+                gallerySection.style.display = 'none';
+            }
+            return;
+        }
+
+        // Show the section
+        if (gallerySection) {
+            gallerySection.style.display = 'block';
+        }
+
+        const galleryGrid = gallerySection.querySelector('.grid');
+        if (galleryGrid) {
+            galleryGrid.innerHTML = ''; // Clear existing content
+            
+            gallery.forEach(image => {
+                const galleryItem = document.createElement('div');
+                galleryItem.className = 'h-48 overflow-hidden rounded-lg';
+                galleryItem.innerHTML = `
+                    <img src="/uploads/${image}" 
+                         alt="Event Gallery" 
+                         class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                         onerror="this.parentElement.style.display='none'">
+                `;
+                galleryGrid.appendChild(galleryItem);
+            });
+        }
+    }
+
+    // Function to populate FAQ section
+    function populateFAQSection(faqs) {
+        const faqSection = findElementByText('h2', 'Frequently Asked Questions')?.closest('section');
+        
+        if (!faqs || faqs.length === 0) {
+            // Hide the entire FAQ section if no FAQs
+            if (faqSection) {
+                faqSection.style.display = 'none';
+            }
+            return;
+        }
+
+        // Show the section
+        if (faqSection) {
+            faqSection.style.display = 'block';
+        }
+
+        const faqContainer = faqSection.querySelector('.space-y-4');
+        if (faqContainer) {
+            faqContainer.innerHTML = ''; // Clear existing content
+            
+            faqs.forEach(faq => {
+                const faqItem = document.createElement('div');
+                faqItem.className = 'border border-gray-200 rounded-lg overflow-hidden';
+                faqItem.innerHTML = `
+                    <button class="faq-toggle w-full px-6 py-4 text-left font-semibold bg-white hover:bg-gray-50 flex justify-between items-center">
+                        <span>${faq.question || 'Question'}</span>
+                        <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content px-6 py-4 bg-gray-50 hidden">
+                        <p class="text-gray-700">${faq.answer || 'Answer not provided.'}</p>
+                    </div>
+                `;
+                faqContainer.appendChild(faqItem);
+                
+                // Add event listener for the new FAQ toggle
+                const toggleBtn = faqItem.querySelector('.faq-toggle');
+                toggleBtn.addEventListener('click', () => {
+                    const content = toggleBtn.nextElementSibling;
+                    const icon = toggleBtn.querySelector('i');
+
+                    const isHidden = content.classList.contains('hidden');
+
+                    // Close other FAQs
+                    document.querySelectorAll('.faq-content').forEach(item => {
+                        if (item !== content) {
+                            item.classList.add('hidden');
+                            item.previousElementSibling.querySelector('i').classList.remove('rotate-180');
+                        }
+                    });
+
+                    if (isHidden) {
+                        content.classList.remove('hidden');
+                        icon.classList.add('rotate-180');
+                    } else {
+                        content.classList.add('hidden');
+                        icon.classList.remove('rotate-180');
+                    }
+                });
+            });
+        }
+    }
+
+    // Function to populate sponsors section
+    function populateSponsorsSection(sponsors) {
+        const sponsorsSection = findElementByText('h2', 'Our Sponsors')?.closest('section');
+        
+        if (!sponsors || sponsors.length === 0) {
+            // Hide the entire sponsors section if no sponsors
+            if (sponsorsSection) {
+                sponsorsSection.style.display = 'none';
+            }
+            return;
+        }
+
+        // Show the section
+        if (sponsorsSection) {
+            sponsorsSection.style.display = 'block';
+        }
+
+        const sponsorsContainer = sponsorsSection.querySelector('.flex.flex-wrap');
+        if (sponsorsContainer) {
+            sponsorsContainer.innerHTML = ''; // Clear existing content
+            
+            sponsors.forEach(sponsor => {
+                const sponsorItem = document.createElement('div');
+                sponsorItem.className = 'sponsor-item text-center';
+                
+                if (sponsor.website) {
+                    sponsorItem.innerHTML = `
+                        <a href="${sponsor.website}" target="_blank" rel="noopener noreferrer" 
+                           class="block p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                            <div class="text-lg font-semibold text-gray-800 mb-1">${sponsor.name || 'Sponsor'}</div>
+                            <div class="text-sm text-gray-500">${sponsor.tier || 'Sponsor'}</div>
+                        </a>
+                    `;
+                } else {
+                    sponsorItem.innerHTML = `
+                        <div class="block p-4 bg-white rounded-lg shadow-sm">
+                            <div class="text-lg font-semibold text-gray-800 mb-1">${sponsor.name || 'Sponsor'}</div>
+                            <div class="text-sm text-gray-500">${sponsor.tier || 'Sponsor'}</div>
+                        </div>
+                    `;
+                }
+                
+                sponsorsContainer.appendChild(sponsorItem);
             });
         }
     }

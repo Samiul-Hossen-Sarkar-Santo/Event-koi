@@ -957,11 +957,34 @@ document.addEventListener('DOMContentLoaded', function() {
             const eventDate = new Date(event.date).toLocaleDateString();
             const createdDate = new Date(event.createdAt).toLocaleDateString();
             
+            // Determine event type tags
+            let eventTypeTags = '';
+            if (event.isEdit) {
+                eventTypeTags += `<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mr-2">
+                    <i class="fas fa-edit mr-1"></i>EDIT
+                </span>`;
+            }
+            if (event.deletionStatus === 'requested') {
+                eventTypeTags += `<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 mr-2">
+                    <i class="fas fa-trash mr-1"></i>DELETE REQUEST
+                </span>`;
+            }
+            
             html += `
                 <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                     <div class="flex flex-col md:flex-row justify-between">
                         <div class="flex-1">
-                            <h3 class="font-bold text-lg">${event.title}</h3>
+                            <div class="flex items-center gap-2 mb-2">
+                                <h3 class="font-bold text-lg">${event.title}</h3>
+                                ${eventTypeTags}
+                            </div>
+                            ${event.isEdit ? `<p class="text-blue-600 text-sm mb-2">
+                                <i class="fas fa-info-circle mr-1"></i>This is an edit of an existing event
+                                ${event.editReason ? ` - ${event.editReason}` : ''}
+                            </p>` : ''}
+                            ${event.deletionStatus === 'requested' ? `<p class="text-red-600 text-sm mb-2">
+                                <i class="fas fa-exclamation-triangle mr-1"></i>Organizer requested deletion: ${event.deletionReason || 'No reason provided'}
+                            </p>` : ''}
                             <p class="text-gray-500 text-sm mt-1">
                                 <i class="fas fa-user mr-2"></i>${event.organizer?.name || event.organizer?.username || 'Unknown Organizer'}
                             </p>
@@ -989,15 +1012,22 @@ document.addEventListener('DOMContentLoaded', function() {
                             ` : ''}
                         </div>
                         <div class="flex items-center mt-4 md:mt-0 space-x-2">
-                            ${event.approvalStatus === 'pending' || event.approvalStatus === 'changes_requested' ? `
+                            ${event.deletionStatus === 'requested' ? `
+                                <button class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg" onclick="approveEventDeletion('${event._id}')">
+                                    <i class="fas fa-trash mr-1"></i>Approve Deletion
+                                </button>
+                                <button class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg" onclick="rejectEventDeletion('${event._id}')">
+                                    <i class="fas fa-times mr-1"></i>Deny Deletion
+                                </button>
+                            ` : event.approvalStatus === 'pending' || event.approvalStatus === 'changes_requested' ? `
                                 <button class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg" onclick="approveEvent('${event._id}')">
-                                    Approve
+                                    <i class="fas fa-check mr-1"></i>Approve
                                 </button>
                                 <button class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg" onclick="rejectEvent('${event._id}')">
-                                    Reject
+                                    <i class="fas fa-times mr-1"></i>Reject
                                 </button>
                                 <button class="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded-lg" onclick="requestChanges('${event._id}')">
-                                    Request Changes
+                                    <i class="fas fa-edit mr-1"></i>Request Changes
                                 </button>
                             ` : `
                                 <span class="text-gray-400 font-medium">
@@ -1112,6 +1142,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    window.approveEventDeletion = function(eventId) {
+        if (confirm('⚠️ WARNING: This will permanently delete the event from the database.\n\nThis action cannot be undone. All registrations, comments, and event data will be lost forever.\n\nAre you sure you want to approve this deletion request?')) {
+            updateEventStatus(eventId, 'approve_deletion', 'Deletion approved by admin');
+        }
+    };
+
+    window.rejectEventDeletion = function(eventId) {
+        const reason = prompt('Reason for denying the deletion request:', 'Deletion request denied');
+        if (reason !== null) {
+            updateEventStatus(eventId, 'reject', reason);
+        }
+    };
+
     window.viewEvent = function(eventId) {
         // In a real app, this would open event details
         window.open(`/event_page.html?id=${eventId}`, '_blank');
@@ -1144,9 +1187,6 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Failed to update event. Please try again.');
         }
     }
-
-    // Make approvals functions globally available
-    window.loadApprovals = loadApprovals;
 
     // --- Activity Logs Management Functionality ---
     let activityLogsData = [];

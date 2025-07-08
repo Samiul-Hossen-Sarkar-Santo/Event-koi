@@ -84,7 +84,13 @@ router.get('/', async (req, res) => {
 router.get('/my-events', isAuthenticated, isOrganizer, async (req, res) => {
   try {
     const organizerId = req.session.userId;
-    const events = await Event.find({ organizer: organizerId }).populate('organizer', 'username name email');
+    const events = await Event.find({ 
+      organizer: organizerId,
+      $or: [
+        { isEdit: { $exists: false } },
+        { isEdit: false }
+      ]
+    }).populate('organizer', 'username name email');
     
     // Group events by status
     const groupedEvents = {
@@ -247,8 +253,15 @@ router.get('/:id', async (req, res) => {
     if (!event) {
       return res.status(404).json({ message: 'Event not found' });
     }
+
+    // Ensure all required fields exist as arrays, even if empty
+    const eventResponse = event.toObject();
+    eventResponse.speakers = eventResponse.speakers || [];
+    eventResponse.gallery = eventResponse.gallery || [];
+    eventResponse.sponsors = eventResponse.sponsors || [];
+    eventResponse.faqs = eventResponse.faqs || [];
     
-    res.status(200).json(event);
+    res.status(200).json(eventResponse);
   } catch (err) {
     console.error('Error fetching event:', err);
     res.status(500).json({ message: 'Error fetching event', error: err.message });
@@ -432,27 +445,6 @@ router.post('/:id/question', async (req, res) => {
   }
 });
 
-// GET organizer's own events
-router.get('/my-events', isAuthenticated, isOrganizer, async (req, res) => {
-  try {
-    const organizerId = req.session.userId;
-    const events = await Event.find({ organizer: organizerId }).populate('organizer', 'username name email');
-    
-    // Group events by status
-    const groupedEvents = {
-      active: events.filter(event => event.approvalStatus === 'approved' && new Date(event.date) >= new Date()),
-      pending: events.filter(event => event.approvalStatus === 'pending'),
-      past: events.filter(event => event.approvalStatus === 'approved' && new Date(event.date) < new Date()),
-      rejected: events.filter(event => event.approvalStatus === 'rejected')
-    };
-    
-    res.status(200).json(groupedEvents);
-  } catch (err) {
-    console.error('Error fetching organizer events:', err);
-    res.status(500).json({ message: 'Error fetching your events', error: err.message });
-  }
-});
-
 // GET organizer dashboard stats
 router.get('/dashboard-stats', isAuthenticated, isOrganizer, async (req, res) => {
   try {
@@ -546,14 +538,50 @@ router.put('/:id', isAuthenticated, isOrganizer, handleFormData, async (req, res
     const eventId = req.params.id;
     const organizerId = req.session.userId;
     
+    // Validate MongoDB ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(eventId)) {
+      return res.status(400).json({ message: 'Invalid event ID format' });
+    }
+    
     // Find event and verify ownership
     const event = await Event.findOne({ _id: eventId, organizer: organizerId });
     if (!event) {
       return res.status(404).json({ message: 'Event not found or you do not have permission to edit this event' });
     }
     
-    // Prepare update data
-    const updateData = {
+    // Parse JSON fields from FormData if they exist
+    let contactInfo = event.contactInfo;
+    let speakers = event.speakers;
+    let faqs = event.faqs;
+    let sponsors = event.sponsors;
+    
+    try {
+      if (req.body.contactInfo) {
+        console.log('Parsing contactInfo:', req.body.contactInfo);
+        contactInfo = JSON.parse(req.body.contactInfo);
+      }
+      if (req.body.speakers_json) {
+        console.log('Parsing speakers_json:', req.body.speakers_json);
+        speakers = JSON.parse(req.body.speakers_json);
+      }
+      if (req.body.faqs_json) {
+        console.log('Parsing faqs_json:', req.body.faqs_json);
+        faqs = JSON.parse(req.body.faqs_json);
+      }
+      if (req.body.sponsors_json) {
+        console.log('Parsing sponsors_json:', req.body.sponsors_json);
+        sponsors = JSON.parse(req.body.sponsors_json);
+      }
+      console.log('JSON parsing successful');
+    } catch (parseError) {
+      console.error('Error parsing JSON fields:', parseError);
+      console.error('parseError.message:', parseError.message);
+      console.error('Stack trace:', parseError.stack);
+      return res.status(400).json({ message: 'Invalid JSON in form data', error: parseError.message });
+    }
+    
+    // Prepare the edited event data
+    const editData = {
       title: req.body.title || event.title,
       description: req.body.description || event.description,
       category: req.body.category || event.category,
@@ -564,19 +592,39 @@ router.put('/:id', isAuthenticated, isOrganizer, handleFormData, async (req, res
       registrationDeadline: req.body.registrationDeadline || event.registrationDeadline,
       prizeInfo: req.body.prizeInfo || event.prizeInfo,
       rules: req.body.rules || event.rules,
-      externalRegistrationUrl: req.body.externalRegistrationUrl || event.externalRegistrationUrl
+      externalRegistrationUrl: req.body.externalRegistrationUrl || event.externalRegistrationUrl,
+      contactInfo: contactInfo,
+      speakers: speakers,
+      faqs: faqs,
+      sponsors: sponsors,
+      schedule: req.body.schedule || event.schedule
     };
     
-    // Update cover image if new one is uploaded
+    // Handle cover image if new one is uploaded
     if (req.file) {
-      updateData.coverImage = req.file.filename;
+      editData.coverImage = req.file.filename;
     }
     
-    const updatedEvent = await Event.findByIdAndUpdate(eventId, updateData, { new: true, runValidators: true });
-    res.status(200).json(updatedEvent);
+    // Create a new event entry for the edit (pending approval)
+    const editedEvent = new Event({
+      ...editData,
+      organizer: organizerId,
+      approvalStatus: 'pending',
+      isEdit: true,
+      originalEventId: eventId,
+      editReason: 'Organizer requested changes'
+    });
+    
+    await editedEvent.save();
+    
+    res.status(200).json({ 
+      message: 'Event changes submitted for admin approval',
+      editId: editedEvent._id,
+      originalEventId: eventId
+    });
   } catch (err) {
-    console.error('Error updating event:', err);
-    res.status(500).json({ message: 'Error updating event', error: err.message });
+    console.error('Error submitting event changes:', err);
+    res.status(500).json({ message: 'Error submitting event changes', error: err.message });
   }
 });
 

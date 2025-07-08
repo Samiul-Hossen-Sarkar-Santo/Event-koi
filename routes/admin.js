@@ -48,8 +48,13 @@ router.get('/events/approval-queue', isAdmin, async (req, res) => {
       search 
     } = req.query;
     
-    // Build query object
-    const query = status === 'all' ? {} : { approvalStatus: status };
+    // Build query object - include events pending approval or deletion requests
+    const query = {
+      $or: [
+        status === 'all' ? { approvalStatus: { $ne: null } } : { approvalStatus: status },
+        { deletionStatus: 'requested' }
+      ]
+    };
     
     // Category filter
     if (category && category !== 'all') {
@@ -164,7 +169,7 @@ router.put('/events/:eventId/moderate', isAdmin, async (req, res) => {
     const { eventId } = req.params;
     const { action, reason, requestedChanges } = req.body;
     
-    if (!['approve', 'reject', 'request_changes'].includes(action)) {
+    if (!['approve', 'reject', 'request_changes', 'approve_deletion'].includes(action)) {
       return res.status(400).json({ message: 'Invalid action' });
     }
 
@@ -176,25 +181,81 @@ router.put('/events/:eventId/moderate', isAdmin, async (req, res) => {
     const adminId = req.session.userId;
     let newStatus, logAction;
 
+    // Handle deletion requests
+    if (action === 'approve_deletion') {
+      // Permanently delete the event
+      await Event.findByIdAndDelete(eventId);
+      
+      // Log admin action
+      await logAdminAction(adminId, 'event_deletion_approved', 'Event', eventId, {
+        reason: event.deletionReason || 'Admin approved deletion',
+        eventTitle: event.title,
+        organizerEmail: event.organizer?.email
+      }, req);
+
+      return res.json({ 
+        message: 'Event deletion approved and completed',
+        deleted: true
+      });
+    }
+
     switch (action) {
       case 'approve':
-        newStatus = 'approved';
-        logAction = 'event_approved';
-        event.approvedBy = adminId;
-        event.approvedAt = new Date();
-        // Reset resubmission fields on approval
-        event.canResubmit = true;
-        event.rejectionReason = '';
-        event.requestedChanges = [];
+        // Handle edit approval
+        if (event.isEdit && event.originalEventId) {
+          // Update the original event with new data
+          const originalEvent = await Event.findById(event.originalEventId);
+          if (originalEvent) {
+            // Copy all fields from edit to original, but only if they exist and are not empty
+            const fieldsToUpdate = [
+              'title', 'description', 'category', 'date', 'time', 'location',
+              'registrationMethod', 'registrationDeadline', 'prizeInfo', 'rules',
+              'externalRegistrationUrl', 'contactInfo', 'speakers', 'faqs', 
+              'sponsors', 'schedule'
+            ];
+            
+            fieldsToUpdate.forEach(field => {
+              if (event[field] !== undefined && event[field] !== null && event[field] !== '') {
+                originalEvent[field] = event[field];
+              }
+            });
+            
+            // Handle cover image separately - only update if a new one was uploaded
+            if (event.coverImage && event.coverImage !== originalEvent.coverImage) {
+              originalEvent.coverImage = event.coverImage;
+            }
+            
+            originalEvent.approvedBy = adminId;
+            originalEvent.approvedAt = new Date();
+            await originalEvent.save();
+            
+            // Delete the edit version
+            await Event.findByIdAndDelete(eventId);
+            
+            logAction = 'event_approved';
+            return res.json({ 
+              message: 'Event edit approved and applied to original event',
+              originalEventId: event.originalEventId
+            });
+          }
+        } else {
+          // Regular event approval
+          newStatus = 'approved';
+          logAction = 'event_approved';
+          event.approvedBy = adminId;
+          event.approvedAt = new Date();
+          event.canResubmit = true;
+          event.rejectionReason = '';
+          event.requestedChanges = [];
+        }
         break;
       case 'reject':
         newStatus = 'rejected';
-        logAction = 'event_rejected';
+        logAction = event.isEdit ? 'event_changes_rejected' : 'event_rejected';
         event.rejectionReason = reason;
-        // Allow resubmission for rejected events unless it's spam/serious violation
         event.canResubmit = !reason?.toLowerCase().includes('spam') && 
                            !reason?.toLowerCase().includes('violation') &&
-                           event.resubmissionCount < 3; // Max 3 resubmissions
+                           event.resubmissionCount < 3;
         break;
       case 'request_changes':
         newStatus = 'changes_requested';
@@ -209,7 +270,7 @@ router.put('/events/:eventId/moderate', isAdmin, async (req, res) => {
     event.approvalStatus = newStatus;
     event.adminRemarks = reason || '';
 
-    // Add to review history - use correct enum values
+    // Add to review history
     let historyAction;
     switch (action) {
       case 'approve':
@@ -236,7 +297,8 @@ router.put('/events/:eventId/moderate', isAdmin, async (req, res) => {
     await logAdminAction(adminId, logAction, 'Event', eventId, {
       reason: reason || '',
       previousStatus,
-      newStatus
+      newStatus,
+      isEdit: event.isEdit || false
     }, req);
 
     res.json({ 
@@ -245,7 +307,8 @@ router.put('/events/:eventId/moderate', isAdmin, async (req, res) => {
         id: event._id,
         title: event.title,
         status: event.approvalStatus,
-        organizer: event.organizer
+        organizer: event.organizer,
+        isEdit: event.isEdit
       }
     });
   } catch (err) {

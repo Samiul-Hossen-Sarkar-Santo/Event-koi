@@ -384,6 +384,51 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Make requestDeleteEvent function global
+    window.requestDeleteEvent = async function(eventId) {
+        // Show warning and get deletion reason
+        const confirmed = confirm(
+            "⚠️ WARNING: If your deletion request is approved by an admin, this event will be permanently deleted from the database with no way to recover it.\n\n" +
+            "All registrations, comments, and event data will be lost forever.\n\n" +
+            "Are you sure you want to proceed with the deletion request?"
+        );
+        
+        if (!confirmed) return;
+        
+        const reason = prompt(
+            "Please provide a reason for deleting this event:\n\n" +
+            "(This will help the admin understand why you want to delete the event)"
+        );
+        
+        if (!reason || reason.trim() === '') {
+            alert('Deletion reason is required. Request cancelled.');
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/events/${eventId}/request-deletion`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({ reason: reason.trim() })
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                alert('Deletion request submitted successfully! An admin will review your request.');
+                loadMyEvents(); // Refresh the events list
+            } else {
+                const error = await response.json();
+                alert(`Failed to submit deletion request: ${error.message || 'Unknown error'}`);
+            }
+        } catch (error) {
+            console.error('Error submitting deletion request:', error);
+            alert('An error occurred while submitting the deletion request. Please try again.');
+        }
+    };
+
     // Make editEvent function global for onclick handlers
     window.editEvent = function(eventId) {
         // Redirect to the comprehensive event editing page
@@ -1142,13 +1187,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // ==================== EVENT DELETION ====================
     
     window.requestEventDeletion = async function(eventId) {
-        const reason = prompt('Please provide a reason for deleting this event:');
-        if (!reason || reason.trim() === '') {
-            alert('Deletion reason is required.');
-            return;
-        }
+        // Show warning and get deletion reason
+        const confirmed = confirm(
+            "⚠️ WARNING: If your deletion request is approved by an admin, this event will be permanently deleted from the database with no way to recover it.\n\n" +
+            "All registrations, comments, and event data will be lost forever.\n\n" +
+            "Are you sure you want to proceed with the deletion request?"
+        );
         
-        if (!confirm('Are you sure you want to request deletion of this event? This action requires admin approval.')) {
+        if (!confirmed) return;
+        
+        const reason = prompt(
+            "Please provide a reason for deleting this event:\n\n" +
+            "(This will help the admin understand why you want to delete the event)"
+        );
+        
+        if (!reason || reason.trim() === '') {
+            alert('Deletion reason is required. Request cancelled.');
             return;
         }
         
@@ -1163,15 +1217,16 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             if (response.ok) {
-                alert('Event deletion request submitted successfully! An admin will review your request.');
+                const result = await response.json();
+                alert('Deletion request submitted successfully! An admin will review your request.');
                 loadMyEvents(); // Refresh the events list
             } else {
                 const error = await response.json();
-                alert(`Failed to request event deletion: ${error.message || 'Unknown error'}`);
+                alert(`Failed to submit deletion request: ${error.message || 'Unknown error'}`);
             }
         } catch (error) {
-            console.error('Error requesting event deletion:', error);
-            alert('An error occurred while requesting event deletion. Please try again.');
+            console.error('Error submitting deletion request:', error);
+            alert('An error occurred while submitting the deletion request. Please try again.');
         }
     };
 
@@ -1486,8 +1541,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
                 datasets: [{
                     label: 'Events Created',
-                    data: [2, 4, 3, 5, 2, 6],
-                    borderColor: 'rgb(139, 92, 246)',
+                    data: [12, 19, 3, 5, 2, 3],
+                    borderColor: 'rgba(139, 92, 246, 1)',
                     backgroundColor: 'rgba(139, 92, 246, 0.1)',
                     tension: 0.4
                 }]

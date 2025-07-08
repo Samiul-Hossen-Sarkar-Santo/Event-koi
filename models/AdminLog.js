@@ -12,6 +12,7 @@ const adminLogSchema = new mongoose.Schema({
       'event_approved',
       'event_rejected',
       'event_changes_requested',
+      'event_changes_rejected',
       'event_deletion_approved',
       'event_deletion_rejected',
       'user_warned',

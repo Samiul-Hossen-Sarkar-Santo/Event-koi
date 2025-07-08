@@ -217,6 +217,19 @@ const eventSchema = new mongoose.Schema({
   lastResubmittedAt: {
     type: Date
   },
+  // Event editing workflow
+  isEdit: {
+    type: Boolean,
+    default: false
+  },
+  originalEventId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Event'
+  },
+  editReason: {
+    type: String,
+    trim: true
+  },
 }, {
   timestamps: true // Adds createdAt and updatedAt timestamps
 });

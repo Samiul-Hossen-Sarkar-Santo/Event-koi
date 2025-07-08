@@ -700,16 +700,20 @@ document.addEventListener('DOMContentLoaded', function() {
             const statusColor = getReportStatusColor(report.status);
             const priorityColor = getReportPriorityColor(report.priority);
             
+            // Use the populated names instead of IDs
+            const targetName = report.reportedEntityName || `${report.reportedEntityModel}: ${report.reportedEntity}`;
+            const reporterName = report.reporterName || 'Anonymous';
+            
             tableHTML += `
                 <tr>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         <div>
-                            <div class="font-medium">${report.reportedEntityModel}: ${report.reportedEntity}</div>
+                            <div class="font-medium">${report.reportedEntityModel}: ${targetName}</div>
                             <div class="text-gray-500 text-xs">${report.reason}</div>
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ${report.reportedBy || 'Anonymous'}
+                        ${reporterName}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         ${capitalizeFirst(report.reportType)}

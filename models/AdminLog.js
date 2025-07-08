@@ -4,7 +4,7 @@ const adminLogSchema = new mongoose.Schema({
   adminId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: false // Allow null for system actions like ban appeals
   },
   action: {
     type: String,
@@ -21,6 +21,7 @@ const adminLogSchema = new mongoose.Schema({
       'user_account_restored',
       'appeal_approved',
       'appeal_rejected',
+      'ban_appeal_submitted',
       'organizer_restricted',
       'organizer_unrestricted',
       'category_approved',
@@ -55,7 +56,7 @@ const adminLogSchema = new mongoose.Schema({
   },
   ipAddress: {
     type: String,
-    required: true
+    required: false // Allow null for system actions
   },
   userAgent: {
     type: String

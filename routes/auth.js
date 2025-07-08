@@ -371,15 +371,18 @@ router.post('/appeal-ban', async (req, res) => {
     // Log the appeal for admin dashboard
     const AdminLog = require('../models/AdminLog');
     const logEntry = new AdminLog({
-      admin: null,
+      adminId: null, // System action, no admin involved
       action: 'ban_appeal_submitted',
-      targetType: 'user',
+      targetType: 'User',
       targetId: user._id,
-      details: `User ${user.email} submitted ban appeal`,
-      metadata: {
-        appealId: appeal._id,
+      details: {
+        reason: `User ${user.email} submitted ban appeal`,
+        additionalNotes: `Appeal Reason: ${reason}`,
+        appealId: appeal._id.toString(),
         appealReason: reason
-      }
+      },
+      ipAddress: req.ip || req.connection.remoteAddress || 'unknown',
+      userAgent: req.get('User-Agent')
     });
     await logEntry.save();
 

@@ -444,11 +444,33 @@ router.get('/reports', isAdmin, async (req, res) => {
     if (type !== 'all') query.reportType = type;
     if (priority !== 'all') query.priority = priority;
 
+    // Get reports with populated reportedBy field
     const reports = await Report.find(query)
+      .populate('reportedBy', 'name username email')
+      .populate('resolvedBy', 'name username')
       .sort({ priority: -1, createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit)
-      .lean(); // Use lean() to get plain objects
+      .lean();
+
+    // Populate the reportedEntity field based on reportedEntityModel
+    const populatedReports = await Promise.all(reports.map(async (report) => {
+      if (report.reportedEntityModel === 'User') {
+        const user = await User.findById(report.reportedEntity).select('name username email').lean();
+        report.reportedEntityData = user;
+        report.reportedEntityName = user ? (user.name || user.username || user.email) : 'Unknown User';
+      } else if (report.reportedEntityModel === 'Event') {
+        const event = await Event.findById(report.reportedEntity).select('title description').lean();
+        report.reportedEntityData = event;
+        report.reportedEntityName = event ? event.title : 'Unknown Event';
+      }
+      
+      // Format reporter name
+      report.reporterName = report.reportedBy ? 
+        (report.reportedBy.name || report.reportedBy.username || report.reportedBy.email) : 'Anonymous';
+      
+      return report;
+    }));
 
     const total = await Report.countDocuments(query);
 
@@ -461,12 +483,12 @@ router.get('/reports', isAdmin, async (req, res) => {
     };
 
     res.json({
-      reports: reports,
+      reports: populatedReports,
       stats: statusStats,
       pagination: {
         current: Number(page),
         total: Math.ceil(total / limit),
-        count: reports.length,
+        count: populatedReports.length,
         totalReports: total
       }
     });

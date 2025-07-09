@@ -68,7 +68,7 @@ const handleFormData = (req, res, next) => {
 };
 
 
-// GET all events (placeholder)
+// GET all events
 router.get('/', async (req, res) => {
   try {
     // Query the database to find all events with approvalStatus of 'approved'
@@ -249,7 +249,7 @@ router.get('/analytics-data', isAuthenticated, isOrganizer, async (req, res) => 
       return eventDate.getMonth() === currentMonth && eventDate.getFullYear() === currentYear;
     }).length;
     
-    // Average rating calculation (placeholder - implement if you have rating system)
+    // Average rating calculation
     const avgRating = 4.8; // You can calculate this from actual ratings
     
     res.status(200).json({
@@ -328,10 +328,6 @@ router.get('/:id', async (req, res) => {
 // POST a new event (requires authentication)
 router.post('/', isAuthenticated, handleFormData, async (req, res) => {
   try {
-    console.log('Received request body:', req.body);
-    console.log('Session userId:', req.session.userId);
-    console.log('Uploaded file:', req.file);
-
     // Validate required fields
     const requiredFields = ['title', 'description', 'category', 'date', 'time', 'location', 'registrationMethod'];
     for (const field of requiredFields) {
@@ -416,8 +412,6 @@ router.post('/', isAuthenticated, handleFormData, async (req, res) => {
       // Add flag for admin to review category
       adminRemarks: categoryRequiresApproval ? `⚠️ This event uses a new category "${categoryToUse}" that requires approval. Please review the category management section.` : null
     };
-
-    console.log('Event data to save:', eventData);
 
     const newEvent = new Event(eventData);
     await newEvent.save();
@@ -614,22 +608,17 @@ router.put('/:id', isAuthenticated, isOrganizer, handleFormData, async (req, res
     
     try {
       if (req.body.contactInfo) {
-        console.log('Parsing contactInfo:', req.body.contactInfo);
         contactInfo = JSON.parse(req.body.contactInfo);
       }
       if (req.body.speakers_json) {
-        console.log('Parsing speakers_json:', req.body.speakers_json);
         speakers = JSON.parse(req.body.speakers_json);
       }
       if (req.body.faqs_json) {
-        console.log('Parsing faqs_json:', req.body.faqs_json);
         faqs = JSON.parse(req.body.faqs_json);
       }
       if (req.body.sponsors_json) {
-        console.log('Parsing sponsors_json:', req.body.sponsors_json);
         sponsors = JSON.parse(req.body.sponsors_json);
       }
-      console.log('JSON parsing successful');
     } catch (parseError) {
       console.error('Error parsing JSON fields:', parseError);
       console.error('parseError.message:', parseError.message);

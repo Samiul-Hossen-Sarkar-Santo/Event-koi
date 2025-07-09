@@ -550,7 +550,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 prefillRegistrationForm(currentUser);
             }
         } catch (error) {
-            console.log('User not logged in, form will not be prefilled');
+            // User not logged in, form will not be prefilled
         }
     }
 

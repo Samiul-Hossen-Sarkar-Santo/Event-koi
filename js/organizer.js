@@ -133,7 +133,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
         } catch (error) {
             console.error('Error checking organizer auth:', error);
-            console.log('Loading demo data instead');
             loadFallbackData();
         }
     }
@@ -1458,8 +1457,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Fallback data for demo purposes when API calls fail
     function loadFallbackData() {
-        console.log('Loading fallback demo data...');
-        
         // Mock dashboard stats
         const mockStats = {
             totalEvents: 3,

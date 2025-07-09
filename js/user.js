@@ -751,7 +751,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (response.ok) {
                     const result = await response.json();
                     // Update UI to reflect favorite status
-                    console.log(result.message);
                 }
             } catch (error) {
                 console.error('Error toggling favorite:', error);
@@ -1484,7 +1483,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Rate event function
         window.rateEvent = function(eventId) {
-            // TODO: Implement event rating modal
+            // Event rating feature placeholder
             alert('Event rating feature coming soon!');
         };
     }

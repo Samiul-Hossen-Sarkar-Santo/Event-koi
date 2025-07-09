@@ -66,13 +66,10 @@ router.post('/signup', async (req, res) => {
 // POST /login - User Login
 router.post('/login', async (req, res) => {
   try {
-    console.log('Login attempt received:', { email: req.body.email, hasPassword: !!req.body.password });
-    
     const { email, password } = req.body;
 
     // Validate input
     if (!email || !password) {
-      console.log('Missing email or password');
       return res.status(400).json({
         message: 'Email and password are required'
       });
@@ -81,13 +78,10 @@ router.post('/login', async (req, res) => {
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
-      console.log('User not found for email:', email);
       return res.status(400).json({
         message: 'Invalid credentials'
       });
     }
-
-    console.log('User found:', { userId: user._id, role: user.role, accountStatus: user.accountStatus });
 
     // Compare passwords
     const isMatch = await bcrypt.compare(password, user.password);

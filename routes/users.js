@@ -196,7 +196,6 @@ router.get('/:id', isAuthenticated, isOwnerOrAdmin, async (req, res) => {
     if (!user) {
       return res.status(404).send('User not found.');
     }
-    // Placeholder: In a real application, you would render a user profile page
     res.status(200).json(user);
   } catch (err) {
     console.error(err);
@@ -506,7 +505,6 @@ router.put('/notices/:noticeId/read', isAuthenticated, async (req, res) => {
     
     // In a real implementation, you'd update the notice in the database
     // For now, we'll just return success
-    console.log(`Marking notice ${noticeId} as read for user ${userId}`);
     
     res.json({
       success: true,
@@ -525,7 +523,6 @@ router.put('/notices/read-all', isAuthenticated, async (req, res) => {
     const userId = req.session.userId;
     
     // In a real implementation, you'd update all notices for the user
-    console.log(`Marking all notices as read for user ${userId}`);
     
     res.json({
       success: true,

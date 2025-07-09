@@ -66,7 +66,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const response = await fetch('/auth/check');
             if (response.ok) {
                 const userData = await response.json();
-                console.log('Admin user data loaded:', userData); // Debug log
                 if (userData.authenticated && userData.user) {
                     // Check if we have complete user data
                     if (userData.user.name && userData.user.email) {
@@ -82,12 +81,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 } else {
                     // Not authenticated, redirect to admin portal
-                    console.log('Not authenticated, redirecting to admin portal');
                     window.location.href = '/admin-portal.html';
                 }
             } else {
                 // Auth check failed, redirect to admin portal
-                console.log('Auth check failed, redirecting to admin portal');
                 window.location.href = '/admin-portal.html';
             }
         } catch (error) {
@@ -98,39 +95,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateAdminProfileDisplay(user) {
-        console.log('Updating admin profile with:', user); // Debug log
-        
         // Update admin name in sidebar - more specific selector
         const adminNameElement = document.querySelector('aside div div h2.text-xl.font-semibold');
-        console.log('Admin name element:', adminNameElement); // Debug log
         if (adminNameElement && user.name) {
             adminNameElement.textContent = user.name;
-            console.log('Updated admin name to:', user.name);
         }
 
         // Update admin email in sidebar - more specific selector
         const adminEmailElement = document.querySelector('aside div div p.text-gray-600');
-        console.log('Admin email element:', adminEmailElement); // Debug log
         if (adminEmailElement && user.email) {
             adminEmailElement.textContent = user.email;
-            console.log('Updated admin email to:', user.email);
         }
 
         // Update avatar initials
         const avatarElement = document.querySelector('aside .bg-red-200 span');
-        console.log('Avatar element:', avatarElement); // Debug log
         if (avatarElement && user.name) {
             const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
             avatarElement.textContent = initials;
-            console.log('Updated avatar initials to:', initials);
         }
 
         // Update welcome message in header - more specific selector
         const welcomeElement = document.querySelector('header div div span.font-semibold');
-        console.log('Welcome element:', welcomeElement); // Debug log
         if (welcomeElement && user.name) {
             welcomeElement.textContent = `Welcome, ${user.name}!`;
-            console.log('Updated welcome message to:', `Welcome, ${user.name}!`);
         }
     }
 
@@ -540,7 +527,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         } catch (error) {
-            console.log('Could not load user info:', error);
+            // Silently handle user info loading errors
         }
     }
 

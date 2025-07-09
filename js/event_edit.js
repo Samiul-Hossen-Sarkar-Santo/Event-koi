@@ -416,20 +416,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const faqs = collectFaqs();
         const sponsors = collectSponsors();
         
-        console.log('Collected data:');
-        console.log('speakers:', speakers);
-        console.log('faqs:', faqs);
-        console.log('sponsors:', sponsors);
-        
         // Add complex fields as JSON strings to FormData
         const speakersJSON = JSON.stringify(speakers);
         const faqsJSON = JSON.stringify(faqs);
         const sponsorsJSON = JSON.stringify(sponsors);
-        
-        console.log('JSON strings:');
-        console.log('speakersJSON:', speakersJSON);
-        console.log('faqsJSON:', faqsJSON);
-        console.log('sponsorsJSON:', sponsorsJSON);
         
         formData.append('speakers_json', speakersJSON);
         formData.append('faqs_json', faqsJSON);
@@ -471,21 +461,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const speakersMap = {};
         const speakerInputs = document.querySelectorAll('[name^="speakers["]');
         
-        console.log('Found speaker inputs:', speakerInputs.length);
-        
         speakerInputs.forEach((input) => {
             const match = input.name.match(/speakers\[(\d+)\]\[(\w+)\]/);
             if (match) {
                 const [, speakerIndex, field] = match;
                 if (!speakersMap[speakerIndex]) speakersMap[speakerIndex] = {};
                 speakersMap[speakerIndex][field] = input.value;
-                console.log(`Speaker ${speakerIndex}.${field}:`, input.value);
             }
         });
         
         // Convert to array and filter
         const result = Object.values(speakersMap).filter(speaker => speaker && speaker.name);
-        console.log('Final speakers result:', result);
         return result;
     }
     
@@ -493,21 +479,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const faqsMap = {};
         const faqInputs = document.querySelectorAll('[name^="faqs["]');
         
-        console.log('Found FAQ inputs:', faqInputs.length);
-        
         faqInputs.forEach((input) => {
             const match = input.name.match(/faqs\[(\d+)\]\[(\w+)\]/);
             if (match) {
                 const [, faqIndex, field] = match;
                 if (!faqsMap[faqIndex]) faqsMap[faqIndex] = {};
                 faqsMap[faqIndex][field] = input.value;
-                console.log(`FAQ ${faqIndex}.${field}:`, input.value);
             }
         });
         
         // Convert to array and filter
         const result = Object.values(faqsMap).filter(faq => faq && faq.question);
-        console.log('Final FAQs result:', result);
         return result;
     }
     
@@ -515,21 +497,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const sponsorsMap = {};
         const sponsorInputs = document.querySelectorAll('[name^="sponsors["]');
         
-        console.log('Found sponsor inputs:', sponsorInputs.length);
-        
         sponsorInputs.forEach((input) => {
             const match = input.name.match(/sponsors\[(\d+)\]\[(\w+)\]/);
             if (match) {
                 const [, sponsorIndex, field] = match;
                 if (!sponsorsMap[sponsorIndex]) sponsorsMap[sponsorIndex] = {};
                 sponsorsMap[sponsorIndex][field] = input.value;
-                console.log(`Sponsor ${sponsorIndex}.${field}:`, input.value);
             }
         });
         
         // Convert to array and filter
         const result = Object.values(sponsorsMap).filter(sponsor => sponsor && sponsor.name);
-        console.log('Final sponsors result:', result);
         return result;
     }
     

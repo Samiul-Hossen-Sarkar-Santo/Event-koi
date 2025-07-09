@@ -38,16 +38,16 @@ async function logAdminAction(adminId, action, targetType, targetId, details, re
 // GET /admin/events/approval-queue - Get all events pending approval with enhanced filtering
 router.get('/events/approval-queue', isAdmin, async (req, res) => {
   try {
-    const { 
-      page = 1, 
-      limit = 20, 
-      status = 'pending', 
-      category, 
-      dateRange, 
-      createdRange, 
-      search 
+    const {
+      page = 1,
+      limit = 20,
+      status = 'pending',
+      category,
+      dateRange,
+      createdRange,
+      search
     } = req.query;
-    
+
     // Build query object - include events pending approval or deletion requests
     const query = {
       $or: [
@@ -55,12 +55,12 @@ router.get('/events/approval-queue', isAdmin, async (req, res) => {
         { deletionStatus: 'requested' }
       ]
     };
-    
+
     // Category filter
     if (category && category !== 'all') {
       query.category = category;
     }
-    
+
     // Search filter
     if (search && search.trim()) {
       const searchRegex = new RegExp(search.trim(), 'i');
@@ -70,12 +70,12 @@ router.get('/events/approval-queue', isAdmin, async (req, res) => {
         { location: searchRegex }
       ];
     }
-    
+
     // Date range filter (for event date)
     if (dateRange && dateRange !== 'all') {
       const now = new Date();
       let startDate, endDate;
-      
+
       switch (dateRange) {
         case 'upcoming':
           query.date = { $gte: now };
@@ -101,12 +101,12 @@ router.get('/events/approval-queue', isAdmin, async (req, res) => {
           break;
       }
     }
-    
+
     // Created range filter (for when event was created)
     if (createdRange && createdRange !== 'all') {
       const now = new Date();
       let startDate, endDate;
-      
+
       switch (createdRange) {
         case 'today':
           startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -139,7 +139,7 @@ router.get('/events/approval-queue', isAdmin, async (req, res) => {
           break;
       }
     }
-    
+
     const events = await Event.find(query)
       .populate('organizer', 'name username email')
       .sort({ createdAt: -1 })
@@ -168,7 +168,7 @@ router.put('/events/:eventId/moderate', isAdmin, async (req, res) => {
   try {
     const { eventId } = req.params;
     const { action, reason, requestedChanges } = req.body;
-    
+
     if (!['approve', 'reject', 'request_changes', 'approve_deletion'].includes(action)) {
       return res.status(400).json({ message: 'Invalid action' });
     }
@@ -185,7 +185,7 @@ router.put('/events/:eventId/moderate', isAdmin, async (req, res) => {
     if (action === 'approve_deletion') {
       // Permanently delete the event
       await Event.findByIdAndDelete(eventId);
-      
+
       // Log admin action
       await logAdminAction(adminId, 'event_deletion_approved', 'Event', eventId, {
         reason: event.deletionReason || 'Admin approved deletion',
@@ -193,7 +193,7 @@ router.put('/events/:eventId/moderate', isAdmin, async (req, res) => {
         organizerEmail: event.organizer?.email
       }, req);
 
-      return res.json({ 
+      return res.json({
         message: 'Event deletion approved and completed',
         deleted: true
       });
@@ -210,30 +210,30 @@ router.put('/events/:eventId/moderate', isAdmin, async (req, res) => {
             const fieldsToUpdate = [
               'title', 'description', 'category', 'date', 'time', 'location',
               'registrationMethod', 'registrationDeadline', 'prizeInfo', 'rules',
-              'externalRegistrationUrl', 'contactInfo', 'speakers', 'faqs', 
+              'externalRegistrationUrl', 'contactInfo', 'speakers', 'faqs',
               'sponsors', 'schedule'
             ];
-            
+
             fieldsToUpdate.forEach(field => {
               if (event[field] !== undefined && event[field] !== null && event[field] !== '') {
                 originalEvent[field] = event[field];
               }
             });
-            
+
             // Handle cover image separately - only update if a new one was uploaded
             if (event.coverImage && event.coverImage !== originalEvent.coverImage) {
               originalEvent.coverImage = event.coverImage;
             }
-            
+
             originalEvent.approvedBy = adminId;
             originalEvent.approvedAt = new Date();
             await originalEvent.save();
-            
+
             // Delete the edit version
             await Event.findByIdAndDelete(eventId);
-            
+
             logAction = 'event_approved';
-            return res.json({ 
+            return res.json({
               message: 'Event edit approved and applied to original event',
               originalEventId: event.originalEventId
             });
@@ -253,9 +253,9 @@ router.put('/events/:eventId/moderate', isAdmin, async (req, res) => {
         newStatus = 'rejected';
         logAction = event.isEdit ? 'event_changes_rejected' : 'event_rejected';
         event.rejectionReason = reason;
-        event.canResubmit = !reason?.toLowerCase().includes('spam') && 
-                           !reason?.toLowerCase().includes('violation') &&
-                           event.resubmissionCount < 3;
+        event.canResubmit = !reason?.toLowerCase().includes('spam') &&
+          !reason?.toLowerCase().includes('violation') &&
+          event.resubmissionCount < 3;
         break;
       case 'request_changes':
         newStatus = 'changes_requested';
@@ -301,7 +301,7 @@ router.put('/events/:eventId/moderate', isAdmin, async (req, res) => {
       isEdit: event.isEdit || false
     }, req);
 
-    res.json({ 
+    res.json({
       message: `Event ${action.replace('_', ' ')} successfully`,
       event: {
         id: event._id,
@@ -323,7 +323,7 @@ router.put('/events/:eventId/moderate', isAdmin, async (req, res) => {
 router.get('/users/management', isAdmin, async (req, res) => {
   try {
     const { page = 1, limit = 20, status = 'all', role = 'all' } = req.query;
-    
+
     let query = {};
     if (status !== 'all') query.accountStatus = status;
     if (role !== 'all') query.role = role;
@@ -344,7 +344,7 @@ router.get('/users/management', isAdmin, async (req, res) => {
         Warning.countDocuments({ userId: user._id, status: 'active' }),
         Report.countDocuments({ reportedBy: user._id })
       ]);
-      
+
       return {
         ...user.toObject(),
         stats: {
@@ -409,7 +409,7 @@ router.post('/users/:userId/warn', isAdmin, async (req, res) => {
       warningCount: user.warningCount
     }, req);
 
-    res.json({ 
+    res.json({
       message: 'Warning issued successfully',
       warning: {
         id: warning._id,
@@ -428,7 +428,7 @@ router.put('/users/:userId/status', isAdmin, async (req, res) => {
   try {
     const { userId } = req.params;
     const { status, reason, duration, restrictions } = req.body;
-    
+
     if (!['active', 'suspended', 'banned', 'restricted'].includes(status)) {
       return res.status(400).json({ message: 'Invalid status' });
     }
@@ -463,9 +463,9 @@ router.put('/users/:userId/status', isAdmin, async (req, res) => {
     await user.save();
 
     // Log admin action
-    const logAction = status === 'active' ? 'user_account_restored' : 
-                     status === 'suspended' ? 'user_suspended' : 
-                     status === 'banned' ? 'user_banned' : 'user_restricted';
+    const logAction = status === 'active' ? 'user_account_restored' :
+      status === 'suspended' ? 'user_suspended' :
+        status === 'banned' ? 'user_banned' : 'user_restricted';
 
     await logAdminAction(adminId, logAction, 'User', userId, {
       reason,
@@ -474,7 +474,7 @@ router.put('/users/:userId/status', isAdmin, async (req, res) => {
       duration
     }, req);
 
-    res.json({ 
+    res.json({
       message: `User ${status} successfully`,
       user: {
         id: user._id,
@@ -494,14 +494,14 @@ router.put('/users/:userId/status', isAdmin, async (req, res) => {
 // GET /admin/reports - Get all reports with filtering
 router.get('/reports', isAdmin, async (req, res) => {
   try {
-    const { 
-      page = 1, 
-      limit = 20, 
-      status = 'all', 
+    const {
+      page = 1,
+      limit = 20,
+      status = 'all',
       type = 'all',
       priority = 'all'
     } = req.query;
-    
+
     let query = {};
     if (status !== 'all') query.status = status;
     if (type !== 'all') query.reportType = type;
@@ -527,11 +527,11 @@ router.get('/reports', isAdmin, async (req, res) => {
         report.reportedEntityData = event;
         report.reportedEntityName = event ? event.title : 'Unknown Event';
       }
-      
+
       // Format reporter name
-      report.reporterName = report.reportedBy ? 
+      report.reporterName = report.reportedBy ?
         (report.reportedBy.name || report.reportedBy.username || report.reportedBy.email) : 'Anonymous';
-      
+
       return report;
     }));
 
@@ -592,7 +592,7 @@ router.put('/reports/:reportId/resolve', isAdmin, async (req, res) => {
       reportType: report.reportType
     }, req);
 
-    res.json({ 
+    res.json({
       message: 'Report resolved successfully',
       report: {
         id: report._id,
@@ -612,9 +612,9 @@ router.put('/reports/:reportId/resolve', isAdmin, async (req, res) => {
 router.get('/categories/pending', isAdmin, async (req, res) => {
   try {
     const { page = 1, limit = 20, status = 'pending' } = req.query;
-    
+
     const query = status === 'all' ? {} : { status };
-    
+
     const categories = await Category.find(query)
       .populate('suggestedBy', 'name username email')
       .populate('approvedBy', 'name username')
@@ -673,7 +673,7 @@ router.put('/categories/:categoryId/moderate', isAdmin, async (req, res) => {
       reason: rejectionReason || ''
     }, req);
 
-    res.json({ 
+    res.json({
       message: `Category ${action}d successfully`,
       category: {
         id: category._id,
@@ -707,8 +707,8 @@ router.get('/dashboard/stats', isAdmin, async (req, res) => {
       Report.countDocuments({ status: { $in: ['pending', 'investigating'] } }),
       Category.countDocuments({ status: 'pending' }),
       Report.countDocuments(),
-      Warning.countDocuments({ 
-        createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } 
+      Warning.countDocuments({
+        createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
       })
     ]);
 
@@ -763,20 +763,20 @@ router.get('/dashboard/stats', isAdmin, async (req, res) => {
 // GET /admin/logs - Get admin action logs
 router.get('/logs', isAdmin, async (req, res) => {
   try {
-    const { 
-      page = 1, 
-      limit = 50, 
+    const {
+      page = 1,
+      limit = 50,
       adminId = 'all',
       action = 'all',
       severity = 'all',
-      days = 30 
+      days = 30
     } = req.query;
-    
+
     let query = {};
     if (adminId !== 'all') query.adminId = adminId;
     if (action !== 'all') query.action = action;
     if (severity !== 'all') query.severity = severity;
-    
+
     // Filter by date range
     const dateFilter = new Date(Date.now() - parseInt(days) * 24 * 60 * 60 * 1000);
     query.createdAt = { $gte: dateFilter };
@@ -810,7 +810,7 @@ router.get('/logs', isAdmin, async (req, res) => {
 router.get('/dashboard/recent-activity', isAdmin, async (req, res) => {
   try {
     const { limit = 10 } = req.query;
-    
+
     // Get recent admin logs
     const recentLogs = await AdminLog.find()
       .populate('adminId', 'name username')
@@ -821,10 +821,10 @@ router.get('/dashboard/recent-activity', isAdmin, async (req, res) => {
     const activities = recentLogs.map(log => {
       const admin = log.adminId ? (log.adminId.name || log.adminId.username) : 'Unknown Admin';
       const timeAgo = getTimeAgo(log.createdAt);
-      
+
       let message, icon, color;
-      
-      switch(log.action) {
+
+      switch (log.action) {
         case 'event_approved':
           message = `${admin} approved event "${log.details.eventTitle || 'Unknown Event'}"}`;
           icon = 'check-circle';
@@ -865,7 +865,7 @@ router.get('/dashboard/recent-activity', isAdmin, async (req, res) => {
           icon = 'info-circle';
           color = 'gray';
       }
-      
+
       return {
         type: log.action,
         message,
@@ -889,7 +889,7 @@ function getTimeAgo(date) {
   const minutes = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
-  
+
   if (minutes < 1) return 'Just now';
   if (minutes < 60) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
   if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
@@ -903,11 +903,11 @@ function getTimeAgo(date) {
 router.get('/events/deletion-queue', isAdmin, async (req, res) => {
   try {
     const { page = 1, limit = 20, status = 'deletion_requested' } = req.query;
-    
-    const query = status === 'all' ? 
-      { deletionStatus: { $in: ['deletion_requested', 'deletion_approved', 'deletion_rejected'] } } : 
+
+    const query = status === 'all' ?
+      { deletionStatus: { $in: ['deletion_requested', 'deletion_approved', 'deletion_rejected'] } } :
       { deletionStatus: status };
-    
+
     const events = await Event.find(query)
       .populate('organizer', 'name username email')
       .populate('deletionRequestedBy', 'name username email')
@@ -934,7 +934,7 @@ router.put('/events/:eventId/deletion', isAdmin, async (req, res) => {
   try {
     const { eventId } = req.params;
     const { action, reason } = req.body; // action: 'approve_deletion', 'reject_deletion'
-    
+
     if (!['approve_deletion', 'reject_deletion'].includes(action)) {
       return res.status(400).json({ message: 'Invalid action' });
     }
@@ -954,9 +954,9 @@ router.put('/events/:eventId/deletion', isAdmin, async (req, res) => {
     if (action === 'approve_deletion') {
       // Actually delete the event
       await Event.findByIdAndDelete(eventId);
-      
+
       logAction = 'event_deletion_approved';
-      
+
       // Log admin action
       await logAdminAction(adminId, logAction, 'Event', eventId, {
         reason: reason || 'Deletion approved',
@@ -964,7 +964,7 @@ router.put('/events/:eventId/deletion', isAdmin, async (req, res) => {
         organizerEmail: event.organizer.email
       }, req);
 
-      res.json({ 
+      res.json({
         message: 'Event deletion approved and event removed',
         deleted: true
       });
@@ -979,7 +979,7 @@ router.put('/events/:eventId/deletion', isAdmin, async (req, res) => {
       await event.save();
 
       logAction = 'event_deletion_rejected';
-      
+
       // Log admin action
       await logAdminAction(adminId, logAction, 'Event', eventId, {
         reason: reason || 'Deletion rejected',
@@ -987,7 +987,7 @@ router.put('/events/:eventId/deletion', isAdmin, async (req, res) => {
         organizerEmail: event.organizer.email
       }, req);
 
-      res.json({ 
+      res.json({
         message: 'Event deletion rejected successfully',
         event: {
           id: event._id,
@@ -1007,20 +1007,20 @@ router.put('/events/:eventId/deletion', isAdmin, async (req, res) => {
 // GET /admin/banned-warned - Get banned, warned, and suspended users with appeals
 router.get('/banned-warned', isAdmin, async (req, res) => {
   try {
-    const { 
-      status = 'banned', 
-      days = 'all', 
-      page = 1, 
-      limit = 20 
+    const {
+      status = 'banned',
+      days = 'all',
+      page = 1,
+      limit = 20
     } = req.query;
-    
+
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
     const skip = (pageNum - 1) * limitNum;
-    
+
     let query = {};
     let dateFilter = {};
-    
+
     if (status === 'appeals') {
       query.appealText = { $exists: true, $ne: null };
       query.accountStatus = 'banned';
@@ -1029,12 +1029,12 @@ router.get('/banned-warned', isAdmin, async (req, res) => {
     } else {
       query.accountStatus = { $in: ['banned', 'suspended', 'warned'] };
     }
-    
+
     // Apply date filter
     if (days !== 'all') {
       const daysAgo = new Date();
       daysAgo.setDate(daysAgo.getDate() - parseInt(days));
-      
+
       if (status === 'appeals') {
         dateFilter.appealSubmittedAt = { $gte: daysAgo };
       } else {
@@ -1042,15 +1042,15 @@ router.get('/banned-warned', isAdmin, async (req, res) => {
       }
       query = { ...query, ...dateFilter };
     }
-    
+
     const users = await User.find(query)
       .select('username email accountStatus banReason appealText appealSubmittedAt statusChangedAt createdAt warnings')
       .sort({ statusChangedAt: -1, appealSubmittedAt: -1 })
       .skip(skip)
       .limit(limitNum);
-    
+
     const total = await User.countDocuments(query);
-    
+
     // Get warning counts for each user
     const usersWithWarnings = await Promise.all(users.map(async (user) => {
       const warningCount = await Warning.countDocuments({ userId: user._id });
@@ -1059,7 +1059,7 @@ router.get('/banned-warned', isAdmin, async (req, res) => {
         warningCount
       };
     }));
-    
+
     res.json({
       success: true,
       users: usersWithWarnings,
@@ -1070,7 +1070,7 @@ router.get('/banned-warned', isAdmin, async (req, res) => {
         totalUsers: total
       }
     });
-    
+
   } catch (err) {
     console.error('Error fetching banned/warned users:', err);
     res.status(500).json({ message: 'Error fetching banned/warned users', error: err.message });
@@ -1083,20 +1083,20 @@ router.put('/handle-appeal/:userId', isAdmin, async (req, res) => {
     const { userId } = req.params;
     const { action, adminResponse } = req.body; // action: 'approve' or 'reject'
     const adminId = req.session.userId;
-    
+
     if (!['approve', 'reject'].includes(action)) {
       return res.status(400).json({ message: 'Invalid action. Must be approve or reject.' });
     }
-    
+
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    
+
     if (!user.appealText) {
       return res.status(400).json({ message: 'No appeal found for this user' });
     }
-    
+
     if (action === 'approve') {
       // Restore user account
       user.accountStatus = 'active';
@@ -1104,35 +1104,35 @@ router.put('/handle-appeal/:userId', isAdmin, async (req, res) => {
       user.appealText = null;
       user.appealSubmittedAt = null;
       user.statusChangedAt = new Date();
-      
+
       await user.save();
-      
+
       // Log admin action
       await logAdminAction(adminId, 'appeal_approved', 'User', userId, {
         username: user.username,
         adminResponse,
         originalBanReason: user.banReason
       }, req);
-      
+
       res.json({ message: 'Ban appeal approved. User account restored.', user: { id: user._id, username: user.username, accountStatus: user.accountStatus } });
-      
+
     } else {
       // Reject appeal
       user.appealText = null;
       user.appealSubmittedAt = null;
-      
+
       await user.save();
-      
+
       // Log admin action
       await logAdminAction(adminId, 'appeal_rejected', 'User', userId, {
         username: user.username,
         adminResponse,
         banReason: user.banReason
       }, req);
-      
+
       res.json({ message: 'Ban appeal rejected.', user: { id: user._id, username: user.username, accountStatus: user.accountStatus } });
     }
-    
+
   } catch (err) {
     console.error('Error handling appeal:', err);
     res.status(500).json({ message: 'Error handling appeal', error: err.message });
@@ -1145,35 +1145,35 @@ router.put('/unban-user/:userId', isAdmin, async (req, res) => {
     const { userId } = req.params;
     const { reason } = req.body;
     const adminId = req.session.userId;
-    
+
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    
+
     if (user.accountStatus !== 'banned') {
       return res.status(400).json({ message: 'User is not banned' });
     }
-    
+
     const oldBanReason = user.banReason;
-    
+
     user.accountStatus = 'active';
     user.banReason = null;
     user.appealText = null;
     user.appealSubmittedAt = null;
     user.statusChangedAt = new Date();
-    
+
     await user.save();
-    
+
     // Log admin action
     await logAdminAction(adminId, 'user_unbanned', 'User', userId, {
       username: user.username,
       reason: reason || 'Admin decision',
       originalBanReason: oldBanReason
     }, req);
-    
+
     res.json({ message: 'User unbanned successfully', user: { id: user._id, username: user.username, accountStatus: user.accountStatus } });
-    
+
   } catch (err) {
     console.error('Error unbanning user:', err);
     res.status(500).json({ message: 'Error unbanning user', error: err.message });
@@ -1186,16 +1186,16 @@ router.put('/unban-user/:userId', isAdmin, async (req, res) => {
 router.get('/users/:userId/warnings', isAdmin, async (req, res) => {
   try {
     const { userId } = req.params;
-    
+
     const warnings = await Warning.find({ userId })
       .sort({ createdAt: -1 })
       .populate('issuedBy', 'username');
-    
+
     res.json({
       success: true,
       warnings
     });
-    
+
   } catch (err) {
     console.error('Error fetching user warnings:', err);
     res.status(500).json({ message: 'Error fetching user warnings', error: err.message });

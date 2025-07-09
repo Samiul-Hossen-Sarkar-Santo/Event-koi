@@ -14,9 +14,14 @@
 <body class="bg-gray-100 min-h-screen">
     <div class="container mx-auto px-4 py-8">
         <!-- Header -->
-        <header class="bg-white shadow-md rounded-lg p-6 mb-8">
+        <header class="organizer-header bg-white shadow-md rounded-lg p-6 mb-8">
             <div class="flex flex-col md:flex-row justify-between items-center">
-                <a href="index.html" class="text-3xl font-bold text-purple-700 mb-4 md:mb-0">Event Koi?! [Organizer]</a>
+                <a href="index.html" class="flex items-center space-x-3 mb-4 md:mb-0">
+                    <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-800 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-network-wired text-white text-lg"></i>
+                    </div>
+                    <span class="text-3xl font-bold text-purple-700 tracking-tight">Event Koi?! <span class="text-purple-700">[Organizer]</span></span>
+                </a>
                 <div class="flex items-center space-x-4">
                     <span class="font-semibold">Welcome, <span data-user-name>Organizer</span>!</span>
                     <button id="logoutBtn"
@@ -32,10 +37,10 @@
             <div class="flex flex-col md:flex-row gap-8">
                 <!-- Sidebar -->
                 <aside class="w-full md:w-1/4">
-                    <div class="bg-purple-50 rounded-lg p-6 mb-6 text-center md:text-left">
+                    <div class="organizer-sidebar bg-gradient-to-br from-gray-50 to-purple-50 rounded-lg p-6 mb-6 text-center md:text-left border border-purple-100">
                         <div class="flex flex-col md:flex-row items-center mb-4">
                             <div
-                                class="relative w-20 h-20 rounded-full bg-purple-200 flex items-center justify-center text-purple-600 text-3xl font-bold mr-0 md:mr-4 mb-4 md:mb-0">
+                                class="relative w-20 h-20 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center text-purple-600 text-3xl font-bold mr-0 md:mr-4 mb-4 md:mb-0 border-2 border-purple-300">
                                 <span data-user-initial>O</span>
                             </div>
                             <div>
@@ -91,39 +96,116 @@
                     <div id="dashboard" class="org-tab-content active">
                         <h2 class="text-2xl font-bold mb-6 text-gray-800">Dashboard Overview</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                            <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-lg">
+                            <div class="dashboard-stat-card bg-gradient-to-r from-gray-600 to-gray-700 text-white p-6 rounded-lg shadow-lg">
                                 <div class="flex items-center justify-between">
                                     <div>
-                                        <p class="text-blue-100">Total Events</p>
-                                        <p class="text-3xl font-bold">12</p>
+                                        <p class="text-gray-200">Total Events</p>
+                                        <p class="text-3xl font-bold" id="total-events-count">12</p>
                                     </div>
-                                    <i class="fas fa-calendar-check text-4xl text-blue-200"></i>
+                                    <i class="fas fa-calendar-check text-4xl text-gray-300"></i>
                                 </div>
                             </div>
-                            <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-lg">
+                            <div class="dashboard-stat-card bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-lg shadow-lg">
                                 <div class="flex items-center justify-between">
                                     <div>
-                                        <p class="text-green-100">Total Attendees</p>
-                                        <p class="text-3xl font-bold">1,247</p>
+                                        <p class="text-purple-100">Active Events</p>
+                                        <p class="text-3xl font-bold" id="active-events-count">5</p>
                                     </div>
-                                    <i class="fas fa-users text-4xl text-green-200"></i>
+                                    <i class="fas fa-play-circle text-4xl text-purple-200"></i>
                                 </div>
                             </div>
-                            
                         </div>
 
                         <!-- Analytics Section -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                             <!-- Events Analytics Chart -->
-                            <div class="bg-white p-6 rounded-lg shadow-md">
-                                <h3 class="text-lg font-semibold mb-4 text-gray-800">Events Over Time</h3>
-                                <canvas id="eventsChart" width="400" height="200"></canvas>
+                            <div class="analytics-section lg:col-span-2 bg-white p-6 rounded-lg shadow-md border border-purple-100">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-lg font-semibold text-gray-800">Events Over Time</h3>
+                                    <div class="flex items-center space-x-2 text-sm text-gray-500">
+                                        <div class="w-3 h-3 bg-purple-500 rounded-full"></div>
+                                        <span>Events Created</span>
+                                    </div>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="eventsChart" width="400" height="200"></canvas>
+                                </div>
                             </div>
 
-                            <!-- Attendees Analytics Chart -->
-                            <div class="bg-white p-6 rounded-lg shadow-md">
-                                <h3 class="text-lg font-semibold mb-4 text-gray-800">Attendees by Category</h3>
-                                <canvas id="attendeesChart" width="400" height="200"></canvas>
+                            <!-- Quick Stats -->
+                            <div class="space-y-4">
+                                <div class="quick-stat-card bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-purple-600 text-sm font-medium">This Month</p>
+                                            <p class="text-2xl font-bold text-purple-800" id="monthly-events">3</p>
+                                        </div>
+                                        <i class="fas fa-calendar-plus text-purple-500 text-2xl"></i>
+                                    </div>
+                                </div>
+                                <div class="quick-stat-card bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg border border-orange-200">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-orange-600 text-sm font-medium">Avg. Rating</p>
+                                            <div class="flex items-center space-x-1">
+                                                <p class="text-2xl font-bold text-orange-800">4.8</p>
+                                                <div class="flex text-orange-400">
+                                                    <i class="fas fa-star text-sm"></i>
+                                                    <i class="fas fa-star text-sm"></i>
+                                                    <i class="fas fa-star text-sm"></i>
+                                                    <i class="fas fa-star text-sm"></i>
+                                                    <i class="fas fa-star text-sm"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <i class="fas fa-star text-orange-500 text-2xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Category Analytics -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                            <!-- Events by Category Chart -->
+                            <div class="analytics-section bg-white p-6 rounded-lg shadow-md border border-purple-100">
+                                <h3 class="text-lg font-semibold mb-4 text-gray-800">Events by Category</h3>
+                                <div class="chart-container">
+                                    <canvas id="attendeesChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Recent Activity -->
+                            <div class="analytics-section bg-white p-6 rounded-lg shadow-md border border-purple-100">
+                                <h3 class="text-lg font-semibold mb-4 text-gray-800">Recent Activity</h3>
+                                <div class="space-y-3" id="recent-activity">
+                                    <div class="activity-item flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                                        <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                                            <i class="fas fa-plus text-purple-600 text-sm"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-900">New event created</p>
+                                            <p class="text-xs text-gray-500">Tech Workshop - 2 hours ago</p>
+                                        </div>
+                                    </div>
+                                    <div class="activity-item flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                                        <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
+                                            <i class="fas fa-user-plus text-emerald-600 text-sm"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-900">25 new registrations</p>
+                                            <p class="text-xs text-gray-500">AI Conference - 4 hours ago</p>
+                                        </div>
+                                    </div>
+                                    <div class="activity-item flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                            <i class="fas fa-edit text-blue-600 text-sm"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-900">Event updated</p>
+                                            <p class="text-xs text-gray-500">Startup Meetup - 6 hours ago</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

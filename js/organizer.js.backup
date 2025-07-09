@@ -1681,6 +1681,59 @@ document.addEventListener('DOMContentLoaded', function() {
             // Charts will show default demo data
         }
     }
+                        '#F59E0B',
+                        '#EF4444'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            }
+        });
+
+        attendeesChart = new Chart(ctx, config);
+    }
+
+    // Update charts with real data from the server
+    async function updateChartsWithRealData(stats) {
+        try {
+            // Fetch detailed analytics data
+            const analyticsResponse = await fetch('/events/analytics-data', {
+                credentials: 'include'
+            });
+            
+            if (analyticsResponse.ok) {
+                const analyticsData = await analyticsResponse.json();
+                
+                // Update events chart
+                if (eventsChart && analyticsData.eventsOverTime) {
+                    eventsChart.data.labels = analyticsData.eventsOverTime.labels;
+                    eventsChart.data.datasets[0].data = analyticsData.eventsOverTime.data;
+                    eventsChart.update();
+                }
+                
+                // Update attendees chart
+                if (attendeesChart && analyticsData.eventsByCategory) {
+                    attendeesChart.data.labels = analyticsData.eventsByCategory.labels;
+                    attendeesChart.data.datasets[0].data = analyticsData.eventsByCategory.data;
+                    attendeesChart.update();
+                }
+            }
+        } catch (error) {
+            console.error('Error loading analytics data:', error);
+            // Charts will show default demo data
+        }
+    }
 
     // Load fallback data when server data is unavailable
     function loadFallbackData() {

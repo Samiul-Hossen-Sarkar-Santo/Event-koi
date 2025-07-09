@@ -3,70 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Events | Event Koi?!</title>
+    <title>Discover Events | Event Koi?!</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
     <!-- Category management utility -->
     <script src="js/category-manager.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'gray-850': '#1f2937',
+                        'gray-750': '#374151',
+                        'gray-650': '#4b5563',
+                        'charcoal': '#2d3748',
+                        'steel': '#4a5568',
+                        'platinum': '#718096',
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 smooth-transition">
+<body class="bg-gray-50 text-gray-800 smooth-transition">
     <!-- Navigation -->
-    <nav class="gradient-bg text-white shadow-lg">
+    <nav class="bg-white shadow-md border-b border-gray-200">
         <div class="container mx-auto px-4 py-3">
             <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-4">
-                    <a href="index.html" class="flex items-center space-x-2">
-                        <i class="fas fa-fish text-2xl"></i>
-                        <span class="text-xl font-bold">Event Koi?!</span>
+                    <a href="index.html" class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-gray-700 to-gray-900 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-network-wired text-white text-lg"></i>
+                        </div>
+                        <span class="text-2xl font-bold text-gray-800 tracking-tight">Event Koi?!</span>
                     </a>
                 </div>
                 
-                <div class="hidden md:flex items-center space-x-6" id="nav-links">
-                    <a href="index.html" class="hover:text-gray-200">Home</a>
-                    <a href="events.html" class="hover:text-gray-200">Events</a>
-                    <!-- Dynamic navigation items will be added by JavaScript -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Home</a>
+                    <a href="events.html" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Events</a>
+                    <a href="event_creation.html" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Create Event</a>
+                    <a href="login_signup.html" class="bg-gradient-to-r from-gray-700 to-gray-800 text-white px-6 py-2 rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all duration-200 font-medium">Join Now</a>
                 </div>
                 
                 <div class="flex items-center space-x-4">
-                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-white hover:bg-opacity-20">
-                        <i class="fas fa-moon dark:hidden"></i>
-                        <i class="fas fa-sun hidden dark:inline"></i>
-                    </button>
-                    
                     <!-- User menu will be dynamically populated by JavaScript -->
-                    <div id="user-section">
-                        <!-- Default login button for non-authenticated users -->
-                        <a href="login_signup.html" class="bg-white text-purple-700 hover:bg-gray-100 font-semibold py-2 px-4 rounded-lg">
-                            Login / Sign Up
-                        </a>
-                    </div>
-                    
+
                     <button class="md:hidden" id="mobile-menu-button">
-                        <i class="fas fa-bars text-xl"></i>
+                        <i class="fas fa-bars text-xl text-gray-600"></i>
                     </button>
                 </div>
             </div>
             
             <!-- Mobile menu -->
-            <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4">
-                <a href="index.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Home</a>
-                <a href="events.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Events</a>
-                <!-- Dynamic mobile menu items will be added by JavaScript -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4 border-t border-gray-200 pt-4">
+                <!-- Mobile menu content will be dynamically populated by JavaScript -->
             </div>
         </div>
     </nav>
 
     <!-- Page Header -->
-    <section class="bg-white dark:bg-gray-800 py-8 shadow-sm">
+    <section class="bg-white py-8 shadow-sm">
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">All Events</h1>
-                    <p class="text-gray-600 dark:text-gray-300">Discover amazing events happening around you</p>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Discover Opportunities</h1>
+                    <p class="text-gray-600">Explore meaningful events and professional connections</p>
                 </div>
                 <div class="flex items-center space-x-4 mt-4 md:mt-0">
-                    <span class="text-sm text-gray-500 dark:text-gray-400" id="events-count">Loading events...</span>
+                    <span class="text-sm text-gray-500" id="events-count">Loading events...</span>
                     
                 </div>
             </div>
@@ -74,14 +80,14 @@
     </section>
 
     <!-- Search and Advanced Filters -->
-    <section class="bg-white dark:bg-gray-800 py-6 border-b border-gray-200 dark:border-gray-700">
+    <section class="bg-white py-6 border-b border-gray-200">
         <div class="container mx-auto px-4">
             <!-- Search Bar -->
             <div class="mb-6">
                 <div class="relative">
                     <input type="text" id="search-input" placeholder="Search events by title, description, or organizer..." 
-                           class="w-full py-3 px-4 pr-12 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white">
-                    <button id="search-button" class="absolute right-3 top-3 text-gray-500 dark:text-gray-400 hover:text-purple-600">
+                           class="w-full py-3 px-4 pr-12 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 bg-gray-50 text-gray-900">
+                    <button id="search-button" class="absolute right-3 top-3 text-gray-500 hover:text-gray-700">
                         <i class="fas fa-search"></i>
                     </button>
                 </div>
@@ -89,10 +95,10 @@
 
             <!-- Quick Category Filters -->
             <div class="mb-6">
-                <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Categories</h3>
+                <h3 class="text-sm font-semibold text-gray-700 mb-3">Categories</h3>
                 <div class="flex flex-wrap gap-2" id="category-filters">
                     <!-- Category filter buttons will be loaded dynamically -->
-                    <div class="text-center text-gray-500 dark:text-gray-400">
+                    <div class="text-center text-gray-500">
                         <i class="fas fa-spinner fa-spin mr-2"></i>
                         Loading filters...
                     </div>
@@ -100,8 +106,8 @@
             </div>
 
             <!-- Advanced Filters -->
-            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <button id="advanced-filters-toggle" class="flex items-center space-x-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-semibold mb-4">
+            <div class="border-t border-gray-200 pt-6">
+                <button id="advanced-filters-toggle" class="flex items-center space-x-2 text-gray-600 hover:text-gray-800 font-semibold mb-4">
                     <i class="fas fa-sliders-h"></i>
                     <span>Advanced Filters</span>
                     <i class="fas fa-chevron-down transform transition-transform" id="advanced-filters-icon"></i>
@@ -111,17 +117,17 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <!-- Date Range -->
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Date Range</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Date Range</label>
                             <div class="space-y-2">
-                                <input type="date" id="date-from" class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-600 dark:text-white text-sm">
-                                <input type="date" id="date-to" class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-600 dark:text-white text-sm">
+                                <input type="date" id="date-from" class="w-full py-2 px-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 text-sm">
+                                <input type="date" id="date-to" class="w-full py-2 px-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 text-sm">
                             </div>
                         </div>
 
                         <!-- Location Type -->
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Location</label>
-                            <select id="location-filter" class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-600 dark:text-white text-sm">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Location</label>
+                            <select id="location-filter" class="w-full py-2 px-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 text-sm">
                                 <option value="all">All Locations</option>
                                 <option value="online">Online Only</option>
                                 <option value="offline">In-Person Only</option>
@@ -130,8 +136,8 @@
 
                         <!-- Event Status -->
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Status</label>
-                            <select id="status-filter" class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-600 dark:text-white text-sm">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                            <select id="status-filter" class="w-full py-2 px-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 text-sm">
                                 <option value="all">All Events</option>
                                 <option value="upcoming">Upcoming</option>
                                 <option value="ongoing">Ongoing</option>
@@ -141,8 +147,8 @@
 
                         <!-- Sort By -->
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Sort By</label>
-                            <select id="sort-filter" class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-600 dark:text-white text-sm">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Sort By</label>
+                            <select id="sort-filter" class="w-full py-2 px-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 text-sm">
                                 <option value="date">Event Date</option>
                                 <option value="popularity">Most Popular</option>
                                 <option value="newest">Newest First</option>
@@ -152,10 +158,10 @@
                     </div>
 
                     <div class="mt-6 flex justify-end space-x-3">
-                        <button id="clear-filters" class="bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 py-2 px-4 rounded-lg text-gray-700 dark:text-white font-semibold">
+                        <button id="clear-filters" class="bg-gray-200 hover:bg-gray-300 py-2 px-4 rounded-lg text-gray-700 font-semibold">
                             Clear Filters
                         </button>
-                        <button id="apply-filters" class="gradient-bg text-white hover:opacity-90 py-2 px-4 rounded-lg font-semibold">
+                        <button id="apply-filters" class="bg-gradient-to-r from-gray-700 to-gray-800 text-white hover:from-gray-800 hover:to-gray-900 py-2 px-4 rounded-lg font-semibold">
                             Apply Filters
                         </button>
                     </div>
@@ -169,15 +175,15 @@
         <div class="container mx-auto px-4">
             <!-- Loading State -->
             <div id="loading-state" class="text-center py-12">
-                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-                <p class="mt-4 text-gray-600 dark:text-gray-400">Loading events...</p>
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600"></div>
+                <p class="mt-4 text-gray-600">Loading events...</p>
             </div>
 
             <!-- No Events State -->
             <div id="no-events-state" class="hidden text-center py-12">
                 <i class="fas fa-calendar-times text-6xl text-gray-400 mb-4"></i>
-                <h3 class="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">No events found</h3>
-                <p class="text-gray-500 dark:text-gray-500">Try adjusting your search criteria or filters</p>
+                <h3 class="text-xl font-semibold text-gray-600 mb-2">No events found</h3>
+                <p class="text-gray-500">Try adjusting your search criteria or filters</p>
             </div>
 
             <!-- Events Grid -->
@@ -189,13 +195,13 @@
                 <!-- Pagination -->
                 <div id="pagination" class="mt-8 flex justify-center">
                     <nav class="flex items-center space-x-2">
-                        <button id="prev-page" class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700" disabled>
+                        <button id="prev-page" class="px-3 py-2 rounded-lg border border-gray-300 text-gray-500 hover:bg-gray-100" disabled>
                             <i class="fas fa-chevron-left"></i>
                         </button>
                         <div id="page-numbers" class="flex space-x-1">
                             <!-- Page numbers will be dynamically generated -->
                         </div>
-                        <button id="next-page" class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <button id="next-page" class="px-3 py-2 rounded-lg border border-gray-300 text-gray-500 hover:bg-gray-100">
                             <i class="fas fa-chevron-right"></i>
                         </button>
                     </nav>
@@ -208,7 +214,7 @@
     <div id="event-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
         <div class="flex items-center justify-center min-h-screen px-4">
             <div class="fixed inset-0 bg-black opacity-50"></div>
-            <div class="relative bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-screen overflow-y-auto">
+            <div class="relative bg-white rounded-lg max-w-4xl w-full max-h-screen overflow-y-auto">
                 <!-- Modal content will be dynamically populated -->
             </div>
         </div>

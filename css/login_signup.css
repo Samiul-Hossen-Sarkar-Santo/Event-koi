@@ -18,8 +18,8 @@
     transition: all 0.3s ease;
 }
 .form-toggle-btn.active {
-    color: #3b82f6; /* blue-500 */
-    border-bottom-color: #3b82f6; /* blue-500 */
+    color: #374151; /* gray-700 */
+    border-bottom-color: #374151; /* gray-700 */
 }
 .form-toggle-btn:focus {
     outline: none;
@@ -53,14 +53,14 @@
     transition: all 0.3s ease;
 }
 .role-btn:hover {
-    border-color: #93c5fd; /* blue-300 */
+    border-color: #9ca3af; /* gray-400 */
     background-color: #f9fafb; /* gray-50 */
 }
 .role-btn.active {
-    border-color: #3b82f6; /* blue-500 */
-    background-color: #eff6ff; /* blue-50 */
-    color: #2563eb; /* blue-600 */
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+    border-color: #374151; /* gray-700 */
+    background-color: #f3f4f6; /* gray-100 */
+    color: #1f2937; /* gray-800 */
+    box-shadow: 0 0 0 2px rgba(55, 65, 81, 0.3);
 }
 
 /* Standardized Form Input and Label Styles */
@@ -85,9 +85,9 @@
 }
 .form-input:focus {
     outline: none;
-    border-color: #3b82f6; /* blue-500 */
+    border-color: #374151; /* gray-700 */
     background-color: #ffffff;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 0 3px rgba(55, 65, 81, 0.2);
 }
 
 /* Password field icon positioning */
@@ -117,11 +117,11 @@
     justify-content: center;
 }
 .next-btn {
-    background-color: #3b82f6; /* blue-500 */
+    background-color: #374151; /* gray-700 */
     color: white;
 }
 .next-btn:hover {
-    background-color: #2563eb; /* blue-600 */
+    background-color: #1f2937; /* gray-800 */
 }
 .back-btn {
     background-color: transparent;

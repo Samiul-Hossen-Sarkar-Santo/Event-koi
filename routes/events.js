@@ -194,47 +194,104 @@ router.get('/questions', isAuthenticated, isOrganizer, async (req, res) => {
   }
 });
 
-// GET all events for admin (including pending and rejected)
-router.get('/admin/all-events', isAuthenticated, isAdmin, async (req, res) => {
+// GET analytics data for organizer dashboard charts
+router.get('/analytics-data', isAuthenticated, isOrganizer, async (req, res) => {
   try {
-    const events = await Event.find({}).populate('organizer', 'username name email');
+    const organizerId = req.session.userId;
+    const events = await Event.find({ organizer: organizerId }).populate('registrations');
     
-    // Group events by approval status
-    const groupedEvents = {
-      pending: events.filter(event => event.approvalStatus === 'pending'),
-      approved: events.filter(event => event.approvalStatus === 'approved'),
-      rejected: events.filter(event => event.approvalStatus === 'rejected')
-    };
+    // Get current date for filtering
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
     
-    res.status(200).json(groupedEvents);
-  } catch (err) {
-    console.error('Error fetching all events:', err);
-    res.status(500).json({ message: 'Error fetching events', error: err.message });
-  }
-});
-
-// GET admin dashboard stats
-router.get('/admin/dashboard-stats', isAuthenticated, isAdmin, async (req, res) => {
-  try {
-    const totalEvents = await Event.countDocuments();
-    const pendingApprovals = await Event.countDocuments({ approvalStatus: 'pending' });
-    const approvedEvents = await Event.countDocuments({ approvalStatus: 'approved' });
-    const rejectedEvents = await Event.countDocuments({ approvalStatus: 'rejected' });
+    // Filter events by approval status and date
+    const approvedEvents = events.filter(event => event.approvalStatus === 'approved');
+    const activeEvents = approvedEvents.filter(event => new Date(event.date) >= now);
+    const pastEvents = approvedEvents.filter(event => new Date(event.date) < now);
     
-    // Get total registrations across all events
-    const events = await Event.find({ approvalStatus: 'approved' });
-    const totalRegistrations = events.reduce((sum, event) => sum + (event.registrations ? event.registrations.length : 0), 0);
+    // Calculate events created over the last 6 months for chart
+    const monthlyData = [];
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    for (let i = 5; i >= 0; i--) {
+      const targetMonth = (currentMonth - i + 12) % 12;
+      const targetYear = currentYear - (currentMonth - i < 0 ? 1 : 0);
+      
+      const eventsInMonth = events.filter(event => {
+        const eventDate = new Date(event.createdAt || event.date);
+        return eventDate.getMonth() === targetMonth && eventDate.getFullYear() === targetYear;
+      });
+      
+      monthlyData.push({
+        month: monthNames[targetMonth],
+        events: eventsInMonth.length
+      });
+    }
+    
+    // Calculate events by category for pie chart
+    const categoryData = {};
+    approvedEvents.forEach(event => {
+      const category = event.category || 'Other';
+      categoryData[category] = (categoryData[category] || 0) + 1;
+    });
+    
+    // Calculate total attendees from registrations
+    let totalAttendees = 0;
+    for (const event of approvedEvents) {
+      const registrations = await Registration.find({ event: event._id });
+      totalAttendees += registrations.length;
+    }
+    
+    // Events created this month
+    const monthlyEvents = events.filter(event => {
+      const eventDate = new Date(event.createdAt || event.date);
+      return eventDate.getMonth() === currentMonth && eventDate.getFullYear() === currentYear;
+    }).length;
+    
+    // Average rating calculation (placeholder - implement if you have rating system)
+    const avgRating = 4.8; // You can calculate this from actual ratings
     
     res.status(200).json({
-      totalEvents,
-      pendingApprovals,
-      approvedEvents,
-      rejectedEvents,
-      totalRegistrations
+      totalEvents: events.length,
+      activeEvents: activeEvents.length,
+      totalAttendees,
+      monthlyEvents,
+      avgRating,
+      chartData: {
+        eventsOverTime: monthlyData,
+        eventsByCategory: Object.entries(categoryData).map(([category, count]) => ({
+          category,
+          count
+        }))
+      },
+      recentActivity: [
+        {
+          type: 'event_created',
+          title: 'New event created',
+          description: activeEvents.length > 0 ? `${activeEvents[activeEvents.length - 1].title} - ${new Date(activeEvents[activeEvents.length - 1].createdAt || activeEvents[activeEvents.length - 1].date).toLocaleDateString()}` : 'No recent events',
+          time: activeEvents.length > 0 ? new Date(activeEvents[activeEvents.length - 1].createdAt || activeEvents[activeEvents.length - 1].date).toLocaleString() : '',
+          icon: 'fas fa-plus'
+        },
+        {
+          type: 'registrations',
+          title: `${totalAttendees} total registrations`,
+          description: `Across all your events`,
+          time: 'Updated now',
+          icon: 'fas fa-user-plus'
+        },
+        {
+          type: 'status_update',
+          title: 'Dashboard updated',
+          description: 'Analytics refreshed with latest data',
+          time: new Date().toLocaleString(),
+          icon: 'fas fa-chart-line'
+        }
+      ]
     });
   } catch (err) {
-    console.error('Error fetching admin dashboard stats:', err);
-    res.status(500).json({ message: 'Error fetching dashboard stats', error: err.message });
+    console.error('Error fetching analytics data:', err);
+    res.status(500).json({ message: 'Error fetching analytics data', error: err.message });
   }
 });
 

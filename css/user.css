@@ -15,7 +15,7 @@
 
 /* Style for the active sidebar navigation button */
 .tab-btn.active-tab {
-    background-color: #e0e7ff; /* indigo-100 */
+    background-color: #f3f4f6; /* gray-100 */
     font-weight: 600;
 }
 
@@ -42,7 +42,7 @@
     width: 20px;
     height: 20px;
     border: 3px solid #f3f3f3;
-    border-top: 3px solid #6366f1;
+    border-top: 3px solid #4b5563;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -214,7 +214,7 @@ html {
 .form-field select:focus,
 .form-field textarea:focus {
     outline: none;
-    border-color: #6366f1;
+    border-color: #4b5563;
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
@@ -270,14 +270,14 @@ html {
     height: 1.25rem;
     border-radius: 0.25rem;
     border: 1px solid #d1d5db;
-    color: #6366f1;
+    color: #4b5563;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .checkbox:checked {
-    background-color: #6366f1;
-    border-color: #6366f1;
+    background-color: #4b5563;
+    border-color: #4b5563;
 }
 
 .checkbox:focus {
@@ -287,7 +287,7 @@ html {
 
 /* Button enhancements */
 .btn-primary {
-    background-color: #6366f1;
+    background-color: #4b5563;
     color: white;
     font-weight: 600;
     padding: 0.75rem 1.5rem;
@@ -355,7 +355,7 @@ html {
 }
 
 .notification.info {
-    background-color: #3b82f6;
+    background-color: #374151;
     color: white;
 }
 
@@ -370,12 +370,12 @@ html {
 }
 
 .upload-area:hover {
-    border-color: #6366f1;
+    border-color: #4b5563;
     background-color: #f8fafc;
 }
 
 .upload-area.dragover {
-    border-color: #6366f1;
+    border-color: #4b5563;
     background-color: #eef2ff;
 }
 
@@ -422,7 +422,7 @@ html {
 .form-field input:focus-visible,
 .form-field select:focus-visible,
 .form-field textarea:focus-visible {
-    outline: 2px solid #6366f1;
+    outline: 2px solid #4b5563;
     outline-offset: 2px;
 }
 

@@ -49,58 +49,72 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateNavigationForUser(userData) {
-        const navLinks = document.getElementById('nav-links');
-        const userSection = document.getElementById('user-section');
+        const navLinks = document.querySelector('.hidden.md\\:flex.items-center.space-x-8');
+        const userSection = document.querySelector('.flex.items-center.space-x-4');
         const mobileMenu = document.getElementById('mobile-menu');
+
+        if (!navLinks || !userSection || !mobileMenu) return;
 
         // Update main navigation
         let navHTML = `
-            <a href="index.html" class="hover:text-gray-200">Home</a>
-            <a href="events.html" class="hover:text-gray-200">Events</a>
+            <a href="index.html" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Home</a>
+            <a href="events.html" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Events</a>
         `;
 
         if (userData.role === 'organizer' || userData.role === 'admin') {
-            navHTML += `<a href="event_creation.html" class="hover:text-gray-200">Create Event</a>`;
+            navHTML += `<a href="event_creation.html" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Create Event</a>`;
         }
 
         navLinks.innerHTML = navHTML;
 
-        // Update user section with dropdown
-        userSection.innerHTML = `
+        // Insert user menu between mobile menu button
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        
+        // Remove existing user menu if present
+        const existingUserMenu = userSection.querySelector('.relative');
+        if (existingUserMenu) {
+            existingUserMenu.remove();
+        }
+
+        // Create user menu element
+        const userMenuHTML = `
             <div class="relative">
-                <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none">
-                    <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-purple-700 font-bold">
+                <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none bg-gray-100 hover:bg-gray-200 py-2 px-3 rounded-lg transition-colors">
+                    <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-white font-bold text-sm">
                         <span>${userData.username ? userData.username.charAt(0).toUpperCase() : 'U'}</span>
                     </div>
-                    <span class="hidden md:inline">${userData.username || 'User'}</span>
-                    <i class="fas fa-chevron-down text-sm"></i>
+                    <span class="hidden md:inline text-gray-700 font-medium">${userData.username || 'User'}</span>
+                    <i class="fas fa-chevron-down text-sm text-gray-500"></i>
                 </button>
                 
-                <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50">
-                    <a href="${getUserDashboardUrl(userData.role)}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Dashboard</a>
-                    <a href="${getUserDashboardUrl(userData.role)}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">My Events</a>
-                    <a href="${getUserDashboardUrl(userData.role)}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Profile</a>
-                    <div class="border-t border-gray-200 dark:border-gray-700"></div>
-                    <button id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Sign out</button>
+                <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-200">
+                    <a href="${getUserDashboardUrl(userData.role)}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Dashboard</a>
+                    <a href="${getUserDashboardUrl(userData.role)}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">My Events</a>
+                    <a href="${getUserDashboardUrl(userData.role)}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Profile</a>
+                    <div class="border-t border-gray-200 my-1"></div>
+                    <button id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Sign out</button>
                 </div>
             </div>
         `;
 
+        // Insert the user menu before the mobile menu button
+        mobileMenuButton.insertAdjacentHTML('beforebegin', userMenuHTML);
+
         // Update mobile menu
         let mobileHTML = `
-            <a href="index.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Home</a>
-            <a href="events.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Events</a>
+            <a href="index.html" class="block py-2 px-4 hover:bg-gray-100 rounded">Home</a>
+            <a href="events.html" class="block py-2 px-4 hover:bg-gray-100 rounded">Events</a>
         `;
 
         if (userData.role === 'organizer' || userData.role === 'admin') {
-            mobileHTML += `<a href="event_creation.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Create Event</a>`;
+            mobileHTML += `<a href="event_creation.html" class="block py-2 px-4 hover:bg-gray-100 rounded">Create Event</a>`;
         }
 
         mobileHTML += `
-            <div class="border-t border-white border-opacity-20 mt-2 pt-2">
-                <a href="${getUserDashboardUrl(userData.role)}" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Dashboard</a>
-                <a href="${getUserDashboardUrl(userData.role)}" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">My Events</a>
-                <button id="mobile-logout-btn" class="block w-full text-left py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Sign out</button>
+            <div class="border-t border-gray-200 mt-2 pt-2">
+                <a href="${getUserDashboardUrl(userData.role)}" class="block py-2 px-4 hover:bg-gray-100 rounded">Dashboard</a>
+                <a href="${getUserDashboardUrl(userData.role)}" class="block py-2 px-4 hover:bg-gray-100 rounded">My Events</a>
+                <button id="mobile-logout-btn" class="block w-full text-left py-2 px-4 hover:bg-gray-100 rounded">Sign out</button>
             </div>
         `;
 
@@ -111,31 +125,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateNavigationForGuest() {
-        const navLinks = document.getElementById('nav-links');
-        const userSection = document.getElementById('user-section');
+        // For guests, the navigation is static in the HTML
+        // Just ensure mobile menu is set up correctly
         const mobileMenu = document.getElementById('mobile-menu');
-
-        // Update main navigation for guests
-        navLinks.innerHTML = `
-            <a href="index.html" class="hover:text-gray-200">Home</a>
-            <a href="events.html" class="hover:text-gray-200">Events</a>
-            <a href="login_signup.html" class="hover:text-gray-200">Sign Up as Organizer</a>
-        `;
-
-        // Show login button
-        userSection.innerHTML = `
-            <a href="login_signup.html" class="bg-white text-purple-700 hover:bg-gray-100 font-semibold py-2 px-4 rounded-lg">
-                Login / Sign Up
-            </a>
-        `;
-
-        // Update mobile menu for guests
-        mobileMenu.innerHTML = `
-            <a href="index.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Home</a>
-            <a href="events.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Events</a>
-            <a href="login_signup.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Sign Up as Organizer</a>
-            <a href="login_signup.html" class="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded">Login</a>
-        `;
+        
+        if (mobileMenu) {
+            // Update mobile menu for guests
+            mobileMenu.innerHTML = `
+                <a href="index.html" class="block py-2 px-4 hover:bg-gray-100 rounded">Home</a>
+                <a href="events.html" class="block py-2 px-4 hover:bg-gray-100 rounded">Events</a>
+                <a href="event_creation.html" class="block py-2 px-4 hover:bg-gray-100 rounded">Create Event</a>
+                <a href="login_signup.html" class="block py-2 px-4 hover:bg-gray-100 rounded">Join Now</a>
+            `;
+        }
     }
 
     function getUserDashboardUrl(role) {
@@ -216,12 +218,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function setupEventListeners() {
-        // Theme toggle
-        const themeToggle = document.getElementById('theme-toggle');
-        if (themeToggle) {
-            themeToggle.addEventListener('click', toggleTheme);
-        }
-
         // Mobile menu toggle
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
@@ -486,41 +482,45 @@ document.addEventListener('DOMContentLoaded', function() {
         const isOnline = event.location.toLowerCase().includes('online') || event.location.toLowerCase().includes('virtual');
         const isPast = new Date() > eventDate;
 
-        return `
-            <div class="event-card bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden" data-event-id="${event._id}">
+        const imageHtml = event.coverImage ? 
+            `<img src="/uploads/${event.coverImage}" alt="${event.title}" class="w-full h-48 object-cover">` : 
+            `<img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="${event.title}" class="w-full h-48 object-cover">`;
+        
+        const pastEventOverlay = isPast ? '<div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center"><span class="text-white font-semibold">Event Ended</span></div>' : '';
+        
+        const heartIcon = currentUser && currentUser.favoriteEvents?.includes(event._id) ? 'text-red-500' : '';
+        const locationIcon = isOnline ? 'fa-globe' : 'fa-map-marker-alt';
+        const price = event.registrationFee > 0 ? '$' + event.registrationFee : 'Free';
+
+        return `<div class="event-card bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden" data-event-id="${event._id}">
                 <div class="relative">
-                    ${event.coverImage ? `
-                                        <img src="/uploads/${event.coverImage}" alt="${event.title}" class="w-full h-48 object-cover rounded-lg mr-4">
-                                    ` : `
-                                        <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                         alt="${event.title}" class="w-full h-48 object-cover">
-                                    `}
+                    ${imageHtml}
                     <div class="absolute top-3 left-3">
-                        <span class="bg-purple-600 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                        <span class="bg-gray-700 text-white px-2 py-1 rounded-full text-xs font-semibold">
                             ${event.category}
                         </span>
                     </div>
                     <div class="absolute top-3 right-3">
                         <button class="favorite-btn w-8 h-8 rounded-full bg-white bg-opacity-80 flex items-center justify-center text-gray-600 hover:text-red-500 transition-colors" data-event-id="${event._id}">
-                            <i class="fas fa-heart ${currentUser && currentUser.favoriteEvents?.includes(event._id) ? 'text-red-500' : ''}"></i>
+                            <i class="fas fa-heart ${heartIcon}"></i>
                         </button>
                     </div>
-                    ${isPast ? '<div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center"><span class="text-white font-semibold">Event Ended</span></div>' : ''}
+                    ${pastEventOverlay}
                 </div>
                 
                 <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">${event.title}</h3>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2 line-clamp-2">${event.title}</h3>
                     
                     <div class="space-y-2 mb-4">
-                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                        <div class="flex items-center text-sm text-gray-600">
                             <i class="fas fa-calendar-alt w-4 mr-2"></i>
                             <span>${formattedDate} at ${formattedTime}</span>
                         </div>
-                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                            <i class="fas ${isOnline ? 'fa-globe' : 'fa-map-marker-alt'} w-4 mr-2"></i>
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas ${locationIcon} w-4 mr-2"></i>
                             <span class="line-clamp-1">${event.location}</span>
                         </div>
-                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                        <div class="flex items-center text-sm text-gray-600">
                             <i class="fas fa-user w-4 mr-2"></i>
                             <span>by ${event.organizerName}</span>
                         </div>
@@ -528,20 +528,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-2">
-                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                            <span class="text-sm text-gray-600">
                                 ${event.registrations?.length || 0} registered
                             </span>
-                            <span class="text-purple-600 font-semibold text-sm">
-                                ${event.registrationFee > 0 ? `$${event.registrationFee}` : 'Free'}
+                            <span class="text-gray-800 font-semibold text-sm">
+                                ${price}
                             </span>
                         </div>
-                        <a href="event_page.html?id=${event._id}" class="view-details-btn bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
+                        <a href="event_page.html?id=${event._id}" class="view-details-btn bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
                             View Details
                         </a>
                     </div>
                 </div>
-            </div>
-        `;
+            </div>`;
     }
 
     function setupEventCardListeners() {
@@ -631,11 +630,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const isRegistered = currentUser && event.registrations?.some(reg => reg.userId === currentUser._id);
         const isPast = new Date() > eventDate;
+        
+        const imageUrl = event.coverImage || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80';
+        const price = event.registrationFee > 0 ? '$' + event.registrationFee : 'Free';
+        
+        let actionButtons = '';
+        if (!isPast) {
+            if (currentUser) {
+                if (isRegistered) {
+                    actionButtons = '<span class="px-4 py-2 bg-green-100 text-green-800 rounded-lg">Already Registered</span>';
+                } else {
+                    actionButtons = `<button id="register-btn" class="px-4 py-2 bg-gradient-to-r from-gray-700 to-gray-800 text-white rounded-lg hover:from-gray-800 hover:to-gray-900" data-event-id="${event._id}">Register Now</button>`;
+                }
+            } else {
+                actionButtons = '<button id="login-to-register-btn" class="px-4 py-2 bg-gradient-to-r from-gray-700 to-gray-800 text-white rounded-lg hover:from-gray-800 hover:to-gray-900">Login to Register</button>';
+            }
+        }
 
-        return `
-            <div class="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">${event.title}</h2>
-                <button id="close-modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+        return `<div class="flex justify-between items-center p-6 border-b border-gray-200">
+                <h2 class="text-2xl font-bold text-gray-900">${event.title}</h2>
+                <button id="close-modal" class="text-gray-400 hover:text-gray-600">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
@@ -643,40 +657,39 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="p-6 max-h-96 overflow-y-auto">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div>
-                        <img src="${event.coverImage || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'}" 
-                             alt="${event.title}" class="w-full h-64 object-cover rounded-lg">
+                        <img src="${imageUrl}" alt="${event.title}" class="w-full h-64 object-cover rounded-lg">
                     </div>
                     
                     <div class="space-y-4">
                         <div>
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Event Details</h3>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Event Details</h3>
                             <div class="space-y-2">
-                                <div class="flex items-center text-gray-600 dark:text-gray-300">
+                                <div class="flex items-center text-gray-600">
                                     <i class="fas fa-calendar-alt w-5 mr-3"></i>
                                     <span>${formattedDate} at ${formattedTime}</span>
                                 </div>
-                                <div class="flex items-center text-gray-600 dark:text-gray-300">
+                                <div class="flex items-center text-gray-600">
                                     <i class="fas fa-map-marker-alt w-5 mr-3"></i>
                                     <span>${event.location}</span>
                                 </div>
-                                <div class="flex items-center text-gray-600 dark:text-gray-300">
+                                <div class="flex items-center text-gray-600">
                                     <i class="fas fa-user w-5 mr-3"></i>
                                     <span>Organized by ${event.organizerName}</span>
                                 </div>
-                                <div class="flex items-center text-gray-600 dark:text-gray-300">
+                                <div class="flex items-center text-gray-600">
                                     <i class="fas fa-tag w-5 mr-3"></i>
                                     <span>${event.category}</span>
                                 </div>
-                                <div class="flex items-center text-gray-600 dark:text-gray-300">
+                                <div class="flex items-center text-gray-600">
                                     <i class="fas fa-dollar-sign w-5 mr-3"></i>
-                                    <span>${event.registrationFee > 0 ? `$${event.registrationFee}` : 'Free'}</span>
+                                    <span>${price}</span>
                                 </div>
                             </div>
                         </div>
                         
                         <div>
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Registration</h3>
-                            <p class="text-gray-600 dark:text-gray-300">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Registration</h3>
+                            <p class="text-gray-600">
                                 ${event.registrations?.length || 0} people registered
                             </p>
                         </div>
@@ -684,29 +697,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 
                 <div class="mt-6">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Description</h3>
-                    <p class="text-gray-600 dark:text-gray-300 leading-relaxed">${event.description}</p>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Description</h3>
+                    <p class="text-gray-600 leading-relaxed">${event.description}</p>
                 </div>
             </div>
             
-            <div class="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
-                <button id="close-modal-btn" class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+            <div class="p-6 border-t border-gray-200 flex justify-end space-x-3">
+                <button id="close-modal-btn" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
                     Close
                 </button>
-                ${!isPast ? `
-                    ${currentUser ? `
-                        ${isRegistered ? 
-                            '<span class="px-4 py-2 bg-green-100 text-green-800 rounded-lg">Already Registered</span>' :
-                            `<button id="register-btn" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700" data-event-id="${event._id}">Register Now</button>`
-                        }
-                    ` : `
-                        <button id="login-to-register-btn" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
-                            Login to Register
-                        </button>
-                    `}
-                ` : ''}
-            </div>
-        `;
+                ${actionButtons}
+            </div>`;
     }
 
     function setupModalListeners() {
@@ -772,11 +773,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         for (let i = startPage; i <= endPage; i++) {
             const isActive = i === currentPage;
-            paginationHTML += `
-                <button class="page-number px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 ${isActive ? 'bg-purple-600 text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}" data-page="${i}">
-                    ${i}
-                </button>
-            `;
+            const buttonClass = isActive ? 'bg-gray-700 text-white' : 'text-gray-700 hover:bg-gray-100';
+            paginationHTML += `<button class="page-number px-3 py-2 rounded-lg border border-gray-300 ${buttonClass}" data-page="${i}">${i}</button>`;
         }
 
         pageNumbers.innerHTML = paginationHTML;
@@ -825,7 +823,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateEventsCount() {
         const eventsCount = document.getElementById('events-count');
-        eventsCount.textContent = `${filteredEvents.length} event${filteredEvents.length !== 1 ? 's' : ''} found`;
+        eventsCount.textContent = filteredEvents.length + ' event' + (filteredEvents.length !== 1 ? 's' : '') + ' found';
     }
 
     function hideLoadingState() {
@@ -837,21 +835,14 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('no-events-state').classList.remove('hidden');
     }
 
-    function toggleTheme() {
-        const html = document.documentElement;
-        html.classList.toggle('dark');
-        const theme = html.classList.contains('dark') ? 'dark' : 'light';
-        localStorage.setItem('theme', theme);
-    }
-
     function showNotification(message, type = 'info') {
         // Create notification element
         const notification = document.createElement('div');
-        notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 ${
-            type === 'success' ? 'bg-green-500 text-white' :
-            type === 'error' ? 'bg-red-500 text-white' :
-            'bg-blue-500 text-white'
-        }`;
+        let bgColor = 'bg-blue-500 text-white';
+        if (type === 'success') bgColor = 'bg-green-500 text-white';
+        if (type === 'error') bgColor = 'bg-red-500 text-white';
+        
+        notification.className = 'fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 ' + bgColor;
         notification.textContent = message;
 
         document.body.appendChild(notification);
@@ -880,12 +871,6 @@ document.addEventListener('DOMContentLoaded', function() {
             clearTimeout(timeout);
             timeout = setTimeout(later, wait);
         };
-    }
-
-    // Load theme on page load
-    const currentTheme = localStorage.getItem('theme') || 'light';
-    if (currentTheme === 'dark') {
-        document.documentElement.classList.add('dark');
     }
 
     async function loadEventCategories() {

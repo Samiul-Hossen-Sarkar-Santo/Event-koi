@@ -1202,4 +1202,17 @@ router.get('/users/:userId/warnings', isAdmin, async (req, res) => {
   }
 });
 
+// ==================== ADMIN USERS LIST ====================
+
+// GET /admin/admins-list - Get list of admin users for filtering
+router.get('/admins-list', isAdmin, async (req, res) => {
+  try {
+    const admins = await User.find({ role: 'admin' }).select('name username email').lean();
+    res.json(admins);
+  } catch (error) {
+    console.error('Error fetching admin list:', error);
+    res.status(500).json({ message: 'Error fetching admin list', error: error.message });
+  }
+});
+
 module.exports = router;

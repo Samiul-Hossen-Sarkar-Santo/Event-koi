@@ -12,9 +12,14 @@
     <!-- Header -->
     <header class="bg-white shadow-sm">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="index.html" class="text-2xl font-bold text-indigo-600">Event Koi?!</a>
+            <a href="index.html" class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-gray-700 to-gray-900 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-network-wired text-white text-lg"></i>
+                </div>
+                <span class="text-2xl font-bold text-gray-800 tracking-tight">Event Koi?!</span>
+            </a>
             <div class="hidden md:flex space-x-8">
-                <a href="index.html" class="text-gray-700 hover:text-indigo-600">Home</a>
+                <a href="index.html" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Home</a>
             </div>
         </div>
     </header>
@@ -23,7 +28,7 @@
     <div class="w-full max-w-4xl bg-white rounded-xl shadow-lg overflow-hidden">
         <div class="md:flex">
             <!-- Left Side - Illustration -->
-            <div class="hidden md:block md:w-1/2 bg-gradient-to-br from-blue-500 to-indigo-600 p-8 text-white">
+            <div class="hidden md:block md:w-1/2 bg-gradient-to-br from-gray-700 to-gray-800 p-8 text-white">
                 <div class="flex flex-col h-full justify-center">
                     <h2 class="text-3xl font-bold mb-4">Join Our Event Platform</h2>
                     <p class="mb-6">Connect with events that matter to you. Whether you're attending or organizing, we've got you covered.</p>
@@ -66,9 +71,9 @@
                         </div>
                         <div class="flex items-center justify-between mb-6">
                             
-                            <a href="#" class="text-sm text-blue-500 hover:underline">Forgot password?</a>
+                            <a href="#" class="text-sm text-gray-600 hover:text-gray-800 hover:underline">Forgot password?</a>
                         </div>
-                        <button type="submit" class="w-full bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 font-semibold">
+                        <button type="submit" class="w-full bg-gray-700 text-white py-3 px-4 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-200 font-semibold">
                             Login
                         </button>
                     </form>
@@ -82,7 +87,7 @@
                     <!-- Progress Bar -->
                     <div class="mb-6">
                         <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div id="progress-bar" class="bg-blue-500 h-2 rounded-full transition-all duration-300" style="width: 33.3%;"></div>
+                            <div id="progress-bar" class="bg-gray-600 h-2 rounded-full transition-all duration-300" style="width: 33.3%;"></div>
                         </div>
                     </div>
 
@@ -154,9 +159,9 @@
                                 </div>
                                 <div class="pt-2">
                                     <label class="flex items-center">
-                                        <input type="checkbox" id="terms" class="h-4 w-4 text-blue-500 focus:ring-blue-500 border-gray-300 rounded" required>
+                                        <input type="checkbox" id="terms" class="h-4 w-4 text-gray-700 focus:ring-gray-500 border-gray-300 rounded" required>
                                         <span class="ml-2 block text-sm text-gray-700">
-                                            I agree to the <a href="#" class="text-blue-500 hover:underline">Terms</a> & <a href="#" class="text-blue-500 hover:underline">Policy</a>
+                                            I agree to the <a href="#" class="text-gray-700 hover:text-gray-900 hover:underline">Terms</a> & <a href="#" class="text-gray-700 hover:text-gray-900 hover:underline">Policy</a>
                                         </span>
                                     </label>
                                 </div>
@@ -168,7 +173,7 @@
                         </div>
                     </form>
                     <div class="mt-4 text-center">
-                        <p class="text-sm text-gray-600">Already have an account? <button id="switch-to-login" class="text-blue-500 hover:underline font-semibold">Login</button></p>
+                        <p class="text-sm text-gray-600">Already have an account? <button id="switch-to-login" class="text-gray-700 hover:text-gray-900 hover:underline font-semibold">Login</button></p>
                     </div>
                 </div>
             </div>

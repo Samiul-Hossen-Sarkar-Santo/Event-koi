@@ -31,14 +31,17 @@ document.addEventListener('DOMContentLoaded', function() {
             if (response.ok) {
                 const userData = await response.json();
                 updateNavigationForUser(userData);
+                updateHeroSectionForUser(userData);
                 return userData;
             } else {
                 updateNavigationForGuest();
+                updateHeroSectionForGuest();
                 return null;
             }
         } catch (error) {
             console.error('Session check failed:', error);
             updateNavigationForGuest();
+            updateHeroSectionForGuest();
             return null;
         }
     }
@@ -574,6 +577,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }, 300);
         }, 3000);
+    }
+
+    function updateHeroSectionForUser(userData) {
+        const heroCreateEventBtn = document.getElementById('hero-create-event-btn');
+        
+        if (heroCreateEventBtn) {
+            // Hide the create event button for regular users, only show for organizers and admins
+            if (userData.role === 'organizer' || userData.role === 'admin') {
+                heroCreateEventBtn.style.display = 'block';
+            } else {
+                heroCreateEventBtn.style.display = 'none';
+            }
+        }
+    }
+
+    function updateHeroSectionForGuest() {
+        const heroCreateEventBtn = document.getElementById('hero-create-event-btn');
+        
+        if (heroCreateEventBtn) {
+            // Show the create event button for guests (it will redirect them to login)
+            heroCreateEventBtn.style.display = 'block';
+        }
     }
 });
 

@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function () {
                      <div class="text-gray-600">${currentAttendees}/${totalCapacity} going</div>
                       ${totalCapacity !== 'N/A' ? `
                      <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-                         <div class="bg-indigo-600 h-2.5 rounded-full" style="width: ${(currentAttendees / totalCapacity) * 100}%"></div>
+                         <div class="bg-gray-600 h-2.5 rounded-full" style="width: ${(currentAttendees / totalCapacity) * 100}%"></div>
                      </div>
                      ` : ''}
                   `;
@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 let prizeHTML = '';
                 prizeLines.forEach((prize, index) => {
                     const position = index + 1;
-                    const colors = ['indigo', 'purple', 'blue'];
+                    const colors = ['gray', 'steel', 'slate'];
                     const color = colors[index % colors.length];
                     prizeHTML += `
                         <div class="bg-${color}-50 p-4 rounded-lg border border-${color}-100">
@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Update Registration Section
-        const registerButton = document.querySelector('#register .bg-indigo-600');
+        const registerButton = document.querySelector('#register .bg-gray-700');
         const registrationFormContainer = document.querySelector('#register form');
         const mainRegisterBtn = document.getElementById('main-register-btn');
         const registrationInfo = document.getElementById('registration-info');
@@ -1135,57 +1135,96 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function updateNavigationForUser(userData) {
-        // Update main navigation links
-        const navLinks = document.querySelector('.hidden.md\\:flex.space-x-8');
-        if (navLinks) {
-            let navHTML = `
-                <a href="index.html" class="text-gray-700 hover:text-indigo-600">Home</a>
-                <a href="events.html" class="text-gray-700 hover:text-indigo-600">Events</a>
-            `;
+        const navLinks = document.querySelector('.hidden.md\\:flex.items-center.space-x-8');
+        const userSection = document.querySelector('.flex.items-center.space-x-4');
+        const mobileMenu = document.getElementById('mobile-menu');
 
-            if (userData.role === 'organizer' || userData.role === 'admin') {
-                navHTML += `<a href="event_creation.html" class="text-gray-700 hover:text-indigo-600">Create Event</a>`;
-            }
+        if (!navLinks || !userSection || !mobileMenu) return;
 
-            navLinks.innerHTML = navHTML;
+        // Update main navigation
+        let navHTML = `
+            <a href="index.html" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Home</a>
+            <a href="events.html" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Events</a>
+        `;
+
+        if (userData.role === 'organizer' || userData.role === 'admin') {
+            navHTML += `<a href="event_creation.html" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Create Event</a>`;
         }
 
-        // Update right side navigation
-        const rightNav = document.querySelector('.flex.items-center.space-x-4');
-        if (rightNav) {
-            rightNav.innerHTML = `
-                <button id="reportEventBtn" class="px-3 py-2 text-red-600 border border-red-600 rounded-md hover:bg-red-50 text-sm">
-                    <i class="fas fa-flag mr-1"></i>Report Event
-                </button>
-                <div class="relative">
-                    <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none">
-                        <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold">
-                            <span>${userData.username ? userData.username.charAt(0).toUpperCase() : 'U'}</span>
-                        </div>
-                        <span class="hidden md:inline text-gray-700">${userData.username || 'User'}</span>
-                        <i class="fas fa-chevron-down text-sm text-gray-700"></i>
-                    </button>
-                    
-                    <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                        <a href="${getUserDashboardUrl(userData.role)}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</a>
-                        <a href="${getUserDashboardUrl(userData.role)}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Events</a>
-                        <a href="${getUserDashboardUrl(userData.role)}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
-                        <div class="border-t border-gray-200"></div>
-                        <button id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</button>
+        navLinks.innerHTML = navHTML;
+
+        // Insert user menu between report button and mobile menu button
+        const reportBtn = document.getElementById('reportEventBtn');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        
+        // Remove existing user menu if present
+        const existingUserMenu = userSection.querySelector('.relative');
+        if (existingUserMenu) {
+            existingUserMenu.remove();
+        }
+
+        // Create user menu element
+        const userMenuHTML = `
+            <div class="relative">
+                <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none bg-gray-100 hover:bg-gray-200 py-2 px-3 rounded-lg transition-colors">
+                    <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-white font-bold text-sm">
+                        <span>${userData.username ? userData.username.charAt(0).toUpperCase() : 'U'}</span>
                     </div>
-                </div>
-                <button class="md:hidden text-gray-700">
-                    <i class="fas fa-bars text-xl"></i>
+                    <span class="hidden md:inline text-gray-700 font-medium">${userData.username || 'User'}</span>
+                    <i class="fas fa-chevron-down text-sm text-gray-500"></i>
                 </button>
-            `;
+                
+                <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-200">
+                    <a href="${getUserDashboardUrl(userData.role)}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Dashboard</a>
+                    <a href="${getUserDashboardUrl(userData.role)}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">My Events</a>
+                    <a href="${getUserDashboardUrl(userData.role)}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Profile</a>
+                    <div class="border-t border-gray-200 my-1"></div>
+                    <button id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Sign out</button>
+                </div>
+            </div>
+        `;
 
-            // Setup user menu functionality
-            setupUserMenu();
+        // Insert the user menu before the mobile menu button
+        mobileMenuButton.insertAdjacentHTML('beforebegin', userMenuHTML);
+
+        // Update mobile menu
+        let mobileHTML = `
+            <a href="index.html" class="block py-2 px-4 hover:bg-gray-100 rounded">Home</a>
+            <a href="events.html" class="block py-2 px-4 hover:bg-gray-100 rounded">Events</a>
+        `;
+
+        if (userData.role === 'organizer' || userData.role === 'admin') {
+            mobileHTML += `<a href="event_creation.html" class="block py-2 px-4 hover:bg-gray-100 rounded">Create Event</a>`;
         }
+
+        mobileHTML += `
+            <div class="border-t border-gray-200 mt-2 pt-2">
+                <a href="${getUserDashboardUrl(userData.role)}" class="block py-2 px-4 hover:bg-gray-100 rounded">Dashboard</a>
+                <a href="${getUserDashboardUrl(userData.role)}" class="block py-2 px-4 hover:bg-gray-100 rounded">My Events</a>
+                <button id="mobile-logout-btn" class="block w-full text-left py-2 px-4 hover:bg-gray-100 rounded">Sign out</button>
+            </div>
+        `;
+
+        mobileMenu.innerHTML = mobileHTML;
+
+        // Set up user menu and logout functionality
+        setupUserMenu();
     }
 
     function updateNavigationForGuest() {
-        // Keep the original guest navigation as is
+        // For guests, the navigation is static in the HTML
+        // Just ensure mobile menu is set up correctly
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenu) {
+            // Update mobile menu for guests
+            mobileMenu.innerHTML = `
+                <a href="index.html" class="block py-2 px-4 hover:bg-gray-100 rounded">Home</a>
+                <a href="events.html" class="block py-2 px-4 hover:bg-gray-100 rounded">Events</a>
+                <a href="event_creation.html" class="block py-2 px-4 hover:bg-gray-100 rounded">Create Event</a>
+                <a href="login_signup.html" class="block py-2 px-4 hover:bg-gray-100 rounded">Join Now</a>
+            `;
+        }
     }
 
     function getUserDashboardUrl(role) {
@@ -1263,7 +1302,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                     <div class="p-6">
                         <h3 class="text-xl font-bold mb-1">${speaker.name || 'Speaker Name'}</h3>
-                        <p class="text-indigo-600 mb-3">${speaker.title || 'Speaker Title'}</p>
+                        <p class="text-gray-600 mb-3">${speaker.title || 'Speaker Title'}</p>
                         <p class="text-gray-600 text-sm">${speaker.bio || 'Speaker biography not available.'}</p>
                     </div>
                 `;

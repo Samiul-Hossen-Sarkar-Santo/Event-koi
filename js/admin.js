@@ -2,6 +2,9 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     
+    // Global variables
+    let activityLogsData = [];
+    
     // --- Main Tab Switching (Dashboard, Approvals, etc.) ---
     const adminTabButtons = document.querySelectorAll('.admin-tab-btn');
     const adminTabContents = document.querySelectorAll('.admin-tab-content');
@@ -190,6 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load admin user data and stats on page load
     loadAdminUserData();
     loadDashboardStats();
+    loadRecentActivity(); // Load recent activity on page load
 
     async function logout() {
         try {
@@ -1189,10 +1193,102 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- Activity Logs Management Functionality ---
-    let activityLogsData = [];
 
     function initializeActivityLogsManagement() {
         loadActivityLogs();
+        
+        // Setup admin filter dropdown
+        const adminFilter = document.getElementById('admin-filter');
+        if (adminFilter) {
+            adminFilter.addEventListener('change', function() {
+                filterActivityLogsByAdmin(this.value);
+            });
+        }
+    }
+
+    // Populate admin filter dropdown from loaded activity logs data
+    function populateAdminFilterFromData() {
+        const adminFilter = document.getElementById('admin-filter');
+        if (!adminFilter || !activityLogsData) return;
+
+        // Extract unique admin names from the logs
+        const uniqueAdmins = [...new Set(activityLogsData.map(log => {
+            if (log.adminId && log.adminId.name) return log.adminId.name;
+            if (log.adminId && log.adminId.username) return log.adminId.username;
+            if (log.adminName) return log.adminName;
+            return 'Unknown Admin';
+        }))];
+
+        // Clear and repopulate dropdown
+        adminFilter.innerHTML = '<option value="all">All Admins</option>';
+        uniqueAdmins.forEach(adminName => {
+            const option = document.createElement('option');
+            option.value = adminName;
+            option.textContent = adminName;
+            adminFilter.appendChild(option);
+        });
+    }
+
+    // Filter activity logs by selected admin
+    function filterActivityLogsByAdmin(selectedAdmin) {
+        const tbody = document.getElementById('activity-log-tbody');
+        if (!tbody || !activityLogsData) return;
+
+        let filteredLogs = activityLogsData;
+        if (selectedAdmin !== 'all') {
+            filteredLogs = activityLogsData.filter(log => {
+                const adminName = log.adminId ? (log.adminId.name || log.adminId.username) : 'Unknown Admin';
+                return adminName === selectedAdmin;
+            });
+        }
+
+        // Re-render the table with filtered data
+        if (filteredLogs.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No logs found for selected admin.</td></tr>';
+            return;
+        }
+
+        let html = '';
+        filteredLogs.forEach(log => {
+            const adminName = log.adminId ? (log.adminId.name || log.adminId.username) : 'Unknown Admin';
+            const timeAgo = formatTimeAgo(log.createdAt);
+            
+            html += `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="text-sm font-medium text-gray-900">${adminName}</div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getActionColor(log.action)}">
+                            ${formatActionName(log.action)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${log.targetType}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                        <div class="max-w-xs">
+                            ${log.details?.reason ? `<div><strong>Reason:</strong> ${log.details.reason}</div>` : ''}
+                            ${log.details?.previousStatus ? `<div><strong>From:</strong> ${log.details.previousStatus}</div>` : ''}
+                            ${log.details?.newStatus ? `<div><strong>To:</strong> ${log.details.newStatus}</div>` : ''}
+                            ${log.details?.additionalNotes ? `<div><strong>Notes:</strong> ${log.details.additionalNotes}</div>` : ''}
+                        </div>
+                        <div class="mt-1">
+                            <span class="px-1 inline-flex text-xs leading-5 font-semibold rounded ${getSeverityColor(log.severity)}">
+                                ${capitalizeFirst(log.severity)}
+                            </span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${timeAgo}
+                    </td>
+                </tr>
+            `;
+        });
+
+        tbody.innerHTML = html;
     }
 
     async function loadActivityLogs() {
@@ -1217,6 +1313,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             activityLogsData = data.logs || [];
             renderActivityLogs();
+            
+            // Populate admin filter dropdown from loaded data
+            populateAdminFilterFromData();
+            
         } catch (error) {
             console.error('Error loading activity logs:', error);
             showActivityLogsErrorState('Failed to load activity logs. Please try again.');
@@ -1227,33 +1327,49 @@ document.addEventListener('DOMContentLoaded', function() {
         const logsTab = document.getElementById('logs');
         if (!logsTab) return;
 
-        // Create the activity logs container if it doesn't exist
+        // Check if we need to recreate the structure (but preserve the filter if it exists)
         let container = logsTab.querySelector('.activity-logs-container');
+        let hasFilter = document.getElementById('admin-filter');
+        
         if (!container) {
             logsTab.innerHTML = `
-                <h2 class="text-2xl font-bold mb-6 text-gray-800">Activity Log</h2>
-                <div class="activity-logs-container bg-gray-50 p-6 rounded-lg border">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-100">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admin</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Target</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200" id="activity-logs-tbody">
-                            </tbody>
-                        </table>
-                    </div>
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">Admin Activity Log</h2>
+                
+                <!-- Filter Section -->
+                <div class="mb-4 flex items-center space-x-4">
+                    <label for="admin-filter" class="text-sm font-medium text-gray-700">Filter by Admin:</label>
+                    <select id="admin-filter" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                        <option value="all">All Admins</option>
+                    </select>
+                </div>
+                
+                <div class="overflow-x-auto bg-gray-50 p-4 rounded-lg border">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admin</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Target</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="activity-log-tbody">
+                        </tbody>
+                    </table>
                 </div>
             `;
-            container = logsTab.querySelector('.activity-logs-container');
+            
+            // Re-setup filter after recreating HTML
+            const adminFilter = document.getElementById('admin-filter');
+            if (adminFilter) {
+                adminFilter.addEventListener('change', function() {
+                    filterActivityLogsByAdmin(this.value);
+                });
+            }
         }
 
-        const tbody = document.getElementById('activity-logs-tbody');
+        const tbody = document.getElementById('activity-log-tbody');
         if (!tbody) return;
 
         if (activityLogsData.length === 0) {
@@ -1270,8 +1386,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         let html = '';
         activityLogsData.forEach(log => {
-            const actionColor = getActionColor(log.action);
-            const severityColor = getSeverityColor(log.severity);
             const adminName = log.adminId ? (log.adminId.name || log.adminId.username) : 'Unknown Admin';
             const timeAgo = formatTimeAgo(log.createdAt);
             
@@ -1283,7 +1397,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${actionColor}">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getActionColor(log.action)}">
                             ${formatActionName(log.action)}
                         </span>
                     </td>
@@ -1298,7 +1412,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             ${log.details?.additionalNotes ? `<div><strong>Notes:</strong> ${log.details.additionalNotes}</div>` : ''}
                         </div>
                         <div class="mt-1">
-                            <span class="px-1 inline-flex text-xs leading-5 font-semibold rounded ${severityColor}">
+                            <span class="px-1 inline-flex text-xs leading-5 font-semibold rounded ${getSeverityColor(log.severity)}">
                                 ${capitalizeFirst(log.severity)}
                             </span>
                         </div>
@@ -1311,6 +1425,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         tbody.innerHTML = html;
+        
+        // Populate filter dropdown after rendering
+        populateAdminFilterFromData();
     }
 
     function showActivityLogsLoadingState() {
@@ -1419,28 +1536,42 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function getActionColor(action) {
-        switch (action) {
-            case 'event_approved': return 'bg-green-100 text-green-800';
-            case 'event_rejected': return 'bg-red-100 text-red-800';
-            case 'event_changes_requested': return 'bg-blue-100 text-blue-800';
-            case 'user_warned': return 'bg-yellow-100 text-yellow-800';
-            case 'user_suspended': return 'bg-orange-100 text-orange-800';
-            case 'user_banned': return 'bg-red-100 text-red-800';
-            case 'user_unbanned': return 'bg-green-100 text-green-800';
-            case 'report_resolved': return 'bg-purple-100 text-purple-800';
-            case 'report_dismissed': return 'bg-gray-100 text-gray-800';
+        const actionLower = action?.toLowerCase() || '';
+        if (actionLower.includes('approve')) return 'bg-green-100 text-green-800';
+        if (actionLower.includes('reject')) return 'bg-red-100 text-red-800';
+        if (actionLower.includes('delete')) return 'bg-red-100 text-red-800';
+        if (actionLower.includes('update') || actionLower.includes('edit')) return 'bg-blue-100 text-blue-800';
+        if (actionLower.includes('create')) return 'bg-green-100 text-green-800';
+        return 'bg-gray-100 text-gray-800';
+    }
+
+    function getSeverityColor(severity) {
+        switch(severity?.toLowerCase()) {
+            case 'high': return 'bg-red-100 text-red-800';
+            case 'medium': return 'bg-yellow-100 text-yellow-800';
+            case 'low': return 'bg-green-100 text-green-800';
             default: return 'bg-gray-100 text-gray-800';
         }
     }
 
-    function getSeverityColor(severity) {
-        switch (severity) {
-            case 'low': return 'bg-green-100 text-green-800';
-            case 'medium': return 'bg-yellow-100 text-yellow-800';
-            case 'high': return 'bg-orange-100 text-orange-800';
-            case 'critical': return 'bg-red-100 text-red-800';
-            default: return 'bg-gray-100 text-gray-800';
-        }
+    function formatActionName(action) {
+        return action ? action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Unknown Action';
+    }
+
+    function capitalizeFirst(str) {
+        return str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : '';
+    }
+
+    function formatTimeAgo(date) {
+        if (!date) return 'Unknown time';
+        const now = new Date();
+        const diffMs = now - new Date(date);
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        const diffDays = Math.floor(diffHours / 24);
+        
+        if (diffDays > 0) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+        if (diffHours > 0) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+        return 'Just now';
     }
 
     function getRecentActivityColor(color) {
@@ -1455,27 +1586,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function formatActionName(action) {
-        return action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    }
-
-    function formatTimeAgo(dateString) {
-        const now = new Date();
-        const date = new Date(dateString);
-        const diffMs = now - date;
-        const diffMinutes = Math.floor(diffMs / (1000 * 60));
-        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-        if (diffMinutes < 60) {
-            return `${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''} ago`;
-        } else if (diffHours < 24) {
-            return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
-        } else {
-            return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
-        }
-    }
-
-    // Make activity logs functions globally available
-    window.loadActivityLogs = loadActivityLogs;
 });

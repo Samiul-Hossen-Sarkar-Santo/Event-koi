@@ -3,30 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tech Conference 2025 | Event Koi?!</title>
+    <title>Event Details | Event Koi?!</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Link to your new external stylesheet -->
-    <link rel="stylesheet" href="css/event_page.css">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Category management utility -->
+    <script src="js/category-manager.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'gray-850': '#1f2937',
+                        'gray-750': '#374151',
+                        'gray-650': '#4b5563',
+                        'charcoal': '#2d3748',
+                        'steel': '#4a5568',
+                        'platinum': '#718096',
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="font-sans bg-gray-50">
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-800 smooth-transition">
     <!-- Navigation -->
-    <nav class="bg-white shadow-md sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="index.html" class="text-2xl font-bold text-indigo-600">Event Koi?!</a>
-            <div class="hidden md:flex space-x-8">
-                <a href="index.html" class="text-gray-700 hover:text-indigo-600">Home</a>
-                <a href="event_page.html" class="text-gray-700 hover:text-indigo-600">Events</a>
-                <a href="login_signup.html" class="text-gray-700 hover:text-indigo-600">Login</a>
+    <nav class="bg-white shadow-md border-b border-gray-200">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="flex items-center space-x-3">
+                        <div
+                            class="w-10 h-10 bg-gradient-to-br from-gray-700 to-gray-900 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-network-wired text-white text-lg"></i>
+                        </div>
+                        <span class="text-2xl font-bold text-gray-800 tracking-tight">Event Koi?!</span>
+                    </a>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html"
+                        class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Home</a>
+                    <a href="events.html"
+                        class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Events</a>
+                    <a href="event_creation.html"
+                        class="text-gray-600 hover:text-gray-900 font-medium transition-colors">Create Event</a>
+                    <a href="login_signup.html"
+                        class="bg-gradient-to-r from-gray-700 to-gray-800 text-white px-6 py-2 rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all duration-200 font-medium">Join
+                        Now</a>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <!-- User menu will be dynamically populated by JavaScript -->
+                    
+                    <button id="reportEventBtn" class="px-3 py-2 text-red-600 border border-red-600 rounded-md hover:bg-red-50 text-sm">
+                        <i class="fas fa-flag mr-1"></i>Report Event
+                    </button>
+
+                    <button class="md:hidden" id="mobile-menu-button">
+                        <i class="fas fa-bars text-xl text-gray-600"></i>
+                    </button>
+                </div>
             </div>
-            <div class="flex items-center space-x-4">
-                <button id="reportEventBtn" class="px-3 py-2 text-red-600 border border-red-600 rounded-md hover:bg-red-50 text-sm">
-                    <i class="fas fa-flag mr-1"></i>Report Event
-                </button>
-                <a href="login_signup.html" class="px-4 py-2 text-indigo-600 border border-indigo-600 rounded-md hover:bg-indigo-50">Login</a>
-                <button class="md:hidden text-gray-700">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
+
+            <!-- Mobile menu -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4 border-t border-gray-200 pt-4">
+                <!-- Mobile menu content will be dynamically populated by JavaScript -->
             </div>
         </div>
     </nav>
@@ -42,7 +86,7 @@
             </div>
             <h1 class="text-4xl md:text-6xl font-bold mb-4">Tech Conference 2023</h1>
             <!-- <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">The premier technology conference featuring industry leaders, innovative workshops, and networking opportunities</p> -->
-            <a href="#register" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full text-lg animate-pulse inline-block">Register Now</a>
+            <a href="#register" class="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 text-white font-bold py-3 px-8 rounded-full text-lg animate-pulse inline-block">Register Now</a>
         </div>
     </section>
 
@@ -70,15 +114,15 @@
                     <div class="mb-8">
                         <h3 class="text-2xl font-semibold mb-4 text-gray-800">Event Schedule</h3>
                         <div class="space-y-4">
-                            <div class="border-l-4 border-indigo-500 pl-4 py-2">
+                            <div class="border-l-4 border-gray-600 pl-4 py-2">
                                 <div class="font-bold">Day 1 - October 12, 2023</div>
                                 <div class="text-gray-600">Opening Keynote, AI Workshops, Networking Mixer</div>
                             </div>
-                            <div class="border-l-4 border-indigo-500 pl-4 py-2">
+                            <div class="border-l-4 border-gray-600 pl-4 py-2">
                                 <div class="font-bold">Day 2 - October 13, 2023</div>
                                 <div class="text-gray-600">Cloud Computing Sessions, Startup Pitches, Tech Expo</div>
                             </div>
-                            <div class="border-l-4 border-indigo-500 pl-4 py-2">
+                            <div class="border-l-4 border-gray-600 pl-4 py-2">
                                 <div class="font-bold">Day 3 - October 14, 2023</div>
                                 <div class="text-gray-600">Blockchain Deep Dive, Closing Ceremony, Awards</div>
                             </div>
@@ -88,16 +132,16 @@
                     <div class="mb-8">
                         <h3 class="text-2xl font-semibold mb-4 text-gray-800">Prizes & Awards</h3>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
-                                <div class="text-indigo-600 font-bold text-xl mb-2">1st Prize</div>
+                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <div class="text-gray-700 font-bold text-xl mb-2">1st Prize</div>
                                 <div class="text-gray-800">$25,000 Cash + Incubation Program</div>
                             </div>
-                            <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
-                                <div class="text-indigo-600 font-bold text-xl mb-2">2nd Prize</div>
+                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <div class="text-gray-700 font-bold text-xl mb-2">2nd Prize</div>
                                 <div class="text-gray-800">$15,000 Cash + Mentorship</div>
                             </div>
-                            <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
-                                <div class="text-indigo-600 font-bold text-xl mb-2">3rd Prize</div>
+                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <div class="text-gray-700 font-bold text-xl mb-2">3rd Prize</div>
                                 <div class="text-gray-800">$10,000 Cash</div>
                             </div>
                         </div>
@@ -123,7 +167,7 @@
                         
                         <div class="space-y-4">
                             <div class="flex items-start">
-                                <div class="text-indigo-600 mr-4 mt-1">
+                                <div class="text-gray-600 mr-4 mt-1">
                                     <i class="fas fa-calendar-alt"></i>
                                 </div>
                                 <div>
@@ -133,7 +177,7 @@
                             </div>
                             
                             <div class="flex items-start">
-                                <div class="text-indigo-600 mr-4 mt-1">
+                                <div class="text-gray-600 mr-4 mt-1">
                                     <i class="fas fa-map-marker-alt"></i>
                                 </div>
                                 <div>
@@ -141,13 +185,13 @@
                                     <div class="text-gray-600">
                                         San Francisco Convention Center<br>
                                         747 Howard St, San Francisco, CA 94103
-                                        <a href="https://maps.google.com" class="text-indigo-600 hover:underline block mt-1">View on Map →</a>
+                                        <a href="https://maps.google.com" class="text-gray-700 hover:text-gray-900 hover:underline block mt-1">View on Map →</a>
                                     </div>
                                 </div>
                             </div>
                             
                             <div class="flex items-start">
-                                <div class="text-indigo-600 mr-4 mt-1">
+                                <div class="text-gray-600 mr-4 mt-1">
                                     <i class="fas fa-ticket-alt"></i>
                                 </div>
                                 <div>
@@ -160,14 +204,14 @@
                             </div>
                             
                             <div class="flex items-start">
-                                <div class="text-indigo-600 mr-4 mt-1">
+                                <div class="text-gray-700 mr-4 mt-1">
                                     <i class="fas fa-users"></i>
                                 </div>
                                 <div>
                                     <div class="font-semibold">Available Seats</div>
                                     <div class="text-gray-600">124/500 remaining</div>
                                     <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-                                        <div class="bg-indigo-600 h-2.5 rounded-full" style="width: 75%"></div>
+                                        <div class="bg-gray-700 h-2.5 rounded-full" style="width: 75%"></div>
                                     </div>
                                 </div>
                             </div>
@@ -190,16 +234,16 @@
     </section>
 
     <!-- Big Registration CTA Section -->
-    <section id="registration-cta" class="py-16 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+    <section id="registration-cta" class="py-16 bg-gradient-to-r from-gray-700 to-gray-800 text-white">
         <div class="container mx-auto px-4 text-center">
             <h2 class="text-3xl md:text-4xl font-bold mb-4">Ready to Join Us?</h2>
             <p class="text-xl mb-8 max-w-2xl mx-auto">Don't miss out on this amazing opportunity. Register now to secure your spot!</p>
             <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <button id="main-register-btn" class="inline-flex items-center px-8 py-4 bg-white text-indigo-600 text-xl font-bold rounded-full shadow-lg hover:bg-gray-50 transform hover:scale-105 transition-all duration-300">
+                <button id="main-register-btn" class="inline-flex items-center px-8 py-4 bg-white text-gray-800 text-xl font-bold rounded-full shadow-lg hover:bg-gray-50 transform hover:scale-105 transition-all duration-300">
                     <i class="fas fa-ticket-alt mr-3"></i>
                     Register Now
                 </button>
-                <button id="favorite-btn" class="inline-flex items-center px-6 py-3 border-2 border-white text-white text-lg font-semibold rounded-full hover:bg-white hover:text-indigo-600 transition-all duration-300">
+                <button id="favorite-btn" class="inline-flex items-center px-6 py-3 border-2 border-white text-white text-lg font-semibold rounded-full hover:bg-white hover:text-gray-800 transition-all duration-300">
                     <i class="far fa-heart mr-2" id="favorite-icon"></i>
                     <span id="favorite-text">Add to Favorites</span>
                 </button>
@@ -220,7 +264,7 @@
             </div>
             
             <div class="text-center mt-12">
-                <button class="px-6 py-3 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors">
+                <button class="px-6 py-3 border border-gray-700 text-gray-700 rounded-md hover:bg-gray-100 transition-colors">
                     View All Speakers
                 </button>
             </div>
@@ -228,7 +272,7 @@
     </section>
 
     <!-- Registration Section -->
-    <section id="register" class="py-16 bg-indigo-600 text-white hidden">
+    <section id="register" class="py-16 bg-gray-700 text-white hidden">
         <div class="container mx-auto px-4">
             <div class="max-w-5xl mx-auto text-center">
                 <h2 class="text-3xl font-bold mb-4">Ready to Join Tech Conference 2023?</h2>
@@ -263,32 +307,32 @@
                                 <div>
                                     <label class="block text-gray-700 mb-2">First Name *</label>
                                     <input type="text" id="firstName" name="firstName" required 
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                                 </div>
                                 <div>
                                     <label class="block text-gray-700 mb-2">Last Name *</label>
                                     <input type="text" id="lastName" name="lastName" required 
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                                 </div>
                                 <div>
                                     <label class="block text-gray-700 mb-2">Email Address *</label>
                                     <input type="email" id="email" name="email" required 
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                                 </div>
                                 <div>
                                     <label class="block text-gray-700 mb-2">Phone Number *</label>
                                     <input type="tel" id="phone" name="phone" required 
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                                 </div>
                                 <div>
                                     <label class="block text-gray-700 mb-2">Date of Birth</label>
                                     <input type="date" id="dateOfBirth" name="dateOfBirth" 
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                                 </div>
                                 <div>
                                     <label class="block text-gray-700 mb-2">Gender</label>
                                     <select id="gender" name="gender" 
-                                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                                         <option value="">Prefer not to say</option>
                                         <option value="male">Male</option>
                                         <option value="female">Female</option>
@@ -298,12 +342,12 @@
                                 <div class="md:col-span-2">
                                     <label class="block text-gray-700 mb-2">Emergency Contact Name</label>
                                     <input type="text" id="emergencyContact" name="emergencyContact" 
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                                 </div>
                                 <div class="md:col-span-2">
                                     <label class="block text-gray-700 mb-2">Emergency Contact Phone</label>
                                     <input type="tel" id="emergencyPhone" name="emergencyPhone" 
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                                 </div>
                             </div>
                         </div>
@@ -315,7 +359,7 @@
                                 <div>
                                     <label class="block text-gray-700 mb-2">Current Status *</label>
                                     <select id="status" name="status" required 
-                                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                                         <option value="">Select Status</option>
                                         <option value="student">Student</option>
                                         <option value="professional">Professional</option>
@@ -327,17 +371,17 @@
                                 <div>
                                     <label class="block text-gray-700 mb-2">Institution/Company</label>
                                     <input type="text" id="institution" name="institution" 
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                                 </div>
                                 <div>
                                     <label class="block text-gray-700 mb-2">Field of Study/Work</label>
                                     <input type="text" id="field" name="field" 
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                                 </div>
                                 <div>
                                     <label class="block text-gray-700 mb-2">Year of Study/Experience Level</label>
                                     <select id="level" name="level" 
-                                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                                         <option value="">Select Level</option>
                                         <option value="1st year">1st Year</option>
                                         <option value="2nd year">2nd Year</option>
@@ -353,12 +397,12 @@
                                     <label class="block text-gray-700 mb-2">Skills/Interests (comma separated)</label>
                                     <input type="text" id="skills" name="skills" 
                                            placeholder="e.g., Python, Machine Learning, Web Development"
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                                 </div>
                                 <div class="md:col-span-2">
                                     <label class="block text-gray-700 mb-2">LinkedIn Profile (optional)</label>
                                     <input type="url" id="linkedin" name="linkedin" 
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                                 </div>
                             </div>
                         </div>
@@ -373,21 +417,21 @@
                                         <div class="border rounded-lg p-4 cursor-pointer ticket-option" data-ticket="general">
                                             <div class="text-center">
                                                 <h5 class="font-semibold text-lg">General Admission</h5>
-                                                <p class="text-2xl font-bold text-indigo-600">$399</p>
+                                                <p class="text-2xl font-bold text-gray-700">$399</p>
                                                 <p class="text-sm text-gray-600">Access to all sessions</p>
                                             </div>
                                         </div>
                                         <div class="border rounded-lg p-4 cursor-pointer ticket-option" data-ticket="vip">
                                             <div class="text-center">
                                                 <h5 class="font-semibold text-lg">VIP Pass</h5>
-                                                <p class="text-2xl font-bold text-indigo-600">$599</p>
+                                                <p class="text-2xl font-bold text-gray-700">$599</p>
                                                 <p class="text-sm text-gray-600">Front row + VIP lounge</p>
                                             </div>
                                         </div>
                                         <div class="border rounded-lg p-4 cursor-pointer ticket-option" data-ticket="student">
                                             <div class="text-center">
                                                 <h5 class="font-semibold text-lg">Student Pass</h5>
-                                                <p class="text-2xl font-bold text-indigo-600">$199</p>
+                                                <p class="text-2xl font-bold text-gray-700">$199</p>
                                                 <p class="text-sm text-gray-600">Valid ID required</p>
                                             </div>
                                         </div>
@@ -420,7 +464,7 @@
                                 <div>
                                     <label class="block text-gray-700 mb-2">T-Shirt Size</label>
                                     <select id="tshirtSize" name="tshirtSize" 
-                                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                                         <option value="">Select Size</option>
                                         <option value="XS">XS</option>
                                         <option value="S">S</option>
@@ -434,7 +478,7 @@
                                 <div>
                                     <label class="block text-gray-700 mb-2">How did you hear about this event?</label>
                                     <select id="hearAbout" name="hearAbout" 
-                                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                                         <option value="">Select Option</option>
                                         <option value="social-media">Social Media</option>
                                         <option value="friend">Friend/Colleague</option>
@@ -448,7 +492,7 @@
                                 <div>
                                     <label class="block text-gray-700 mb-2">Special Requirements/Notes</label>
                                     <textarea id="specialNotes" name="specialNotes" rows="3" 
-                                              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                                               placeholder="Any accessibility needs, allergies, or special requests..."></textarea>
                                 </div>
                             </div>
@@ -464,8 +508,8 @@
                             <div class="mb-4">
                                 <label class="flex items-center">
                                     <input type="checkbox" id="agreeTerms" name="agreeTerms" required class="mr-2">
-                                    I agree to the <a href="#" class="text-indigo-600 underline">terms and conditions</a> and 
-                                    <a href="#" class="text-indigo-600 underline">privacy policy</a>
+                                    I agree to the <a href="#" class="text-gray-700 underline">terms and conditions</a> and 
+                                    <a href="#" class="text-gray-700 underline">privacy policy</a>
                                 </label>
                             </div>
                             
@@ -483,7 +527,7 @@
                                 <i class="fas fa-arrow-left mr-2"></i>Previous
                             </button>
                             <div class="flex space-x-4">
-                                <button type="button" id="nextRegBtn" class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                                <button type="button" id="nextRegBtn" class="px-6 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800">
                                     Next<i class="fas fa-arrow-right ml-2"></i>
                                 </button>
                                 <button type="submit" id="submitRegBtn" class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 hidden">
@@ -507,7 +551,7 @@
             </div>
             
             <div class="text-center mt-8">
-                <button class="px-6 py-3 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors">
+                <button class="px-6 py-3 border border-gray-700 text-gray-700 rounded-md hover:bg-gray-100 transition-colors">
                     View More Photos
                 </button>
             </div>
@@ -526,10 +570,10 @@
             <div class="text-center mt-12">
                 <p class="text-gray-700 mb-4">Have more questions?</p>
                 <div class="space-x-4">
-                    <button id="ask-question-btn" class="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
+                    <button id="ask-question-btn" class="px-6 py-3 bg-gray-700 text-white rounded-md hover:bg-gray-800 transition-colors">
                         Ask a Question
                     </button>
-                    <a href="mailto:info@eventKoi.com" class="px-6 py-3 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors inline-block">
+                    <a href="mailto:info@eventKoi.com" class="px-6 py-3 border border-gray-700 text-gray-700 rounded-md hover:bg-gray-100 transition-colors inline-block">
                         Contact Our Team
                     </a>
                 </div>
@@ -548,7 +592,7 @@
             
             <div class="text-center mt-12">
                 <p class="text-gray-700 mb-4">Interested in sponsoring?</p>
-                <button id="become-sponsor-btn" class="px-6 py-3 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors">
+                <button id="become-sponsor-btn" class="px-6 py-3 border border-gray-700 text-gray-700 rounded-md hover:bg-gray-100 transition-colors">
                     Become a Sponsor
                 </button>
             </div>
@@ -657,32 +701,32 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-gray-700 mb-2">First Name *</label>
-                            <input type="text" name="firstName" id="reg-firstName" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                            <input type="text" name="firstName" id="reg-firstName" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500" required>
                         </div>
                         <div>
                             <label class="block text-gray-700 mb-2">Last Name *</label>
-                            <input type="text" name="lastName" id="reg-lastName" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                            <input type="text" name="lastName" id="reg-lastName" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500" required>
                         </div>
                     </div>
                     
                     <div>
                         <label class="block text-gray-700 mb-2">Email Address *</label>
-                        <input type="email" name="email" id="reg-email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                        <input type="email" name="email" id="reg-email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500" required>
                     </div>
                     
                     <div>
                         <label class="block text-gray-700 mb-2">Phone Number</label>
-                        <input type="tel" name="phone" id="reg-phone" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <input type="tel" name="phone" id="reg-phone" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-gray-700 mb-2">University/Organization</label>
-                            <input type="text" name="university" id="reg-university" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <input type="text" name="university" id="reg-university" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                         </div>
                         <div>
                             <label class="block text-gray-700 mb-2">Year of Study</label>
-                            <select name="yearOfStudy" id="reg-yearOfStudy" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <select name="yearOfStudy" id="reg-yearOfStudy" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                                 <option value="">Select year</option>
                                 <option value="1st Year">1st Year</option>
                                 <option value="2nd Year">2nd Year</option>
@@ -703,7 +747,7 @@
                     
                     <div>
                         <label class="block text-gray-700 mb-2">How did you hear about this event?</label>
-                        <select name="referralSource" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <select name="referralSource" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                             <option value="">Select an option</option>
                             <option value="social-media">Social Media</option>
                             <option value="friend">Friend/Colleague</option>
@@ -717,17 +761,17 @@
                     
                     <div>
                         <label class="block text-gray-700 mb-2">What are your expectations from this event?</label>
-                        <textarea name="expectations" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="What do you hope to learn or gain from this event?"></textarea>
+                        <textarea name="expectations" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500" placeholder="What do you hope to learn or gain from this event?"></textarea>
                     </div>
                     
                     <div>
                         <label class="block text-gray-700 mb-2">Dietary Restrictions/Special Requirements</label>
-                        <textarea name="specialRequirements" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Any dietary restrictions, accessibility needs, or other special requirements?"></textarea>
+                        <textarea name="specialRequirements" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500" placeholder="Any dietary restrictions, accessibility needs, or other special requirements?"></textarea>
                     </div>
                     
                     <div>
                         <label class="block text-gray-700 mb-2">T-Shirt Size (if applicable)</label>
-                        <select name="tshirtSize" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <select name="tshirtSize" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                             <option value="">Select size</option>
                             <option value="XS">XS</option>
                             <option value="S">S</option>
@@ -754,7 +798,7 @@
                         <div class="flex items-center">
                             <input type="checkbox" id="agree-terms" name="agreeTerms" class="mr-2" required>
                             <label for="agree-terms" class="text-sm text-gray-700">
-                                I agree to the <a href="#" class="text-indigo-600 hover:underline">Terms and Conditions</a> and <a href="#" class="text-indigo-600 hover:underline">Privacy Policy</a>
+                                I agree to the <a href="#" class="text-gray-700 hover:underline">Terms and Conditions</a> and <a href="#" class="text-gray-700 hover:underline">Privacy Policy</a>
                             </label>
                         </div>
                         
@@ -778,7 +822,7 @@
                             Cancel
                         </button>
                         
-                        <button type="button" id="next-step-btn" class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        <button type="button" id="next-step-btn" class="px-6 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800">
                             Next <i class="fas fa-arrow-right ml-2"></i>
                         </button>
                         
@@ -799,22 +843,22 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-gray-700 mb-2">Your Name</label>
-                        <input type="text" id="question-name" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                        <input type="text" id="question-name" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500" required>
                     </div>
                     <div>
                         <label class="block text-gray-700 mb-2">Email</label>
-                        <input type="email" id="question-email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                        <input type="email" id="question-email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500" required>
                     </div>
                     <div>
                         <label class="block text-gray-700 mb-2">Your Question</label>
-                        <textarea id="question-text" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="What would you like to know about this event?" required></textarea>
+                        <textarea id="question-text" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500" placeholder="What would you like to know about this event?" required></textarea>
                     </div>
                 </div>
                 <div class="flex justify-end space-x-4 mt-6">
                     <button type="button" onclick="hideQuestionModal()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50">
                         Cancel
                     </button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                    <button type="submit" class="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800">
                         Submit Question
                     </button>
                 </div>
@@ -830,26 +874,26 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-gray-700 mb-2">Company Name</label>
-                        <input type="text" id="sponsor-company" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                        <input type="text" id="sponsor-company" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500" required>
                     </div>
                     <div>
                         <label class="block text-gray-700 mb-2">Contact Person</label>
-                        <input type="text" id="sponsor-contact" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                        <input type="text" id="sponsor-contact" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500" required>
                     </div>
                     <div>
                         <label class="block text-gray-700 mb-2">Email</label>
-                        <input type="email" id="sponsor-email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                        <input type="email" id="sponsor-email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500" required>
                     </div>
                     <div>
                         <label class="block text-gray-700 mb-2">Message</label>
-                        <textarea id="sponsor-message" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Tell us about your sponsorship interests..."></textarea>
+                        <textarea id="sponsor-message" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500" placeholder="Tell us about your sponsorship interests..."></textarea>
                     </div>
                 </div>
                 <div class="flex justify-end space-x-4 mt-6">
                     <button type="button" onclick="hideSponsorModal()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50">
                         Cancel
                     </button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                    <button type="submit" class="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800">
                         Send Inquiry
                     </button>
                 </div>
@@ -909,7 +953,7 @@
                 <button onclick="hideExternalLinkModal()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50">
                     Cancel
                 </button>
-                <button onclick="proceedToExternalLink()" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                <button onclick="proceedToExternalLink()" class="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800">
                     Continue
                 </button>
             </div>

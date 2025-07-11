@@ -252,6 +252,60 @@ router.get('/analytics-data', isAuthenticated, isOrganizer, async (req, res) => 
     // Average rating calculation
     const avgRating = 4.8; // You can calculate this from actual ratings
     
+    // Generate real recent activity
+    const recentActivity = [];
+    
+    // Recent event creation
+    const recentEvents = events
+      .sort((a, b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date))
+      .slice(0, 2);
+    
+    recentEvents.forEach(event => {
+      recentActivity.push({
+        type: 'event_created',
+        title: 'New event created',
+        description: `${event.title}`,
+        time: new Date(event.createdAt || event.date).toLocaleDateString(),
+        icon: 'fas fa-plus'
+      });
+    });
+
+    // Recent approvals/rejections
+    const recentApprovals = events
+      .filter(event => event.approvedAt)
+      .sort((a, b) => new Date(b.approvedAt) - new Date(a.approvedAt))
+      .slice(0, 1);
+    
+    recentApprovals.forEach(event => {
+      recentActivity.push({
+        type: 'event_approved',
+        title: 'Event approved',
+        description: `${event.title} was approved by admin`,
+        time: new Date(event.approvedAt).toLocaleDateString(),
+        icon: 'fas fa-check'
+      });
+    });
+
+    // Total registrations summary
+    if (totalAttendees > 0) {
+      recentActivity.push({
+        type: 'registrations',
+        title: `${totalAttendees} total registrations`,
+        description: `Across all your ${approvedEvents.length} approved events`,
+        time: 'Updated now',
+        icon: 'fas fa-user-plus'
+      });
+    }
+
+    // Dashboard update
+    recentActivity.push({
+      type: 'status_update',
+      title: 'Dashboard updated',
+      description: 'Analytics refreshed with latest data',
+      time: new Date().toLocaleString(),
+      icon: 'fas fa-chart-line'
+    });
+
     res.status(200).json({
       totalEvents: events.length,
       activeEvents: activeEvents.length,
@@ -265,29 +319,7 @@ router.get('/analytics-data', isAuthenticated, isOrganizer, async (req, res) => 
           count
         }))
       },
-      recentActivity: [
-        {
-          type: 'event_created',
-          title: 'New event created',
-          description: activeEvents.length > 0 ? `${activeEvents[activeEvents.length - 1].title} - ${new Date(activeEvents[activeEvents.length - 1].createdAt || activeEvents[activeEvents.length - 1].date).toLocaleDateString()}` : 'No recent events',
-          time: activeEvents.length > 0 ? new Date(activeEvents[activeEvents.length - 1].createdAt || activeEvents[activeEvents.length - 1].date).toLocaleString() : '',
-          icon: 'fas fa-plus'
-        },
-        {
-          type: 'registrations',
-          title: `${totalAttendees} total registrations`,
-          description: `Across all your events`,
-          time: 'Updated now',
-          icon: 'fas fa-user-plus'
-        },
-        {
-          type: 'status_update',
-          title: 'Dashboard updated',
-          description: 'Analytics refreshed with latest data',
-          time: new Date().toLocaleString(),
-          icon: 'fas fa-chart-line'
-        }
-      ]
+      recentActivity: recentActivity.slice(0, 4) // Limit to 4 items
     });
   } catch (err) {
     console.error('Error fetching analytics data:', err);
@@ -493,35 +525,6 @@ router.post('/:id/question', async (req, res) => {
   } catch (err) {
     console.error('Error submitting question:', err);
     res.status(500).json({ message: 'Error submitting question', error: err.message });
-  }
-});
-
-// GET organizer dashboard stats
-router.get('/dashboard-stats', isAuthenticated, isOrganizer, async (req, res) => {
-  try {
-    const organizerId = req.session.userId;
-    const events = await Event.find({ organizer: organizerId });
-    
-    const totalEvents = events.length;
-    const activeEvents = events.filter(event => event.approvalStatus === 'approved' && new Date(event.date) >= new Date()).length;
-    const totalAttendees = events.reduce((sum, event) => sum + (event.registrations ? event.registrations.length : 0), 0);
-    const pendingApprovals = events.filter(event => event.approvalStatus === 'pending').length;
-    
-    // Calculate sponsor inquiries and questions
-    const totalSponsorInquiries = events.reduce((sum, event) => sum + (event.sponsorInquiries ? event.sponsorInquiries.length : 0), 0);
-    const totalQuestions = events.reduce((sum, event) => sum + (event.questions ? event.questions.length : 0), 0);
-    
-    res.status(200).json({
-      totalEvents,
-      activeEvents,
-      totalAttendees,
-      pendingApprovals,
-      totalSponsorInquiries,
-      totalQuestions
-    });
-  } catch (err) {
-    console.error('Error fetching dashboard stats:', err);
-    res.status(500).json({ message: 'Error fetching dashboard stats', error: err.message });
   }
 });
 

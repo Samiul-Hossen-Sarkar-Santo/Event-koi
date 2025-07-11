@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadSponsorInquiries();
     loadQuestions();
     loadNotices();
+    loadRecentActivity();
     
     // Initialize charts after a small delay to ensure DOM is ready
     setTimeout(() => {
@@ -247,21 +248,31 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Dashboard Data Loading Functions ---
     async function loadDashboardData() {
         try {
-            const response = await fetch('/events/dashboard-stats', {
-                credentials: 'include'
-            });
+            // Load both dashboard stats and analytics data
+            const [dashboardResponse, analyticsResponse] = await Promise.all([
+                fetch('/events/dashboard-stats', { credentials: 'include' }),
+                fetch('/events/analytics-data', { credentials: 'include' })
+            ]);
             
-            if (response.ok) {
-                const stats = await response.json();
+            if (dashboardResponse.ok) {
+                const stats = await dashboardResponse.json();
                 updateDashboardStats(stats);
-            } else {
-                console.error('Failed to load dashboard stats');
-                // Load fallback demo data
+            }
+            
+            if (analyticsResponse.ok) {
+                const analyticsData = await analyticsResponse.json();
+                // Update dashboard stats with analytics data
+                updateDashboardStats(analyticsData);
+                // Update charts with real data
+                updateChartsWithRealData(analyticsData);
+            }
+            
+            if (!dashboardResponse.ok && !analyticsResponse.ok) {
+                console.error('Failed to load dashboard data');
                 loadFallbackData();
             }
         } catch (error) {
             console.error('Error loading dashboard data:', error);
-            // Load fallback demo data
             loadFallbackData();
         }
     }
@@ -275,8 +286,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const activeEventsEl = document.getElementById('active-events-count');
         if (activeEventsEl) activeEventsEl.textContent = stats.activeEvents || 0;
 
-        // Update charts with real data
-        updateChartsWithRealData(stats);
+        // Update Total Attendees (if available)
+        const totalAttendeesEl = document.getElementById('total-attendees-count');
+        if (totalAttendeesEl) totalAttendeesEl.textContent = stats.totalAttendees || 0;
+
+        // Update Monthly Events (if available)
+        const monthlyEventsEl = document.getElementById('monthly-events-count');
+        if (monthlyEventsEl) monthlyEventsEl.textContent = stats.monthlyEvents || 0;
     }
 
     async function loadMyEvents() {
@@ -1521,9 +1537,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Initialize Analytics Charts
-    function initializeCharts() {
-        createEventsChart();
-        createAttendeesChart();
+    async function initializeCharts() {
+        // Try to load real data first
+        try {
+            const response = await fetch('/events/analytics-data', {
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                const analyticsData = await response.json();
+                // Create charts with real data
+                createEventsChart(analyticsData.chartData?.eventsOverTime);
+                createAttendeesChart(analyticsData.chartData?.eventsByCategory);
+            } else {
+                // Create charts with placeholder data
+                createEventsChart();
+                createAttendeesChart();
+            }
+        } catch (error) {
+            console.error('Error loading analytics data:', error);
+            // Create charts with placeholder data
+            createEventsChart();
+            createAttendeesChart();
+        }
     }
 
     // Store chart instances for updates
@@ -1531,17 +1567,21 @@ document.addEventListener('DOMContentLoaded', function() {
     let attendeesChart = null;
 
     // Events Over Time Chart with Real Data
-    function createEventsChart() {
+    function createEventsChart(realData = null) {
         const ctx = document.getElementById('eventsChart');
         if (!ctx) return;
+
+        // Use real data if available, otherwise use placeholder
+        const labels = realData ? realData.map(item => item.month) : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+        const data = realData ? realData.map(item => item.events) : [0, 0, 0, 0, 0, 0];
 
         const config = {
             type: 'line',
             data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                labels: labels,
                 datasets: [{
                     label: 'Events Created',
-                    data: [12, 19, 3, 5, 2, 3],
+                    data: data,
                     borderColor: 'rgba(139, 92, 246, 1)',
                     backgroundColor: 'rgba(139, 92, 246, 0.1)',
                     tension: 0.4,
@@ -1588,23 +1628,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Attendees by Category Chart with Real Data
-    function createAttendeesChart() {
+    function createAttendeesChart(realData = null) {
         const ctx = document.getElementById('attendeesChart');
         if (!ctx) return;
+
+        // Use real data if available, otherwise use placeholder
+        const labels = realData ? realData.map(item => item.category) : ['No Events', 'Created', 'Yet'];
+        const data = realData ? realData.map(item => item.count) : [1, 0, 0];
+        const colors = [
+            '#8B5CF6', '#06B6D4', '#10B981', '#F59E0B', '#EF4444',
+            '#8B5CF6', '#06B6D4', '#10B981', '#F59E0B', '#EF4444'
+        ];
 
         const config = {
             type: 'doughnut',
             data: {
-                labels: ['Hackathon', 'Workshop', 'Conference', 'Networking', 'Other'],
+                labels: labels,
                 datasets: [{
-                    data: [30, 25, 20, 15, 10],
-                    backgroundColor: [
-                        '#8B5CF6',
-                        '#06B6D4',
-                        '#10B981',
-                        '#F59E0B',
-                        '#EF4444'
-                    ],
+                    data: data,
+                    backgroundColor: colors.slice(0, labels.length),
                     borderWidth: 2,
                     borderColor: '#ffffff',
                     hoverBorderWidth: 3,
@@ -1659,23 +1701,25 @@ document.addEventListener('DOMContentLoaded', function() {
             if (analyticsResponse.ok) {
                 const analyticsData = await analyticsResponse.json();
                 
-                // Update events chart
-                if (eventsChart && analyticsData.eventsOverTime) {
-                    eventsChart.data.labels = analyticsData.eventsOverTime.labels;
-                    eventsChart.data.datasets[0].data = analyticsData.eventsOverTime.data;
+                // Update events chart with real monthly data
+                if (eventsChart && analyticsData.chartData?.eventsOverTime) {
+                    const monthlyData = analyticsData.chartData.eventsOverTime;
+                    eventsChart.data.labels = monthlyData.map(item => item.month);
+                    eventsChart.data.datasets[0].data = monthlyData.map(item => item.events);
                     eventsChart.update();
                 }
                 
-                // Update attendees chart
-                if (attendeesChart && analyticsData.eventsByCategory) {
-                    attendeesChart.data.labels = analyticsData.eventsByCategory.labels;
-                    attendeesChart.data.datasets[0].data = analyticsData.eventsByCategory.data;
+                // Update category chart with real category data
+                if (attendeesChart && analyticsData.chartData?.eventsByCategory) {
+                    const categoryData = analyticsData.chartData.eventsByCategory;
+                    attendeesChart.data.labels = categoryData.map(item => item.category);
+                    attendeesChart.data.datasets[0].data = categoryData.map(item => item.count);
                     attendeesChart.update();
                 }
             }
         } catch (error) {
             console.error('Error loading analytics data:', error);
-            // Charts will show default demo data
+            // Charts will continue showing their current data
         }
     }
 
@@ -1687,5 +1731,78 @@ document.addEventListener('DOMContentLoaded', function() {
         const activeEventsEl = document.getElementById('active-events-count');
         if (activeEventsEl) activeEventsEl.textContent = '5';
     }
+
+    // Load and display real recent activity
+    async function loadRecentActivity() {
+        try {
+            const response = await fetch('/events/analytics-data', {
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.recentActivity) {
+                    displayRecentActivity(data.recentActivity);
+                }
+            }
+        } catch (error) {
+            console.error('Error loading recent activity:', error);
+            // Keep existing hardcoded activity if API fails
+        }
+    }
+
+    // Display recent activity in the UI
+    function displayRecentActivity(activities) {
+        const container = document.getElementById('recent-activity');
+        if (!container) return;
+
+        // Show empty state if no activities
+        if (!activities || activities.length === 0) {
+            container.innerHTML = `
+                <div class="activity-item flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-history text-gray-400 text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-500">No recent activity</p>
+                        <p class="text-xs text-gray-400">Start creating events to see activity here</p>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        // Generate icon color classes
+        const iconColors = {
+            'event_created': { bg: 'bg-purple-100', text: 'text-purple-600' },
+            'registrations': { bg: 'bg-emerald-100', text: 'text-emerald-600' },
+            'status_update': { bg: 'bg-blue-100', text: 'text-blue-600' },
+            'event_approved': { bg: 'bg-green-100', text: 'text-green-600' },
+            'event_rejected': { bg: 'bg-red-100', text: 'text-red-600' }
+        };
+
+        // Generate HTML for activities
+        const activityHTML = activities.map(activity => {
+            const colors = iconColors[activity.type] || { bg: 'bg-gray-100', text: 'text-gray-600' };
+            
+            return `
+                <div class="activity-item flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <div class="w-8 h-8 ${colors.bg} rounded-full flex items-center justify-center">
+                        <i class="${activity.icon || 'fas fa-info'} ${colors.text} text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-900">${activity.title}</p>
+                        <p class="text-xs text-gray-500">${activity.description}</p>
+                        ${activity.time ? `<p class="text-xs text-gray-400 mt-1">${activity.time}</p>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        container.innerHTML = activityHTML;
+    }
+
+    // Load recent activity on page load
+    loadRecentActivity();
 
 });

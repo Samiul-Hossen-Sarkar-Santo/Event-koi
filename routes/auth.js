@@ -45,7 +45,6 @@ router.post('/signup', async (req, res) => {
 
     await user.save();
 
-    // You might want to automatically log in the user after signup
     req.session.userId = user.id;
     req.session.userRole = user.role;
     req.session.userName = user.name;
@@ -111,7 +110,6 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Create session with more user info
     req.session.userId = user._id;
     req.session.userRole = user.role;
     req.session.userName = user.name;
@@ -297,7 +295,6 @@ router.get('/admin-check', (req, res) => {
 // GET /auth/check - Check authentication status
 router.get('/check', (req, res) => {
   if (req.session && req.session.userId) {
-    // Get user details from session if available
     const user = {
       id: req.session.userId,
       role: req.session.userRole,
